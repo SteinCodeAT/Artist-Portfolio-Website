@@ -1,7 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Card from '../components/Card.astro';
-import type { Code } from 'astro:components';
+
+import PixelBallImage from '../img/pixel_ball.png'
+
+import CcProfileImage from '../img/cc.png';
+import { Image } from 'astro:assets';
 
 const description = `
 Cagdas Cecen is a Vienna based media artist. He studied Media Art : 
@@ -20,7 +23,8 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 
 <Layout title="Çağdaş Çeçen" description={description}>
 	<main>
-		<div class="vertical-lines-container">
+		<section>			
+			<div class="vertical-lines-container">
 				<!-- Generate multiple divs like this for more lines -->
 				<div class="vertical-line"></div>
 				<div class="vertical-line"></div>
@@ -28,62 +32,59 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 				<div class="vertical-line"></div>
 				<div class="vertical-line"></div>
 				<!-- ... -->
-				
-			<div class="link-card-1">
-				<div class="card-content">
-					<h1 class="font-family-header font-extrabold">DESIGN.TECH.A</h1>
 					
-					<p class="instructions font-family-header">
-					CC
-				</p>
-
+				<div class="link-card-1">
+					<div class="card-content">
+						<h1 class="font-family-header font-extrabold">DESIGN.TECH.A</h1>
+						
+						<p class="instructions font-family-header">
+						&copy; <span class="copyright-year"></span>
+					</p>
 				</div>
-				
-			</div>
-			<div class="link-card-2">
-				<div class="content-card">
-					<div class="circle-images">
-						<div class="image-container">
-						<img src="../img/pixel_ball.png" alt="Home" class="main-circle"/>
-
+					
+				</div>
+				<div class="link-card-2">
+					<div class="content-card">
+						<div class="circle-images">
+							<div class="image-container">
+								<Image class="main-circle" src={PixelBallImage} alt="main circle in illustration" />
+							</div>
+							
+							<!-- rotating circles -->
+							<div class="circle circle1"></div>
+							<div class="circle circle2"></div>
+							<div class="circle circle3"></div>
+							<div class="circle circle4"></div>
+							<div class="circle circle5"></div>
+							<div class="circle circle6"></div>
+							<div class="circle circle7"></div>
+							<div class="circle circle8"></div>
+							<div class="circle circle9"></div>
+							<div class="circle circle10"></div>
+							<div class="circle circle11"></div>
+						<!-- background dots -->
+							<div class="dots-containter"></div>
+						</div>
+						<div class="content-card-2">
+							<h1 class="font-family-header glow sub-title">MEDIA:ART<span class="tubelight">S</span></h1>
+							<div class="line-container"></div>
+							<h2 class="front-numbers">29.09.2023/200924</h2>
+							<button class="btn dot"> &gt; projects </button>
 						</div>
 						
-						<!-- rotating circles -->
-						<div class="circle circle1"></div>
-						<div class="circle circle2"></div>
-						<div class="circle circle3"></div>
-						<div class="circle circle4"></div>
-						<div class="circle circle5"></div>
-						<div class="circle circle6"></div>
-						<div class="circle circle7"></div>
-						<div class="circle circle8"></div>
-						<div class="circle circle9"></div>
-						<div class="circle circle10"></div>
-						<div class="circle circle11"></div>
-					<!-- background dots -->
-						<div class="dots-containter"></div>
-					</div>
-					<div class="content-card-2">
-						<h1 class="font-family-header glow sub-title">MEDIA:ART<span class="tubelight">S</span></h1>
-						<div class="line-container"></div>
-						<h2 class="front-numbers">29.09.2023/200924</h2>
-						<button class="btn dot"> &gt; projects </button>
-					</div>
-					
-					
+						
 
+					</div>
+						
 				</div>
-					
+				
 			</div>
 			
-		</div>
+			<div class="vertical-line-2"></div>
+			<div class="vertical-line-2"></div>
+		</section>	
 		
-				<!-- Generate multiple divs like this for more lines -->
-		<div class="vertical-line-2"></div>
-		<div class="vertical-line-2"></div>
-		
-		
-		<div class="link-card-3">
+		<section class="link-card-3">
 			<div class="center">
 				<div class="stack-area">
 					<div class="left">
@@ -359,91 +360,107 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 					</div>
 
 				</div>
-				<div class="bottom">
-					
-					<section>
-						<div class="imgbox">
-							<h1>ABOUT ME</h1>
-							<img src="../img/cc.png">
-							<h1>ABOUT ME</h1>
-							<hr class="contact-line glow">
-						</div>
-						<div class="textbox">
-							
-							<p>Cagdas Cecen is a Vienna based media artist. He studied Media Art :
-								Digital Art at University of Applied Arts Vienna and Physics at University of Vienna.
-								Currently, his artistic practices focuses in the relationship between
-								human movement, space and uncertainity. Since 2018 he is developing
-								new ways of interaction between human and space by using synesthetic
-								nature of Quantum Physics not just symbolic or inspirational way
-								but as an active element in his artworks. He strongly believes that
-								democratization of Quantum Physics will open new artistic ways
-								to reexplore our surroundings and improving our synesthetic sensation.
-								His projects have been already presented in several countries:
-								Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
-								Conciliating with his artistic activity.
-						</p>
-						<br>
-						<h2>Exhibitions/Projects</h2>
-						<br>
-						<div class="exhibitions-container">
-
-							<h5>2022 |</h5>
-
-						<p>
-							"TRAUMATRAUMA" feat. B.A.D.-Vienna-Austria
-							"Distance Fog" feat. B.A.D. Wienstation-Vienna - Austria
-							"The Cellular Fidelity" Alte Schieberkammer- Vienna -Austria
-						</p>
-						<br>	
-						<h5>2021 </h5>	
-							
-						<p>Participating artist at “Transform-Arte 2021” - Eisenstadt - Austria
-							Participating artist at “Angewandte Festival 2021” - Vienna - Austria
-						</p>	
-						<br>	
-						<h5>2019 </h5>	
-							
-						<p>	“KAIROS” Recall of Earth Part 2 / Collective exhibition / Thessalonikki - Greece
-							“Spannung!”-Medienwerkstatt / Collective exhibition / Vienna - Austria
-							“Fabrikraum #01” / Collective exhibition / Vienna - Austria
-							“5.5” Mixed media installation /La Biennale di Venezia , Biennale Sessions / Venice - Italy
-							Participating artist at “Offene Ateliers in Margareten”, Künstlerhaus / Vienna - Austria
-							“Reflecting Records” / Collective exhibition / Vienna - Austria
-						</p>
-						<br>
-						<h5>2018 |</h5>
-							
-						<p>“A community of individuals” / Collective exhibition / SOHO Festival/ Vienna - Austria</p>
-						<br>	
-						<h5>2017 |</h5>
-							
-						<p>	“DIGITAL WORKFLOW” / Collective exhibition / Vienna - Austria
-							“UNTAPPED SUR-PLUS” / Collective exhibition / Künstlerhaus / Vienna - Austria
-							“Disintegrate“ - Stop-Motion PSA Film für “Ministerium für ein lebenswertes Österreich” - “Danube Projekt”- Der Haus der Europäischen
-							Union / Vienna - Austria
-						</p>
-						<br>	
-						<h5>2016 |</h5>
-							
-						<p></p>	“Infected Structures”/ Collective exhibition / Sokolowsko - Poland
-							„Smells Like Sh.t“ Video Documenary “TV916” / Trebinje - Bosnia and Herzegovina
-							„....Sowohl als auch.....“ /Performance/ Vienna - Austria</p>
-
-						</div>
+		
+				<div class="about-me">
+					<div class="imgbox">
+						<h1>ABOUT ME</h1>
+						<Image src={CcProfileImage} alt="Cagdas Cecen Profile Image" />
+						<h1>ABOUT ME</h1>
+						<hr class="contact-line glow">
+					</div>
+					<div class="textbox">
 						
+						<p>Cagdas Cecen is a Vienna based media artist. He studied Media Art :
+							Digital Art at University of Applied Arts Vienna and Physics at University of Vienna.
+							Currently, his artistic practices focuses in the relationship between
+							human movement, space and uncertainity. Since 2018 he is developing
+							new ways of interaction between human and space by using synesthetic
+							nature of Quantum Physics not just symbolic or inspirational way
+							but as an active element in his artworks. He strongly believes that
+							democratization of Quantum Physics will open new artistic ways
+							to reexplore our surroundings and improving our synesthetic sensation.
+							His projects have been already presented in several countries:
+							Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
+							Conciliating with his artistic activity.
+					</p>
+					<br>
+					<h2>Exhibitions/Projects</h2>
+					<br>
+					<div class="exhibitions-container">
+
+						<h5>2022 |</h5>
+
+					<p>
+						"TRAUMATRAUMA" feat. B.A.D.-Vienna-Austria
+						"Distance Fog" feat. B.A.D. Wienstation-Vienna - Austria
+						"The Cellular Fidelity" Alte Schieberkammer- Vienna -Austria
+					</p>
+					<br>	
+					<h5>2021 </h5>	
 						
-						</div>
-					</section>
+					<p>Participating artist at “Transform-Arte 2021” - Eisenstadt - Austria
+						Participating artist at “Angewandte Festival 2021” - Vienna - Austria
+					</p>	
+					<br>	
+					<h5>2019 </h5>	
+						
+					<p>	“KAIROS” Recall of Earth Part 2 / Collective exhibition / Thessalonikki - Greece
+						“Spannung!”-Medienwerkstatt / Collective exhibition / Vienna - Austria
+						“Fabrikraum #01” / Collective exhibition / Vienna - Austria
+						“5.5” Mixed media installation /La Biennale di Venezia , Biennale Sessions / Venice - Italy
+						Participating artist at “Offene Ateliers in Margareten”, Künstlerhaus / Vienna - Austria
+						“Reflecting Records” / Collective exhibition / Vienna - Austria
+					</p>
+					<br>
+					<h5>2018 |</h5>
+						
+					<p>“A community of individuals” / Collective exhibition / SOHO Festival/ Vienna - Austria</p>
+					<br>	
+					<h5>2017 |</h5>
+						
+					<p>	“DIGITAL WORKFLOW” / Collective exhibition / Vienna - Austria
+						“UNTAPPED SUR-PLUS” / Collective exhibition / Künstlerhaus / Vienna - Austria
+						“Disintegrate“ - Stop-Motion PSA Film für “Ministerium für ein lebenswertes Österreich” - “Danube Projekt”- Der Haus der Europäischen
+						Union / Vienna - Austria
+					</p>
+					<br>	
+					<h5>2016 |</h5>
+						
+					<p></p>	“Infected Structures”/ Collective exhibition / Sokolowsko - Poland
+						„Smells Like Sh.t“ Video Documenary “TV916” / Trebinje - Bosnia and Herzegovina
+						„....Sowohl als auch.....“ /Performance/ Vienna - Austria</p>
+
+					</div>
 					
 					
+					</div>
+				</div>
+							
 					
-				</div>	
+					
 			</div>
 			
 				
-		</div>
+		</section>
 	</main>
+
+	<footer>
+
+		&copy; <span class="copyright-year"></span>
+
+	</footer>
+
+	<script>
+		const today = new Date();
+			
+		const copyrightYearLabels = document.querySelectorAll(".copyright-year")
+		copyrightYearLabels.forEach(item => {
+			if (item !== null) {
+				item.innerText = today.getFullYear().toString();
+			}
+		})
+	</script>
+
 </Layout>
 
 <script src="../scripts/apps.js"></script>
