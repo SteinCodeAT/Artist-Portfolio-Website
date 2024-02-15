@@ -1,20 +1,14 @@
-# Astro Starter Kit: Basics
 
-```sh
-npm create astro@latest -- --template basics
-```
+# Cagdas Cecen Portfolio Website
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+This repository holds the code for the portfolio website of Cagdas Cecen. It is hosted under [https://www.cagdascecen.com/](https://www.cagdascecen.com/).
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+[![Built with Astro](https://astro.badg.es/v2/built-with-astro/small.svg)](https://astro.build)
 
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
 
-## 🚀 Project Structure
+## Project Structure
 
-Inside of your Astro project, you'll see the following folders and files:
+Inside of your project, you see the following folders and files:
 
 ```text
 /
@@ -25,18 +19,25 @@ Inside of your Astro project, you'll see the following folders and files:
 │   │   └── Card.astro
 │   ├── layouts/
 │   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
+│   ├── pages/
+│   │    └── index.astro
+│   └── img/
+│       └── cc.png
 └── package.json
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+The `src` folder holds all code that is written to build the final website. Files in the `public` folder are just directly copied to the final build.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+The folder `components` holds snippets that are reused across the website.
 
-Any static assets, like images, can be placed in the `public/` directory.
+The `layouts` folder holds the general layout HTML that is used to build pages.
 
-## 🧞 Commands
+The folder `pages` holds the final pages of the website. All routes and urls are based on these files.
+
+Images placed in the `img` folder are automatically converted to webp and optimizied in the final html build.
+
+
+## Commands
 
 All commands are run from the root of the project, from a terminal:
 
@@ -49,6 +50,13 @@ All commands are run from the root of the project, from a terminal:
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 
-## 👀 Want to learn more?
+## Making changes to the website
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+1. Change the relevant file in the `src` folder. 
+2. Run `npm run build` to create a new build of the website. The final files are located in the `dist` folder.
+3. Copy the final files from the `dist` folder to the web server (usually using an ftp client)
+
+Since astro builds mainly static html files you can alternatively also directly 
+change the html file in `dist` and copy this file to the webserver.
+
+**WARNING**: This can go horribly wrong if you change class-names or the html structure. If you do that, stick to changes of pure text.
