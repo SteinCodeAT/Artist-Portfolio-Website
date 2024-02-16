@@ -1,0 +1,59 @@
+---
+
+import Layout from '../../layouts/Layout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import '../../styles/sub.css';
+
+import Behind1 from '../../img/behind1.png'
+import Behind2 from '../../img/behind2.png'
+import Behind3 from '../../img/behind3.png'
+import Behind4 from '../../img/behind4.png'
+
+
+const project = {
+    title: "Behind the box",
+    type: "Interactive Mixed-Media Installation",
+    videos: [{url: "https://player.vimeo.com/video/400722312?autoplay=1&muted=1&loop=1&autopause=0&background=1&playsinline=1"}],
+    images: [Behind1, Behind2, Behind3, Behind4], 
+    artist: "Cagdas Cecen",
+    verticaltext: "Behind the box",
+    description: `Cubic object with translucent lcd panel and multi channel mapped
+                audio transmitting led arrays as backlight. Observers can also
+                interact with the installation ”Behind the box” by moving the
+                apparatus from the project “5.5”. In this way, they listen
+                different sounds which come from box. Those sounds can be audio
+                recordings from a war zone, a suicide youtuber, a make up video,
+                and many other. Without any interaction installation stays silent.
+                Visuals and movements on screen are working on Unity Engine .
+                Translucent lcd creates an augmented reality feeling depending on
+                the angle when observer looks inside the box. Apparatus is
+                functioning just as receiver and amplifier, it does not alter anything.
+                Audio cables from both Apparatus are connected to camera's
+                microphone input for this presentation. What observers hear is the
+                audio mapped led arrays and when they move around with the
+                apparatus, they hear mixtures of mapped sounds`,
+    link: "https://vimeo.com/400722312"
+};
+
+const subdescription = `
+Cagdas Cecen is a Vienna based media artist. He studied Media Art : 
+Digital Art at University of Applied Arts Vienna and Physics at University  of Vienna. 
+Currently, his artistic practices focuses in the relationship between 
+human movement, space and uncertainity. Since 2018 he is developing 
+new ways of interaction between human and space by using synesthetic 
+nature of Quantum Physics not just symbolic or inspirational way 
+but as an active element in his artworks. He strongly believes that 
+democratization of Quantum Physics will open new artistic ways 
+to reexplore our surroundings and improving our synesthetic sensation. 
+His projects have been already presented in several countries: 
+Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
+`
+---
+
+<Layout title="Çağdaş Çeçen" description={subdescription}>
+
+    <ProjectCard project={project} />
+
+</Layout>
+
+<script src="../../scripts/sub.js"></script>

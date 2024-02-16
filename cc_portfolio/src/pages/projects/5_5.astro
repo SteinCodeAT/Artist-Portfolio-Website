@@ -1,0 +1,54 @@
+---
+
+import Layout from '../../layouts/Layout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import '../../styles/sub.css';
+
+import Five1 from '../../img/5_1.png'
+import Five2 from '../../img/5_2.png'
+import Five3 from '../../img/5_3.png'
+import Five4 from '../../img/5_4.png'
+import Five5 from '../../img/5_5.png'
+import Five6 from '../../img/5_6.png'
+import Five7 from '../../img/5_7.png'
+import Five8 from '../../img/5_8.png'
+
+
+const project = {
+    title: "5.5",
+    type: "Wearable device, Audio Installation",
+    videos: [{url: "https://player.vimeo.com/video/504789015?autoplay=1&muted=1&loop=1&autopause=0&background=1&playsinline=1"}],
+    images: [Five1, Five2, Five3, Five4, Five5, Five6, Five7, Five8], 
+    artist: "Cagdas Cecen",
+    verticaltext: "5.5",
+    description: `5.5 transforms artificial light into sound. When viewers put on the
+                headset and headphones, they hear a mixture of electromagnetic
+                disturbances caused by the artificial light sources in the room. 5.5
+                invites you to an ambient synaesthetic experience. The apparatus
+                becomes an artificial sensory organ: follow the white noise, let your
+                ears guide you, and experience the space anews`,
+    link: " https://vimeo.com/504789015"
+};
+
+const subdescription = `
+Cagdas Cecen is a Vienna based media artist. He studied Media Art : 
+Digital Art at University of Applied Arts Vienna and Physics at University  of Vienna. 
+Currently, his artistic practices focuses in the relationship between 
+human movement, space and uncertainity. Since 2018 he is developing 
+new ways of interaction between human and space by using synesthetic 
+nature of Quantum Physics not just symbolic or inspirational way 
+but as an active element in his artworks. He strongly believes that 
+democratization of Quantum Physics will open new artistic ways 
+to reexplore our surroundings and improving our synesthetic sensation. 
+His projects have been already presented in several countries: 
+Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
+`
+---
+
+<Layout title="Çağdaş Çeçen" description={subdescription}>
+
+    <ProjectCard project={project} />
+
+</Layout>
+
+<script src="../../scripts/sub.js"></script>

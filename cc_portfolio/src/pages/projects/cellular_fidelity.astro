@@ -1,0 +1,80 @@
+---
+
+import Layout from '../../layouts/Layout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import '../../styles/sub.css';
+
+import Cellular1 from '../../img/cellular1.png'
+import Cellular2 from '../../img/cellular2.png'
+import Cellular3 from '../../img/cellular3.png'
+import Cellular4 from '../../img/cellular4.png'
+import Cellular5 from '../../img/cellular5.png'
+import Cellular6 from '../../img/cellular6.png'
+import Cellular7 from '../../img/cellular7.png'
+
+const project = {
+    title: "The Cellular Fidelity",
+    type: "Interactive Sound Installation",
+    videos: [{url: "https://player.vimeo.com/video/715293038?autoplay=1&muted=1&autopause=0&loop=1&playsinline=1"}],
+    images: [Cellular1, Cellular2, Cellular3, Cellular4, Cellular5, Cellular6, Cellular7], 
+    artist: "Cagdas Cecen",
+    verticaltext: "The Cellular Fidelity",
+    description: `The Cellular Fidelity creates a three-dimensional aquarium that breaks its boundaries using 
+    light and sound. Audio is encoded into lasers that project through microscopic aquatic
+                            environments into the gallery space. On the floor is a cast, colorful view of what, in reality, is
+                            floating tiny and suspended above the visitors' heads. The laser reveals its sound when a
+                            visitor steps into the shared aquatic space holding a sensor. Field recordings from the
+                            collection sites of 30 groups of marine microbes fill the space- bending, humming, and
+                            distorting with the visitor's movement. But the audio changes without a visitor, as well.
+                            Because the audio-encoded laser first travels through the microbes' environment, they are
+                            the first beings to make contact with it. When a cellular shape 'runs' across the floor, the
+                            audio reshapes in response to the actual microbe's interaction with the laser up above,
+                            picking up movement from above and making it visible and audible from below. The
+                            potential for interaction permeates this whole work. That is, interaction exists in what is
+                            visual and loud and in what is potential. If every visitor stood perfectly still, holding out their
+                            sensors, they would still hear the audio change in a memorable chorus of microbial
+                            decisions. You see, the microbes have shadowed spaces and,, therefore,, the option to
+                            engage with the laser. Nobody is obligated to communicate in cellular Fidelity. We can't
+                            talk, but we can hear each other. While one group sees, another sense. While only some
+                            microbe in these water samples are capable of sensing light, many are, and several also
+                            display different behaviours based on the volume and interference of sound. The microbes'
+                            movements create a sound for the visitors. The visitors' movements create a sound for the
+                            microbes. The light is shaped from both directions. Communication goes two ways. While
+                            one group sees, another sense. While not every microbe in these water samples can sense
+                            light, many are, and several also display different behaviours based on the volume and
+                            interference of sound. Dead and decaying cells remain motionless while their descendants'
+                            shadows distort them. Movements that would be invisible or indecipherable become visible
+                            and audible. We can stay and spend time here. A traditional aquarium is a meeting point
+                            that is also a boundary. We observe each other in our respective three-dimensional spaces,
+                            separate and uncommunicative. Outside of the aquarium, even this limited observation is
+                            fading. We are becoming more and more separated into our individual environments and
+                            roles. We can only be aware of each other on special occasions or moments of severe harm.
+                            Everything disconnects separate and moves on. Where is the value in being still, slow,
+                            spending time to observe and be in a relationship with another, watery, silent world? In The
+                            Cellular Fidelity, everyone is invited to step- or propel themselves- into a relationship of
+                            mutual observation.`,
+    link: "https://vimeo.com/708169950"
+};
+
+const subdescription = `
+Cagdas Cecen is a Vienna based media artist. He studied Media Art : 
+Digital Art at University of Applied Arts Vienna and Physics at University  of Vienna. 
+Currently, his artistic practices focuses in the relationship between 
+human movement, space and uncertainity. Since 2018 he is developing 
+new ways of interaction between human and space by using synesthetic 
+nature of Quantum Physics not just symbolic or inspirational way 
+but as an active element in his artworks. He strongly believes that 
+democratization of Quantum Physics will open new artistic ways 
+to reexplore our surroundings and improving our synesthetic sensation. 
+His projects have been already presented in several countries: 
+Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
+`
+---
+
+<Layout title="Çağdaş Çeçen" description={subdescription}>
+
+    <ProjectCard project={project} />
+
+</Layout>
+
+<script src="../../scripts/sub.js"></script>
