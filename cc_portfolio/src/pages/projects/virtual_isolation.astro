@@ -1,0 +1,55 @@
+---
+
+import Layout from '../../layouts/Layout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import '../../styles/sub.css';
+
+import Virtual1 from '../../img/virtual1.png'
+import Virtual2 from '../../img/virtual2.png'
+import Virtual3 from '../../img/virtual3.png'
+import Virtual4 from '../../img/virtual4.png'
+
+
+
+const project = {
+    title: "Visual Isolation",
+    type: "Wearable device, interactive Installation",
+    videos: [{url: "https://player.vimeo.com/video/429057286?autoplay=1&muted=1&loop=1&autopause=0&background=1&playsinline=1"}],
+    images: [Virtual1, Virtual2, Virtual3, Virtual4], 
+    artist: "Cagdas Cecen",
+    verticaltext: "Visual Isolation",
+    description: `Visual Isolation is a wearable interactive object with a display which
+                demonstrates real-time vital readings and memories.
+                Our lives are all about numbers and graphs for quite a while. Society tries to
+                adopt new relation between our survival and our social interactions during
+                isolation times and we still don't know what future will bring on us.
+                Although human memory is highly depending on our social interactions, we
+                as individuals are stuck between fear and losing social abilities.
+                “Is surviving alone enough to stay human, what is left without memories
+                with others ? “ - this was the question that lead me to develop this
+                project`,
+    link: "https://vimeo.com/429057286"
+};
+
+const subdescription = `
+Cagdas Cecen is a Vienna based media artist. He studied Media Art : 
+Digital Art at University of Applied Arts Vienna and Physics at University  of Vienna. 
+Currently, his artistic practices focuses in the relationship between 
+human movement, space and uncertainity. Since 2018 he is developing 
+new ways of interaction between human and space by using synesthetic 
+nature of Quantum Physics not just symbolic or inspirational way 
+but as an active element in his artworks. He strongly believes that 
+democratization of Quantum Physics will open new artistic ways 
+to reexplore our surroundings and improving our synesthetic sensation. 
+His projects have been already presented in several countries: 
+Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
+`
+---
+
+<Layout title="Çağdaş Çeçen" description={subdescription}>
+
+    <ProjectCard project={project} />
+
+</Layout>
+
+<script src="../../scripts/sub.js"></script>

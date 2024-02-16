@@ -662,6 +662,18 @@ body{
     font-size: 15px;
 }
 
+.left-text .detail-button{
+    font-family: poppins;
+    font-size: 14px;
+    padding: 15px 30px;
+    background-color: #171A1E;
+    border-color: #E4E4E4;
+    outline: none;
+    cursor: pointer;
+    border-radius: 8mm;
+    margin-top: 20px;
+}
+
 /* ABOUT ME - PROJECTS */
 .about-me {
     display: flex;
