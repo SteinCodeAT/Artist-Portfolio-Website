@@ -106,12 +106,11 @@ a:hover {
     position: relative;
     width: 100%;
     height: 100%;
-    overflow: hidden; /* Prevents lines from going outside the bounds */
   }
   
   .vertical-line {
     position: absolute;
-    bottom: 0; /* Start at the bottom of the container */
+    top: 0; /* Start at the bottom of the container */
     width: 1px; /* Thin line */
     height: 100%; /* Full height of the container */
     background-color: white; /* Line color */
@@ -126,13 +125,19 @@ a:hover {
     height: 200%;
 }
   .vertical-line:nth-child(2) {
-     left: 25%; background-color: rgba(255, 255, 255, 18%); 
+     left: 25%; 
+     height: 250%;
+     background-color: rgba(255, 255, 255, 18%); 
     }
     .vertical-line:nth-child(3) {
-        left: 28%; background-color: rgba(255, 255, 255, 18%); 
+        left: 28%; 
+        height: 700%;
+        background-color: rgba(255, 255, 255, 18%); 
        }
        .vertical-line:nth-child(4) {
-        left: 29%; background-color: rgba(255, 255, 255, 18%); 
+        left: 29%; 
+        height: 120%;
+        background-color: rgba(255, 255, 255, 18%); 
        }
   .vertical-line:nth-child(5) { 
     left: 98%; 
@@ -156,6 +161,10 @@ a:hover {
     z-index: 5;
     left: 2%;
     
+  }
+
+  .vertical-line-2:nth-of-type(2) {
+    height: 700%;
   }
   
   
@@ -582,6 +591,7 @@ a:hover {
 
 /* psuedo lines */
 
+/* psuedo lines */
 
 .banner-card::before {
     content: '';
@@ -591,5 +601,16 @@ a:hover {
     background: rgba(0, 0, 0, .5);
     top: 50%;
     left: 40%;
+    margin-left: -3px;  
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 100%;
+    background: black;
+    top: 110%;
+    left: 30%;
     margin-left: -3px;  
 }

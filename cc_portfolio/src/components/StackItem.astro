@@ -9,11 +9,10 @@ const {classes, slug, title, projectType, description, imageObject, year} = Astr
     .stack-item {
         display: grid;
         gap: 1rem;
-        height: 90vh;
         grid-template-columns: 1fr 1fr;
         
-        height: 100vh;
-        width: 100vw;
+        height: 100dvh;
+        width: 100dvw;
 
         position: -webkit-sticky;
         position: sticky;
@@ -109,7 +108,7 @@ const {classes, slug, title, projectType, description, imageObject, year} = Astr
 
     .stack-item--image-link {
         transition: color 0.2s ease-in-out;
-        padding: 0.5rem 1rem;
+        padding: 0.5rem 0rem;
         font-weight: bold;
         border-radius: 0.25rem;
         cursor: pointer;
@@ -149,8 +148,8 @@ const {classes, slug, title, projectType, description, imageObject, year} = Astr
         }
 
         .stack-item .stack-item--image-area {
-            width: 100vw;
-            height: 100vh;
+            width: 100dvw;
+            height: 100%;
             aspect-ratio: unset;
         }
     }
