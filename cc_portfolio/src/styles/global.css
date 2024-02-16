@@ -10,6 +10,8 @@
 
     --scrollbar-accent: #2f343a;
 
+    --text-color: #E4E4E4;
+
     scrollbar-face-color: var(--scrollbar-accent);
 	scrollbar-base-color: var(--scrollbar-accent);
 	scrollbar-3dlight-color: var(--scrollbar-accent);
@@ -28,10 +30,11 @@
   ::-webkit-resizer { background-color: var(--scrollbar-accent);}
 
 body{
-    background-color: #000000;
+    background-color: var(--main-bg);
     height: fit-content;
     margin: 0;
     padding: 0;
+    color: var(--text-color)
 }
 
 h1, h2, h3, h4, h5, h6, p {
@@ -40,6 +43,28 @@ h1, h2, h3, h4, h5, h6, p {
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Lastica', sans-serif;
+}
+
+
+h2 {
+    font-size: 1.7rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+a {
+    color: var(--text-color);
+    text-decoration: underline;
+}
+
+a:hover {
+    filter: brightness(80%);
 }
 
 .tubelight{
@@ -232,7 +257,7 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 2.5rem;
     font-family: 'Lastica', sans-serif;
     text-transform: uppercase;;
-    color: none;
+    color: transparent;
     font-weight: 700;
     padding-top: 10%;
     rotate: 2deg;
@@ -244,6 +269,11 @@ h1, h2, h3, h4, h5, h6 {
     width: 10vh;
     right: 2%;
     top: 80%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
 }
 
 .btn {
@@ -297,19 +327,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .banner-card .content-card .circle-images .main-circle{
-    width: 60%;
+    width: 13vw;
     height: auto;
     display: block;
     position: absolute;
-    top: 50%;
+    top: 51%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 2;
-    animation: autofocus 8s infinite;
-    
-    
-      
-    }
+    animation: autofocus 8s infinite;    
+}
 
 
 @keyframes autofocus {
@@ -323,11 +350,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .banner-card .content-card .circle-images .circle {
     position: absolute;
-    margin-top: -2vw; /* half of the width to center it */
-    margin-left: -1vw; /* half of the height to center it */
     border-radius: 50%;
-    top: 55%;
-    left: 51%;
+    top: 50%;
+    left: 50%;
     transform-origin: center;
     z-index: 2;
 }
@@ -440,7 +465,111 @@ h1, h2, h3, h4, h5, h6 {
   }
 
 
+  
+@media (max-width: 762px) {
+    .banner-card {
+        margin-bottom: 20vh;
+    }
+    .banner-card .content-card {
+        grid-template-columns: 1fr;
+    }
+
+    .banner-card .content-card .title {
+        font-size: 2.5rem;
+    }
+    .banner-card .content-card-2 {
+        width: 80vw;
+    }
+
+    .banner-card .content-card .line-container {
+        display: none;
+    }
+
+    .banner-card .content-card .circle-images {
+        position: absolute;
+        z-index: -1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-top: 15vh;
+    }
+
+    .banner-card .content-card .circle-images .main-circle {
+        width: 25vw;
+    }
+
+    .banner-card .content-card-2 .btn {
+        display: none;
+    }
+
+    .banner-card .content-card-2 .front-numbers {
+        font-size: 2rem;
+        margin-top: 30vh;
+    }
+
+    .banner-card .content-card .circle-images .circle {
+        position: absolute;
+    }
+    .circle1 {
+        width: 30vw;
+        height: 30vw;
+    }
+    
+    .circle2 {
+        width: 32vw;
+        height: 32vw;
+    }
+
+    .circle3 {
+        width: 34vw;
+        height: 34vw;
+    }
+
+    .circle4 {
+        width: 36vw;
+        height: 36vw;
+    }
+
+    .circle5 {
+        width: 38vw;
+        height: 38vw;
+    }
+
+    .circle6 {
+        width: 39vw;
+        height: 39vw;
+    }
+
+    .circle7 {
+        width: 39vw;
+        height: 39vw;
+    }
+
+    .circle8 {
+        width: 40vw;
+        height: 40vw;
+    }
+
+    .circle9 {
+        width: 42vw;
+        height: 42vw;
+    }
+    
+    .circle10 {
+        width: 44vw;
+        height: 44vw;
+    }
+
+    .circle11 {
+        width: 47vw;
+        height: 47vw;
+    }
+}
 /* background dots */
+@keyframes fadeEffect {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
 
 /* Dot styles */
 .dot {
@@ -449,20 +578,6 @@ h1, h2, h3, h4, h5, h6 {
     background-color: rgba(255, 255, 255, 0.6); /* Starting color and opacity */
     /* Sizes and exact positions will be set by JavaScript */
   }
-
-@keyframes fadeEffect {
-    0%, 100% { opacity: 0; }
-    50% { opacity: 1; }
-}
-
-.link-card:is(:hover, :focus-within) {
-    background-position: 0;
-    background-image: var(--accent-gradient);
-}
-.link-card:is(:hover, :focus-within) h2 {
-    color: rgb(var(--accent-light));
-}
-
 
 
 /* psuedo lines */
@@ -477,295 +592,4 @@ h1, h2, h3, h4, h5, h6 {
     top: 50%;
     left: 40%;
     margin-left: -3px;  
-}
-
-.btn::before {
-    content: '';
-    position: absolute;
-    width: 4px;
-    height: 100%;
-    background: black;
-    top: 110%;
-    left: 30%;
-    margin-left: -3px;  
-}
-
-/* PROJECTs */
-
-.link-card-3 {
-    padding: 1px;
-    justify-content: center; /* Center horizontally */
-    margin: auto;
-    width: 90%;
-    height: 600px;
-    background-color: black;
-    background-image: none;
-    background-size: 400%;
-    border-radius: 7px;
-    margin-top: 2%;
-    background-position: 100%;
-}
-
-.link-card-3 .center {
-    width: 100%;
-    height: fit-content;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-}
-
-.link-card-3 .center .stack-area {
-    width: 100%;
-    height: 280vh;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-
-}
-.link-card-3 .center .stack-area .right{
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: sticky;
-    top: 0;
-    box-sizing: border-box;
-    flex-basis: 50%;
-}
-
-.link-card-3 .center .stack-area .right .cards{
-    width: 100%;
-    height: 100%;
-    position: relative;
-}
-
-.link-card-3 .center .stack-area .right .cards .card {
-    width: 450px;
-    height: 450px;
-    box-sizing: border-box;
-    padding: 35px;
-    border-radius: 1mm;
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
-    position: absolute;
-    top: 50%;
-    left:50%;
-    transition: 0.5s ease-in-out;
-}
-
-
-.link-card-3 .center .stack-area .right .cards .card:nth-child(1){
-    background-image: url("/img/two_faces.png");
-    background-position: center;
-    z-index: 8;
-    filter: grayscale(88%);
-
-}
-
-.link-card-3 .center .stack-area .right .cards .card:nth-child(2){
-    background-image: url("/img/cellular_fidelity.png");
-    background-position: center;
-    z-index: 7;
-    filter: grayscale(88%);
-}
-
-.link-card-3 .center .stack-area .right .cards .card:nth-child(3){
-    background-image: url("/img/ghost_box.png");
-    background-position: center;
-    z-index: 6;
-    filter: grayscale(88%);
-
-}
-.link-card-3 .center .stack-area .right .cards .card:nth-child(4){
-    background-image: url("/img/visual_isolation.png");
-    background-position: center;
-    z-index: 5;
-    filter: grayscale(88%);
-
-}
-.link-card-3 .center .stack-area .right .cards .card:nth-child(5){
-    background-image: url("/img/behind_the_box.png");
-    background-position: center;
-    z-index: 4;
-    filter: grayscale(88%);
-
-}
-
-.link-card-3 .center .stack-area .right .cards .card:nth-child(6){
-    background-image: url("/img/5_5.png");
-    background-position: center;
-    z-index: 3;
-    filter: grayscale(88%);
-
-}
-
-.link-card-3 .center .stack-area .right .cards .card:nth-child(7){
-    background-image: url("/img/limbo.png");
-    background-position: center;
-    z-index: 2;
-    filter: grayscale(88%);
-
-}
-
-.link-card-3 .center .stack-area .right .cards .card:nth-child(8){
-    background-image: url("/img/moneyment.png");
-    background-position: center;
-    z-index: 1;
-    filter: grayscale(88%);
-
-}
-
-.sub{
-    font-family: poppins;
-    font-size: 20px;
-    font-weight: 700;
-    color: #E4E4E4;
-}
-
-.content {
-    font-family: poppins;
-    font-size: 16px;
-    color: #E4E4E4;
-    line-height: 28px;
-    background: rgb(23,26,30, .6);
-    border-radius: 2mm;
-}
-
-.card.active{
-    transform-origin: bottom left;
-}
-
-.left {
-    align-items: center;
-    flex-direction: column;
-    color: #E4E4E4;
-    width: 50%;
-    align-self: flex-start;
-    align-items: center;
-    justify-content: center;
-    position: sticky;
-    top:20vh;
-    margin-top: 5%;
-    
-    animation: fadeIn 2s;
-    
-    
-}
-
-.content-1,
-.content-2,
-.content-3,
-.content-4,
-.content-5
-{
-    display: none;
-}
-
-@keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-  }
-  
-.left .title{
-    width: 320px;
-    font-size: 34px;
-    font-family: poppins;
-    font-weight: 700;
-    line-height: 88px;
-
-}
-.left .title .sub-title{
-    width: 50%;
-    font-size: 10px;
-    font-family: poppins;
-    margin-top: 50px;
-    
-    
-}
-.left-content {
-    font-size: 15px;
-}
-
-/* ABOUT ME - PROJECTS */
-.about-me {
-    display: flex;
-    width: 100%;
-    height: 100vh;
-    color: #E4E4E4;
-
-    
-    padding: 1px;
-    margin: auto;
-    justify-content: center; /* Center horizontally */
-   
-  
-    background-image: none;
-    background-size: 400%;
-    border-radius: 7px;
-    background-position: 100%;
-    transition: background-position 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-    
-    position: relative; /* Add this if not already positioned */
-    transform: translateY(-25px); /* Move to the right, showing only half */
-}
-section{
-	display: flex;
-}
-.imgbox{
-	width: 50%;
-	height: 655px;
-	position: sticky;
-	top: 10%;
-   
-    left:30%;
-}
-.imgbox img{
-	width: 30em;
-    height: 20em;
-	position: absolute;
-    transform: translate(-60%, 5%);
-   
-   
-}
-
-
-.imgbox h1 {
-    color: #E4E4E4;
-    font-family: "Poppins", sans-serif;
-    font-size: 5.7em;
-    position: absolute;
-    transform: translate(-60%, 170%);
-    
-}
-.imgbox h1:nth-child(3){
-    color: transparent;
-    -webkit-text-stroke: 3px #E4E4E4;
-
-}
-
-hr {
-    border: 0.6px solid #E4E4E4;
-    margin-top: 53%;
-    margin-left: -25%;
-    width: 30%;
-}
-.textbox{
-	width: 50%;
-	padding: 20px;
-	font-size: 18px;
-    font-family: poppins;
-    text-align: justify;
-}
-
-.textbox h1{
-	font-size: 50px;
-	font-weight: 700;
-	margin: 0 0 20px;
-}
-
-.exhibitions-container{
-    text-align: center;
 }

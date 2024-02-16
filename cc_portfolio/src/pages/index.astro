@@ -1,10 +1,34 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-import PixelBallImage from '../img/pixel_ball.png'
+import { Icon } from 'astro-icon/components'
+
+import StackItem from '../components/StackItem.astro'
+import Exhibition from '../components/Exhibition.astro'
+
+import PixelBallImage from '../img/pixel_ball.png';
 import CcProfileImage from '../img/cc.png';
 
+import TwoFacesImage from '../img/two_faces.png'
+import CellularFidelityImage from '../img/cellular_fidelity.png'
+import GhostBoxImage from '../img/ghost_box.png'
+import VirtualIsolationImage from '../img/visual_isolation.png'
+import BehindTheBoxImage from '../img/behind_the_box.png'
+import FiveDotFiveImage from '../img/5_5.png'
+import LimboImage from '../img/limbo.png'
+import MoneyMentImage from '../img/moneyment.png'
+
+/* WARNING: DO NOT FORGET TO UPDATE THIS NUMBER
+* IF YOU ADD A NEW PROJECT
+* this number is used to calculate the necessary height of stack area
+* so that there is enough room for all cards to switch through
+*/
+const numberOfProjects = 8
+
 import { Image } from 'astro:assets';
+
+import '../styles/global.css';
+
 
 const description = `
 Cagdas Cecen is a Vienna based media artist. He studied Media Art : 
@@ -23,7 +47,7 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 
 <Layout title="Çağdaş Çeçen" description={description}>
 	<main>
-		<section>			
+		<section class="banner-section">			
 			<div class="vertical-lines-container">
 				<!-- Generate multiple divs like this for more lines -->
 				<div class="vertical-line"></div>
@@ -45,9 +69,7 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 
 					<div class="content-card">
 						<div class="circle-images">
-							<div class="image-container">
-								<Image class="main-circle" src={PixelBallImage} alt="main circle in illustration" />
-							</div>
+							<Image class="main-circle" src={PixelBallImage} alt="main circle in illustration" />
 							
 							<!-- rotating circles -->
 							<div class="circle circle1"></div>
@@ -61,14 +83,14 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 							<div class="circle circle9"></div>
 							<div class="circle circle10"></div>
 							<div class="circle circle11"></div>
-						<!-- background dots -->
+							<!-- background dots -->
 							<div class="dots-containter"></div>
 						</div>
 						<div class="content-card-2">
 							<h2 class="title font-family-header glow sub-title">MEDIA:ART<span class="tubelight">S</span></h2>
 							<div class="line-container"></div>
 							<p class="front-numbers">29.09.2023/200924</p>
-							<button class="btn dot"> &gt; projects </button>
+							<a class="btn dot" href="#about-me-section"> &gt; about</a>
 						</div>
 						
 						
@@ -83,683 +105,539 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 			<div class="vertical-line-2"></div>
 		</section>	
 		
-		<section class="link-card-3">
-			<div class="center">
-				<!--
-				<div class="stack-area">
-					<div class="stack-item">
-						<div class="stack-text">
-							<div class="title">Two Faces</div>
-							<div class="sub-title">Video Installation</div>
-							<br>
-							<div class="left-text">
-								Once the largest bakery in Europe, now leaving Vienna after 130 years. What remains
-								behind? What can a place tell? Who remembers what and what seems to have been
-								completely forgotten? We make our research walkable and invite you to come along: A
-								daughter who tries to decipher her secretive mother. A son who struggles with the ghost of
-								his father. Together we follow her verses and accompany her every step of the way in her
-								search for traces through time. Along the way, we listen to people remembering. Two
-								Faces" is one of the eight artistic stations, we experience how layer after layer is removed to
-								see what is hidden behind it.
-								
-							</div>
+		<section id="projects-section" style={`height: ${100 * numberOfProjects}vh;`}>
+			<style>
+				#projects-section {
+					width: 100vw;
+				}
 
-						</div>
-						<div class="stack-image-card">
-							<div class="card"  data-id="0">
-								
-								<div class="sub">
-									<h2>Two Faces</h2>
-									<small>2023</small>
-								</div>
-								<div class="content">
-									Palimpsest is an artistic audio walk through "Ankerbrotfabrik" and its history. Once the largest bakery in Europe, now leaving Vienna after 130 years...
-								</div>
-													
-								
-							</div>
-						</div>
-					</div>
-
-					<div class="stack-item">
-						<div class="stack-text">
-							<div class="title">Cellular Fidelity</div>
-							<div class="sub-title">Interactive Sound Installation</div>
-							<br>
-							<div class="left-text">
-		
-							The Cellular Fidelity creates a three-dimensional aquarium that breaks its boundaries using
-							light and sound. Audio is encoded into lasers that project through microscopic aquatic
-							environments into the gallery space. On the floor is a cast, colorful view of what, in reality, is
-							floating tiny and suspended above the visitors' heads. The laser reveals its sound when a
-							visitor steps into the shared aquatic space holding a sensor. Field recordings from the
-							collection sites of 30 groups of marine microbes fill the space- bending, humming, and
-							distorting with the visitor's movement. But the audio changes without a visitor, as well.
-							Because the audio-encoded laser first travels through the microbes' environment, they are
-							the first beings to make contact with it. When a cellular shape 'runs' across the floor, the
-							audio reshapes in response to the actual microbe's interaction with the laser up above,
-							picking up movement from above and making it visible and audible from below. The
-							potential for interaction permeates this whole work. 
-								
-							</div>
-
-						</div>
-
-						<div class="stack-image-card">
-
-							<div class="card" data-id="1">
-								
-								<div class="sub">
-									<h2>The Cellular Fidelity</h2>
-									<small>2022</small>
-								</div>
-								<div class="content">
-									The Cellular Fidelity creates a three-dimensional aquarium that breaks its boundaries using
-							light and sound...
-								</div>
-													
-								
-							</div>
-
-						</div>
-					</div>
-
-					<div class="stack-item">
-						<div class="stack-text">
-							<div class="title">Ghostbox</div>
-							<div class="sub-title">Interactive Sound Installation</div>
-							<br>
-							<div class="left-text">
-								Ghostbox is a work in the medium of audio-visual experience within
-								a constructed environment. It is an attempt to investigate the
-								“Observer Effect” in the real world. The action takes place in a dark
-								space filled with ten constantly-powered, audio-modulated, red
-								laser modules.
-								While the lasers are physically identical, the audio information they
-								carry differs. This creates an entangled, amorphous audiovisual scape,
-								lending it a patterned structure. Although the structure appears
-								uniform, it reveals its synthesized nature upon interaction.
-								Visitors wearing light-sensitive devices on both fists explore the layers
-								of the soundscape through their body movements, as they interact with
-								the linear-patterned space of laser beams. The devices on their wrists
-								receive the modulated laser rays, transmitting the information to
-								speakers, and making the rays audible inside the space.
-								
-							</div>
-
-						</div>
-
-						<div class="stack-image-card">
-
-							<div class="card"  data-id="2">
-								
-								<div class="sub">
-									<h2>Ghostbox</h2>
-									<small>2020 - 2021</small>
-								</div>
-								<div class="content">
-									Ghostbox is a work in the medium of audio-visual experience within
-							a constructed environment...
-								</div>
-													
-								
-							</div>
-
-						</div>
-					</div>
-
-					<div class="stack-item">
-						<div class="stack-text">
-							<div class="title">Virtual Isolation</div>
-							<div class="sub-title">Wearable device, interactive Installation</div>
-							<br>
-							<div class="left-text">
-								Visual Isolation is a wearable interactive object with a display which
-								demonstrates real-time vital readings and memories.
-								Our lives are all about numbers and graphs for quite a while. Society tries to
-								adopt new relation between our survival and our social interactions during
-								isolation times and we still don’t know what future will bring on us.
-								Although human memory is highly depending on our social interactions, we
-								as individuals are stuck between fear and losing social abilities.
-								“Is surviving alone enough to stay human, what is left without memories
-								with others ? “ - this was the question that lead me to develop this
-								project.
-								
-							</div>
-
-						</div>
-
-						<div class="stack-image-card">
-							<div class="card" data-id="3">
-								
-								<div class="sub">
-									<h2>Virtual Isolation</h2>
-									<small>2020</small>
-								</div>
-								<div class="content">
-									Visual Isolation is a wearable interactive object with a display which
-							demonstrates real-time vital readings and memories...
-								</div>
-													
-								
-							</div>
-						</div>
-					</div>
-
-					
-					<div class="stack-item">
-						<div class="stack-text">
-							<div class="title">Behind the box</div>
-							<div class="sub-title">Interactive Mixed-Media Installation</div>
-							<br>
-							<div class="left-text">
-								Cubic object with translucent lcd panel and multi channel mapped
-								audio transmitting led arrays as backlight. Observers can also
-								interact with the installation ”Behind the box” by moving the
-								apparatus from the project “5.5”. In this way, they listen
-								differentsounds which come from box. Those sounds can be audio
-								recordings from a war zone, a suicide youtuber, a make up video,
-								and many other. Without any interaction installation stays silent.
-								Visuals and movements on screen are working on Unity Engine .
-								Translucent lcd creates an augmented reality feeling depending on
-								the angle when observer looks inside the box. Apparatus is
-								functioning just as receiver and amplifier, it does not alter anything.
-								Audio cables from both Apparatus are connected to camera’ s
-								microphone input for this presentation. What observers hear is the
-								audio mapped led arrays and when they move around with the
-								apparatus, they hear mixtures of mapped sounds.
-								
-							</div>
-						</div>
-
-						<div class="stack-image-card">
-							
-							<div class="card" data-id="4">
-								
-								<div class="sub">
-									<h2>Behind the box</h2>
-									<small>2020</small>
-								</div>
-								<div class="content">
-									Cubic object with translucent lcd panel and multi channel mapped
-							audio transmitting led arrays as backlight...
-								</div>
-													
-								
-							</div>
-						</div>
-					</div>
-
-					
-					<div class="stack-item">
-						<div class="stack-text">
-							<div class="title">5.5</div>
-							<div class="sub-title">Interactive Sound Installation</div>
-							<br>
-							<div class="left-text">
-								5.5 transforms artificial light into sound. When viewers put on the
-								headset and headphones, they hear a mixture of electromagnetic
-								disturbances caused by the artificial light sources in the room. 5.5
-								invites you to an ambient synaesthetic experience. The apparatus
-								becomes an artificial sensory organ: follow the white noise, let your
-								ears guide you, and experience the space anew
-								
-							</div>
-
-						</div>
-
-						<div class="stack-image-card">
-							
-							<div class="card" data-id="5">
-								
-								<div class="sub">
-									<h2>5.5</h2>
-									<small>2019</small>
-								</div>
-								<div class="content">
-									5.5 transforms artificial light into sound. When viewers put on the
-							headset and headphones, they hear a mixture of electromagnetic
-							disturbances caused by the artificial light sources in the room...
-								</div>
-													
-								
-							</div>
-						</div>
-					</div>
-
-					<div class="stack-item">
-						<div class="stack-text">
-							<div class="title">Limbo</div>
-							<div class="sub-title">Reactive Video-Installation
-								Vertical display, Camera , mini-computer , custom face recognition algorithm</div>
-							<br>
-							<div class="left-text">
-								Replacing a specific space close to the stairs between two floors with a
-								reactive interface will allow the participants to reach a story which will be
-								decided by their appearance. When the observer watches the screen, it
-								triggers a private story, which is trapped in time and space.
-								
-							</div>
-
-						</div>
-
-						<div class="stack-image-card">
-							
-
-							<div class="card" data-id="6">
-								
-								<div class="sub">
-									<h2>Limbo</h2>
-									<small>2016 - 2018</small>
-								</div>
-								<div class="content">
-									Replacing a specific space close to the stairs between two floors with a
-									reactive interface will allow the participants to reach a story which will be
-									decided by their appearance...
-								</div>
-													
-								
-							</div>
-						</div>
-					</div>
-
-					<div class="stack-item">
-						<div class="stack-text">
-							<div class="title">Moneyment</div>
-							<div class="sub-title">Mixed-Media Installation (Video and object)
-								POS Device(Card reader), Display, Striped bills</div>
-							<br>
-							<div class="left-text">
-								Money needs people, and people need money - an almost perfect circle.
-								If you like, every human action finds its place in the value chain, and every
-								move is profitable.
-								Moneyment is dedicated to all those who do not play this game.
-								
-							</div>
-
-						</div>
-
-						<div class="stack-image-card">
-							
-
-							<div class="card" data-id="7">
-								
-								<div class="sub">
-									<h2>Moneyment</h2>
-									<small>2018</small>
-								</div>
-								<div class="content">
-									Money needs people, and people need money - an almost perfect circle...
-								</div>
-													
-								
-							</div>
-						</div>
-					</div>
-
-				</div>
- 				-->
+				.stack-area {
+					position: sticky;
+					width: 100vw;
+					height: 100vh;
+					top: 0;
+				}
+			</style>
+			<script>
 				
-				<div class="stack-area">
-					<div class="left">
-						<div class="left-content content-0"  data-id="0">
-							<div class="title">Two Faces</div>
-							<div class="sub-title">Video Installation</div>
-							<br>
-							<div class="left-text">
-								Once the largest bakery in Europe, now leaving Vienna after 130 years. What remains
-								behind? What can a place tell? Who remembers what and what seems to have been
-								completely forgotten? We make our research walkable and invite you to come along: A
-								daughter who tries to decipher her secretive mother. A son who struggles with the ghost of
-								his father. Together we follow her verses and accompany her every step of the way in her
-								search for traces through time. Along the way, we listen to people remembering. Two
-								Faces" is one of the eight artistic stations, we experience how layer after layer is removed to
-								see what is hidden behind it.
-								
-							</div>
+			</script>
 
-						</div>
-						<div class="left-content content-1" data-id="1">
-							<div class="title">Cellular Fidelity</div>
-							<div class="sub-title">Interactive Sound Installation</div>
-							<br>
-							<div class="left-text">
-		
-							The Cellular Fidelity creates a three-dimensional aquarium that breaks its boundaries using
-							light and sound. Audio is encoded into lasers that project through microscopic aquatic
-							environments into the gallery space. On the floor is a cast, colorful view of what, in reality, is
-							floating tiny and suspended above the visitors' heads. The laser reveals its sound when a
-							visitor steps into the shared aquatic space holding a sensor. Field recordings from the
-							collection sites of 30 groups of marine microbes fill the space- bending, humming, and
-							distorting with the visitor's movement. But the audio changes without a visitor, as well.
-							Because the audio-encoded laser first travels through the microbes' environment, they are
-							the first beings to make contact with it. When a cellular shape 'runs' across the floor, the
-							audio reshapes in response to the actual microbe's interaction with the laser up above,
-							picking up movement from above and making it visible and audible from below. The
-							potential for interaction permeates this whole work. 
-								
-							</div>
+			<div class="stack-area">
+					<StackItem 
+						classes=""
+						slug="moneyment"
+						title="Moneyment"
+						projectType="Mixed-Media Installation (Video and object)"
+						description=`Money needs people, and people need money - an almost perfect circle.
+						If you like, every human action finds its place in the value chain, and every
+						move is profitable.
+						Moneyment is dedicated to all those who do not play this game.`
+						imageObject={MoneyMentImage}
+						year="2018"
+					/>
 
-						</div>
+					<StackItem 
+						classes=""
+						slug="limbo"
+						title="Limbo"
+						projectType=`Reactive Video-Installation`
+						description=`Replacing a specific space close to the stairs between two floors with a
+						reactive interface will allow the participants to reach a story which will be
+						decided by their appearance. When the observer watches the screen, it
+						triggers a private story, which is trapped in time and space.`
+						imageObject={LimboImage}
+						year="2016 - 2018"
+					/>
 
-						
+					<StackItem 
+						classes=""
+						slug="5.5"
+						title="5.5"
+						projectType="Interactive Sound Installation"
+						description=`5.5 transforms artificial light into sound. When viewers put on the
+						headset and headphones, they hear a mixture of electromagnetic
+						disturbances caused by the artificial light sources in the room. 5.5
+						invites you to an ambient synaesthetic experience. The apparatus
+						becomes an artificial sensory organ: follow the white noise, let your
+						ears guide you, and experience the space anew`
+						imageObject={FiveDotFiveImage}
+						year="2019"
+					/>
 
-						<div class="left-content content-3" data-id="2">
-							<div class="title">Ghostbox</div>
-							<div class="sub-title">Interactive Sound Installation</div>
-							<br>
-							<div class="left-text">
-								Ghostbox is a work in the medium of audio-visual experience within
-								a constructed environment. It is an attempt to investigate the
-								“Observer Effect” in the real world. The action takes place in a dark
-								space filled with ten constantly-powered, audio-modulated, red
-								laser modules.
-								While the lasers are physically identical, the audio information they
-								carry differs. This creates an entangled, amorphous audiovisual scape,
-								lending it a patterned structure. Although the structure appears
-								uniform, it reveals its synthesized nature upon interaction.
-								Visitors wearing light-sensitive devices on both fists explore the layers
-								of the soundscape through their body movements, as they interact with
-								the linear-patterned space of laser beams. The devices on their wrists
-								receive the modulated laser rays, transmitting the information to
-								speakers, and making the rays audible inside the space.
-								
-							</div>
+					<StackItem 
+						classes=""
+						slug="behind-the-box"
+						title="Behind the box"
+						projectType="Interactive Mixed-Media Installation"
+						description=`Cubic object with translucent lcd panel and multi channel mapped
+						audio transmitting led arrays as backlight. Observers can also
+						interact with the installation ”Behind the box” by moving the
+						apparatus from the project “5.5”. In this way, they listen
+						differentsounds which come from box. Those sounds can be audio
+						recordings from a war zone, a suicide youtuber, a make up video,
+						and many other. Without any interaction installation stays silent.
+						Visuals and movements on screen are working on Unity Engine .
+						Translucent lcd creates an augmented reality feeling depending on
+						the angle when observer looks inside the box. Apparatus is
+						functioning just as receiver and amplifier, it does not alter anything.
+						Audio cables from both Apparatus are connected to camera’ s
+						microphone input for this presentation. What observers hear is the
+						audio mapped led arrays and when they move around with the
+						apparatus, they hear mixtures of mapped sounds.`
+						imageObject={BehindTheBoxImage}
+						year="2020"
+					/>
 
-						</div>
+					<StackItem 
+						classes=""
+						slug="virtual-isolation"
+						title="Virtual Isolation"
+						projectType="Wearable device, interactive Installation"
+						description=`Visual Isolation is a wearable interactive object with a display which
+						demonstrates real-time vital readings and memories.
+						Our lives are all about numbers and graphs for quite a while. Society tries to
+						adopt new relation between our survival and our social interactions during
+						isolation times and we still don’t know what future will bring on us.
+						Although human memory is highly depending on our social interactions, we
+						as individuals are stuck between fear and losing social abilities.
+						“Is surviving alone enough to stay human, what is left without memories
+						with others ? “ - this was the question that lead me to develop this
+						project.`
+						imageObject={VirtualIsolationImage}
+						year="2020"
+					/>
 
-						<div class="left-content content-4"  data-id="3">
-							<div class="title">Virtual Isolation</div>
-							<div class="sub-title">Wearable device, interactive Installation</div>
-							<br>
-							<div class="left-text">
-								Visual Isolation is a wearable interactive object with a display which
-								demonstrates real-time vital readings and memories.
-								Our lives are all about numbers and graphs for quite a while. Society tries to
-								adopt new relation between our survival and our social interactions during
-								isolation times and we still don’t know what future will bring on us.
-								Although human memory is highly depending on our social interactions, we
-								as individuals are stuck between fear and losing social abilities.
-								“Is surviving alone enough to stay human, what is left without memories
-								with others ? “ - this was the question that lead me to develop this
-								project.
-								
-							</div>
+					<StackItem 
+						classes=""
+						slug="ghostbox"
+						title="Ghostbox"
+						projectType="Interactive Sound Installation"
+						description=`Ghostbox is a work in the medium of audio-visual experience within
+						a constructed environment. It is an attempt to investigate the
+						“Observer Effect” in the real world. The action takes place in a dark
+						space filled with ten constantly-powered, audio-modulated, red
+						laser modules.
+						While the lasers are physically identical, the audio information they
+						carry differs. This creates an entangled, amorphous audiovisual scape,
+						lending it a patterned structure. Although the structure appears
+						uniform, it reveals its synthesized nature upon interaction.
+						Visitors wearing light-sensitive devices on both fists explore the layers
+						of the soundscape through their body movements, as they interact with
+						the linear-patterned space of laser beams. The devices on their wrists
+						receive the modulated laser rays, transmitting the information to
+						speakers, and making the rays audible inside the space.`
+						imageObject={GhostBoxImage}
+						year="2020 - 2021"
+					/>
 
-						</div>
-
-						<div class="left-content content-5" data-id="4">
-							<div class="title">Behind the box</div>
-							<div class="sub-title">Interactive Mixed-Media Installation</div>
-							<br>
-							<div class="left-text">
-								Cubic object with translucent lcd panel and multi channel mapped
-								audio transmitting led arrays as backlight. Observers can also
-								interact with the installation ”Behind the box” by moving the
-								apparatus from the project “5.5”. In this way, they listen
-								differentsounds which come from box. Those sounds can be audio
-								recordings from a war zone, a suicide youtuber, a make up video,
-								and many other. Without any interaction installation stays silent.
-								Visuals and movements on screen are working on Unity Engine .
-								Translucent lcd creates an augmented reality feeling depending on
-								the angle when observer looks inside the box. Apparatus is
-								functioning just as receiver and amplifier, it does not alter anything.
-								Audio cables from both Apparatus are connected to camera’ s
-								microphone input for this presentation. What observers hear is the
-								audio mapped led arrays and when they move around with the
-								apparatus, they hear mixtures of mapped sounds.
-								
-							</div>
-
-						</div>
-
-						<div class="left-content content-2" data-id="5">
-							<div class="title">5.5</div>
-							<div class="sub-title">Interactive Sound Installation</div>
-							<br>
-							<div class="left-text">
-								5.5 transforms artificial light into sound. When viewers put on the
-								headset and headphones, they hear a mixture of electromagnetic
-								disturbances caused by the artificial light sources in the room. 5.5
-								invites you to an ambient synaesthetic experience. The apparatus
-								becomes an artificial sensory organ: follow the white noise, let your
-								ears guide you, and experience the space anew
-								
-							</div>
-
-						</div>
-
-						<div class="left-content content-2" data-id="6">
-							<div class="title">Limbo</div>
-							<div class="sub-title">Reactive Video-Installation
-								Vertical display, Camera , mini-computer , custom face recognition algorithm</div>
-							<br>
-							<div class="left-text">
-								Replacing a specific space close to the stairs between two floors with a
-								reactive interface will allow the participants to reach a story which will be
-								decided by their appearance. When the observer watches the screen, it
-								triggers a private story, which is trapped in time and space.
-								
-							</div>
-
-						</div>
-
-						<div class="left-content content-2" data-id="7">
-							<div class="title">Moneyment</div>
-							<div class="sub-title">Mixed-Media Installation (Video and object)
-								POS Device(Card reader), Display, Striped bills</div>
-							<br>
-							<div class="left-text">
-								Money needs people, and people need money - an almost perfect circle.
-								If you like, every human action finds its place in the value chain, and every
-								move is profitable.
-								Moneyment is dedicated to all those who do not play this game.
-								
-							</div>
-
-						</div>
-
-						
-					</div>
-
-					<div class="right">
-						<div class="cards">
-							<div class="card"  data-id="0">
-								
-								<div class="sub">
-									<h2>Two Faces</h2>
-									<small>2023</small>
-								</div>
-								<div class="content">
-									Palimpsest is an artistic audio walk through "Ankerbrotfabrik" and its history. Once the largest bakery in Europe, now leaving Vienna after 130 years...
-								</div>
-													
-								
-							</div>
-							<div class="card" data-id="1">
-								
-								<div class="sub">
-									<h2>The Cellular Fidelity</h2>
-									<small>2022</small>
-								</div>
-								<div class="content">
-									The Cellular Fidelity creates a three-dimensional aquarium that breaks its boundaries using
-							light and sound...
-								</div>
-													
-								
-							</div>
-							<div class="card"  data-id="2">
-								
-								<div class="sub">
-									<h2>Ghostbox</h2>
-									<small>2020 - 2021</small>
-								</div>
-								<div class="content">
-									Ghostbox is a work in the medium of audio-visual experience within
-							a constructed environment...
-								</div>
-													
-								
-							</div>
-							<div class="card" data-id="3">
-								
-								<div class="sub">
-									<h2>Virtual Isolation</h2>
-									<small>2020</small>
-								</div>
-								<div class="content">
-									Visual Isolation is a wearable interactive object with a display which
-							demonstrates real-time vital readings and memories...
-								</div>
-													
-								
-							</div>
-							<div class="card" data-id="4">
-								
-								<div class="sub">
-									<h2>Behind the box</h2>
-									<small>2020</small>
-								</div>
-								<div class="content">
-									Cubic object with translucent lcd panel and multi channel mapped
-							audio transmitting led arrays as backlight...
-								</div>
-													
-								
-							</div>
-							<div class="card" data-id="5">
-								
-								<div class="sub">
-									<h2>5.5</h2>
-									<small>2019</small>
-								</div>
-								<div class="content">
-									5.5 transforms artificial light into sound. When viewers put on the
-							headset and headphones, they hear a mixture of electromagnetic
-							disturbances caused by the artificial light sources in the room...
-								</div>
-													
-								
-							</div>
-
-							<div class="card" data-id="6">
-								
-								<div class="sub">
-									<h2>Limbo</h2>
-									<small>2016 - 2018</small>
-								</div>
-								<div class="content">
-									Replacing a specific space close to the stairs between two floors with a
-									reactive interface will allow the participants to reach a story which will be
-									decided by their appearance...
-								</div>
-													
-								
-							</div>
-
-							<div class="card" data-id="7">
-								
-								<div class="sub">
-									<h2>Moneyment</h2>
-									<small>2018</small>
-								</div>
-								<div class="content">
-									Money needs people, and people need money - an almost perfect circle...
-								</div>
-													
-								
-							</div>
-						</div>
-					</div>
-
-				</div>
-		 		
-				<div class="about-me">
-					<div class="imgbox">
-						<h1>ABOUT ME</h1>
-						<Image src={CcProfileImage} alt="Cagdas Cecen Profile Image" />
-						<h1>ABOUT ME</h1>
-						<hr class="contact-line glow">
-					</div>
-					<div class="textbox">
-						
-						<p>Cagdas Cecen is a Vienna based media artist. He studied Media Art :
-							Digital Art at University of Applied Arts Vienna and Physics at University of Vienna.
-							Currently, his artistic practices focuses in the relationship between
-							human movement, space and uncertainity. Since 2018 he is developing
-							new ways of interaction between human and space by using synesthetic
-							nature of Quantum Physics not just symbolic or inspirational way
-							but as an active element in his artworks. He strongly believes that
-							democratization of Quantum Physics will open new artistic ways
-							to reexplore our surroundings and improving our synesthetic sensation.
-							His projects have been already presented in several countries:
-							Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
-							Conciliating with his artistic activity.
-					</p>
-					<br>
-					<h2>Exhibitions/Projects</h2>
-					<br>
-					<div class="exhibitions-container">
-
-						<h5>2022 |</h5>
-
-					<p>
-						"TRAUMATRAUMA" feat. B.A.D.-Vienna-Austria
-						"Distance Fog" feat. B.A.D. Wienstation-Vienna - Austria
-						"The Cellular Fidelity" Alte Schieberkammer- Vienna -Austria
-					</p>
-					<br>	
-					<h5>2021 </h5>	
-						
-					<p>Participating artist at “Transform-Arte 2021” - Eisenstadt - Austria
-						Participating artist at “Angewandte Festival 2021” - Vienna - Austria
-					</p>	
-					<br>	
-					<h5>2019 </h5>	
-						
-					<p>	“KAIROS” Recall of Earth Part 2 / Collective exhibition / Thessalonikki - Greece
-						“Spannung!”-Medienwerkstatt / Collective exhibition / Vienna - Austria
-						“Fabrikraum #01” / Collective exhibition / Vienna - Austria
-						“5.5” Mixed media installation /La Biennale di Venezia , Biennale Sessions / Venice - Italy
-						Participating artist at “Offene Ateliers in Margareten”, Künstlerhaus / Vienna - Austria
-						“Reflecting Records” / Collective exhibition / Vienna - Austria
-					</p>
-					<br>
-					<h5>2018 |</h5>
-						
-					<p>“A community of individuals” / Collective exhibition / SOHO Festival/ Vienna - Austria</p>
-					<br>	
-					<h5>2017 |</h5>
-						
-					<p>	“DIGITAL WORKFLOW” / Collective exhibition / Vienna - Austria
-						“UNTAPPED SUR-PLUS” / Collective exhibition / Künstlerhaus / Vienna - Austria
-						“Disintegrate“ - Stop-Motion PSA Film für “Ministerium für ein lebenswertes Österreich” - “Danube Projekt”- Der Haus der Europäischen
-						Union / Vienna - Austria
-					</p>
-					<br>	
-					<h5>2016 |</h5>
-						
-					<p></p>	“Infected Structures”/ Collective exhibition / Sokolowsko - Poland
-						„Smells Like Sh.t“ Video Documenary “TV916” / Trebinje - Bosnia and Herzegovina
-						„....Sowohl als auch.....“ /Performance/ Vienna - Austria</p>
-
-					</div>
+					<StackItem 
+						classes=""
+						slug="cellular-fidelity"
+						title="The Cellular Fidelity"
+						projectType="Interactive Sound Installation"
+						description=`The Cellular Fidelity creates a three-dimensional aquarium that breaks its boundaries using
+						light and sound. Audio is encoded into lasers that project through microscopic aquatic
+						environments into the gallery space. On the floor is a cast, colorful view of what, in reality, is
+						floating tiny and suspended above the visitors' heads. The laser reveals its sound when a
+						visitor steps into the shared aquatic space holding a sensor. Field recordings from the
+						collection sites of 30 groups of marine microbes fill the space- bending, humming, and
+						distorting with the visitor's movement. But the audio changes without a visitor, as well.
+						Because the audio-encoded laser first travels through the microbes' environment, they are
+						the first beings to make contact with it. When a cellular shape 'runs' across the floor, the
+						audio reshapes in response to the actual microbe's interaction with the laser up above,
+						picking up movement from above and making it visible and audible from below. The
+						potential for interaction permeates this whole work.`
+						imageObject={CellularFidelityImage}
+						year=2022
+					/>
 					
-					
-					</div>
-				</div>
-							
-					
+					<StackItem 
+						classes=""
+						slug="two-faces"
+						title="Two Faces"
+						projectType="Video Installation"
+						description=`Once the largest bakery in Europe, now leaving Vienna after 130 years. What remains
+						behind? What can a place tell? Who remembers what and what seems to have been
+						completely forgotten? We make our research walkable and invite you to come along: A
+						daughter who tries to decipher her secretive mother. A son who struggles with the ghost of
+						his father. Together we follow her verses and accompany her every step of the way in her
+						search for traces through time. Along the way, we listen to people remembering. Two
+						Faces" is one of the eight artistic stations, we experience how layer after layer is removed to
+						see what is hidden behind it.`
+						imageObject={TwoFacesImage}
+						year=2023
+					/>
 					
 			</div>
-			
+		</section>
+
+		<section id="about-me-section">
+			<style>
+				#about-me-section {
+					display: grid;
+					grid-template-columns: 1fr 1fr;
+					width: 100%;
+					color: var(--text-color);
+					gap: 1rem;
+					padding: 0 10vw;					
+					padding-top: 2rem;
+				}
+
+				.about-me--header-area {
+					width: 100%;
+					height: 40vh;
+					position: sticky;
+					top: 5vh;
+				}
+
+				.about-me--header-img-wrapper {
+					width: 100%;
+					position: relative;
+					height: 40vh;
+					display: flex;
+					justify-content: center;
+				}
+
+				.about-me--header-img-wrapper * {
+					position: absolute;
+					bottom: 0;
+				}
+
+				.about-me--header-img-wrapper img {
+					height: auto;
+					width: 50%;
+				}
+
+				.about-me--header-img-wrapper h2 {
+					font-family: poppins;
+					font-size: 6rem;
+					text-align: center;
+					width: 100%;
+					line-height: 4.5rem;
+				}
+
+				.about-me--title-front {
+					color: transparent;
+					-webkit-text-stroke: 3px #E4E4E4;
+				}
+
+				.contact-line {
+					width: 50%;
+					margin: 1rem auto;
+				}
+
+				.about-me--header--social-wrapper {
+					display: flex;
+					align-items: center;
+					gap: 1rem;
+					justify-content: center;
+					margin-top: 1rem;
+				}
+
+				.about-me--header--social-wrapper svg {
+					height: 2rem;
+					width: 2rem;
+				}
+
+				.about-me--header--social-wrapper a {
+					cursor: pointer;
+					display: flex;
+					align-items: center;
+					gap: 0.5rem;
+				}
+				.about-me--header--social-wrapper a:hover {
+					filter: brightness(80%);
+				}
+
+				.about-me--text-area {
+					padding: 0 5vw;
+				}
+
+				.about-me--exhibitions {
+					margin-top: 2rem;
+				}
+
+				.about-me--exhibitions h2 {
+					text-align: center;
+				}
+
+				.about-me--exhibitions h3 {
+					color: transparent;
+					margin-top: 3rem;
+					-webkit-text-stroke: 1px #E4E4E4;
+				}
+
+				.about-me--exhibitions ul {
+					margin-bottom: 1rem;
+				}
+
+				.about-me--exhibitions li {
+					margin-bottom: 0.5rem;
+					padding-left: 1rem;
+				}
+
+
+
+				@media (max-width:762px) {
+					#about-me-section {
+						grid-template-columns: 1fr;
+					}
+
+					.about-me--header-area {
+						position: unset;
+						margin-top: 20vh;
+						margin-bottom: 2rem;
+						height: unset;
+					}
+
+					.about-me--header--social-wrapper {
+						flex-direction: column;
+					}
+
+					.about-me--header-img-wrapper img {
+						width: 100%;
+					}
+
+					.about-me--header-img-wrapper h2 {
+						font-size: 3.8rem;
+						color: var(--text-color);
+					-webkit-text-stroke: unset;
+					}
+
+					.contact-line {
+						width: 100%;
+					}
+				}
+			</style>
+
+			<div class="about-me--header-area">
+				<div class="about-me--header-img-wrapper">
+					<h2 class="about-me--title-back">ABOUT ME</h1>
+					<Image src={CcProfileImage} alt="Cagdas Cecen Profile Image" />
+					<h2 class="about-me--title-front">ABOUT ME</h1>	
+				</div>
+				<hr class="contact-line glow">
+				<div class="about-me--header--social-wrapper">
+
+					<a href="https://www.instagram.com/nihilprophet/">
+						<Icon name="mdi:instagram" /> @nihilprophet
+					</a>
 				
+					<a href="mailto:nihilprophet@gmail.com">
+						<Icon name="mdi:email" /> nihilprophet@gmail.com
+					</a>
+					
+				</div>
+				
+			</div>
+			<div class="about-me--text-area">
+				
+				<p>
+					Cagdas Cecen is a Vienna based media artist. He studied Media Art :
+					Digital Art at University of Applied Arts Vienna and Physics at University of Vienna.
+					Currently, his artistic practices focuses in the relationship between
+					human movement, space and uncertainity. Since 2018 he is developing
+					new ways of interaction between human and space by using synesthetic
+					nature of Quantum Physics not just symbolic or inspirational way
+					but as an active element in his artworks. He strongly believes that
+					democratization of Quantum Physics will open new artistic ways
+					to reexplore our surroundings and improving our synesthetic sensation.
+					His projects have been already presented in several countries:
+					Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
+					Conciliating with his artistic activity.
+				</p>
+
+				<div class="about-me--exhibitions">
+					
+					<style is:global>
+						.exhibition {
+							margin-bottom: 1rem;
+						}
+					</style>
+					<h2>Exhibitions/Projects</h2>
+
+					
+					<style>
+						.exhibition {
+							border-left: 1px solid var(--text-color);
+							padding: 0 1rem;
+							display: flex;
+							flex-direction: column;
+							gap: 0.2rem;
+							align-items: start;
+							justify-content: start;
+							flex-wrap: wrap;
+						}
+
+						.exhibition--top {
+							display: flex;
+							width: 100%;
+							gap: 1rem;
+							flex-wrap: wrap;
+						}
+
+						.exhibition--title {
+							font-weight: bold;
+							white-space: nowrap;
+						}
+
+						.exhibition--organization {
+
+						}
+
+						.exhibition--location {
+							font-style: italic;
+						}
+
+						@media (max-width: 762px) {
+							.exhibition {
+								flex-direction: row;
+							}
+
+							.exhibition--top {
+								flex-direction: column;
+							}
+						}
+					</style>
+
+					<h3>2022</h3>
+
+					<Exhibition 
+						title="TRAUMATRAUMA"
+						organization="feat. B.A.D."
+						organizationUrl="https://www.bad-art.org/"
+						location="Vienna - Austria"
+					/>
+
+					<Exhibition 
+						title="Distance Fog"
+						organization="feat. B.A.D. Wienstation"
+						location="Vienna - Austria"
+					/>
+
+					<Exhibition 
+						title="The Cellular Fidelity"
+						organization="Alte Schieberkammer"
+						location="Vienna - Austria"
+					/>
+
+					<h3>2021 </h3>	
+					
+					<Exhibition 
+						title="Transform-Arte 2021"
+						organization="Participating artist"
+						location="Eisenstadt - Austria"
+					/>
+
+					<Exhibition 
+						title="Angewandte Festival 2021"
+						organization="Paricipating artist"
+						location="Vienna - Austria"
+					/>
+					
+					<h3>2019</h3>	
+					
+					<Exhibition 
+						title="“KAIROS” Recall of Earth Part 2"
+						organization="Collective exhibition"
+						location="Thessalonikki - Greece"
+					/>
+					
+
+					<Exhibition 
+						title="“Spannung!”-Medienwerkstatt"
+						organization="Collective exhibition"
+						location="Vienna - Austria"
+					/>
+					
+
+					<Exhibition 
+						title="Fabrikraum #01"
+						organization="Collective exhibition"
+						location="Vienna - Austria"
+					/>
+
+					<Exhibition 
+						title="“5.5” Mixed media installation"
+						organization="La Biennale di Venezia, Biennale Sessions"
+						location="Venice - Italy"
+					/>
+
+					<Exhibition 
+						title="Offene Ateliers in Margareten"
+						organization="Künstlerhaus, Participating artist"
+						location="Vienna - Austria"
+					/>
+
+					<Exhibition 
+						title="Reflecting Records"
+						organization="Collective exhibition"
+						location="Vienna - Austria"
+					/>
+					
+					<h3>2018</h3>
+					
+					<Exhibition 
+						title="A community of individuals"
+						organization="SOHO Festival, Collective exhibition"
+						location="Vienna - Austria"
+					/>
+
+					<h3>2017</h3>
+					
+					<Exhibition 
+						title="DIGITAL WORKFLOW"
+						organization="Collective exhibition"
+						location="Vienna - Austria"
+					/>
+
+					<Exhibition 
+						title="UNTAPPED SUR-PLUS"
+						organization="Künstlerhaus, Collective exhibition"
+						location="Vienna - Austria"
+					/>
+
+					<Exhibition 
+						title="Disintegrate"
+						organization="Stop-Motion PSA movie for “Ministerium für ein lebenswertes Österreich”, “Danube Projekt”- Der Haus der Europäischen Union"
+						location="Vienna - Austria"
+					/>
+
+					<h3>2016</h3>
+					
+					<Exhibition 
+						title="Infected Structures"
+						organization="Collective exhibition"
+						location="Sokolowsko - Poland"
+					/>
+
+					<Exhibition 
+						title="Smells Like Sh.t"
+						organization="Video Documenary “TV916”"
+						location="Trebinje - Bosnia and Herzegovina"
+					/>
+
+					<Exhibition 
+						title="....Sowohl als auch....."
+						organization="Performance"
+						location="Vienna - Austria"
+					/>
+
+				</div>
+			
+			
+			</div>
 		</section>
 	</main>
 
+	<style>
+		footer {
+			margin: 2rem 0;
+			text-align: center;
+		}
+	</style>
 	<footer>
-		&copy; <span class="copyright-year"></span>
+		&copy; <span class="copyright-year"></span> Çağdaş Çeçen
 	</footer>
 
 	<script>
@@ -768,12 +646,12 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 		const copyrightYearLabels = document.querySelectorAll(".copyright-year")
 		copyrightYearLabels.forEach(item => {
 			if (item !== null) {
-				item.innerText = today.getFullYear().toString();
+				item.innerHTML = today.getFullYear().toString();
 			}
 		})
 	</script>
 
 </Layout>
 
-<script src="../scripts/apps.js"></script>
+<script src="../scripts/index.js"></script>
 

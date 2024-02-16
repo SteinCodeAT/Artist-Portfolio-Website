@@ -1,0 +1,58 @@
+---
+
+const {title, organization, location, organizationUrl} = Astro.props;
+
+---
+
+
+<style>
+    .exhibition {
+        border-left: 1px solid var(--text-color);
+        padding: 0 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        align-items: start;
+        justify-content: start;
+        flex-wrap: wrap;
+    }
+
+    .exhibition--top {
+        display: flex;
+        width: 100%;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .exhibition--title {
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .exhibition--organization {
+
+    }
+
+    .exhibition--location {
+        font-style: italic;
+    }
+
+    @media (max-width: 762px) {
+        .exhibition {
+            flex-direction: row;
+        }
+
+        .exhibition--top {
+            flex-direction: column;
+        }
+    }
+</style>
+<div class="exhibition">
+    <div class="exhibition--top">
+        <span class="exhibition--title">{title}</span>
+        <span class="exhibition--organization">
+            {organizationUrl === undefined ? organization : <a href={organizationUrl}>{organization}</a> }
+        </span>
+    </div>
+    <span class="exhibition--location">{location}</span>
+</div>

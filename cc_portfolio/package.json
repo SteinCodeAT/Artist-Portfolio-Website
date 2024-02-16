@@ -30,11 +30,13 @@
   "dependencies": {
     "@astrojs/check": "^0.5.2",
     "@astrojs/tailwind": "^5.1.0",
+    "@iconify-json/mdi": "^1.1.64",
     "astro": "^4.3.5",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3"
   },
   "devDependencies": {
+    "astro-icon": "^1.1.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
