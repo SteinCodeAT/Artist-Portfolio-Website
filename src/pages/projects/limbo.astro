@@ -1,7 +1,5 @@
 ---
-
-import Layout from '../../layouts/Layout.astro';
-import ProjectCard from '../../components/ProjectCard.astro';
+import ProjectPage from '../../layouts/ProjectPage.astro';
 
 import Limbo1 from '../../img/limbo1.png'
 import Limbo2 from '../../img/limbo2.png'
@@ -12,7 +10,7 @@ import Limbo5 from '../../img/limbo5.png'
 
 const project = {
     title: "Limbo",
-    type: "Reactive Video-Installation Vertical display, Camera , mini-computer , custom face recognition algorithm",
+    type: "Reactive Video-Installation Vertical display, Camera, mini-computer, custom face recognition algorithm",
     videos: [],
     images: [Limbo1, Limbo2, Limbo3, Limbo4, Limbo5], 
     artist: "Çağdaş Çeçen",
@@ -21,13 +19,20 @@ const project = {
                 reactive interface will allow the participants to reach a story which will be
                 decided by their appearance. When the observer watches the screen, it
                 triggers a private story, which is trapped in time and space.`,
-    link: "#"
+    links: []
 };
-
 ---
 
-<Layout title="Çağdaş Çeçen" description={project.description}>
-
-    <ProjectCard project={project} />
-
-</Layout>
+<ProjectPage 
+    title="Çağdaş Çeçen" 
+    description={project.description}
+    project={project}    
+>
+    <p>
+        Replacing a specific space close to the stairs between two floors with a
+        reactive interface will allow the participants to reach a story which will be
+        decided by their appearance. When the observer watches the screen, it
+        triggers a private story, which is trapped in time and space.
+    </p>
+     
+</ProjectPage>

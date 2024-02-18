@@ -1,7 +1,6 @@
 ---
 
-import Layout from '../../layouts/Layout.astro';
-import ProjectCard from '../../components/ProjectCard.astro';
+import ProjectPage from '../../layouts/ProjectPage.astro';
 
 import Behind1 from '../../img/behind1.png'
 import Behind2 from '../../img/behind2.png'
@@ -12,7 +11,7 @@ import Behind4 from '../../img/behind4.png'
 const project = {
     title: "Behind the box",
     type: "Interactive Mixed-Media Installation",
-    videos: [{url: "https://player.vimeo.com/video/400722312?autoplay=1&muted=1&loop=1&autopause=0&background=1&playsinline=1"}],
+    videos: [{url: "https://player.vimeo.com/video/400722312?autoplay=1&muted=1&loop=1&autopause=0&playsinline=1"}],
     images: [Behind1, Behind2, Behind3, Behind4], 
     artist: "Cagdas Cecen",
     verticaltext: "Behind the box",
@@ -23,21 +22,40 @@ const project = {
                 different sounds which come from box. Those sounds can be audio
                 recordings from a war zone, a suicide youtuber, a make up video,
                 and many other. Without any interaction installation stays silent.
-                Visuals and movements on screen are working on Unity Engine .
-                Translucent lcd creates an augmented reality feeling depending on
-                the angle when observer looks inside the box. Apparatus is
-                functioning just as receiver and amplifier, it does not alter anything.
-                Audio cables from both Apparatus are connected to camera's
-                microphone input for this presentation. What observers hear is the
+                 What observers hear is the
                 audio mapped led arrays and when they move around with the
                 apparatus, they hear mixtures of mapped sounds`,
-    link: "https://vimeo.com/400722312"
+    links: [
+        {
+            type: "Video",
+            url: "https://vimeo.com/400722312"
+        }
+    ]
 };
 
 ---
 
-<Layout title="Çağdaş Çeçen" description={project.description}>
+<ProjectPage 
+    title="Çağdaş Çeçen" 
+    description={project.description}
+    project={project}
+>
+    <p>
+        Cubic object with translucent lcd panel and multi channel mapped
+        audio transmitting led arrays as backlight. Observers can also
+        interact with the installation ”Behind the box” by moving the
+        apparatus from the project “5.5”. In this way, they listen
+        different sounds which come from box. Those sounds can be audio
+        recordings from a war zone, a suicide youtuber, a make up video,
+        and many other. Without any interaction installation stays silent.
+        Visuals and movements on screen are working on Unity Engine .
+        Translucent lcd creates an augmented reality feeling depending on
+        the angle when observer looks inside the box. Apparatus is
+        functioning just as receiver and amplifier, it does not alter anything.
+        Audio cables from both Apparatus are connected to camera's
+        microphone input for this presentation. What observers hear is the
+        audio mapped led arrays and when they move around with the
+        apparatus, they hear mixtures of mapped sounds.
+    </p>
 
-    <ProjectCard project={project} />
-
-</Layout>
+</ProjectPage>

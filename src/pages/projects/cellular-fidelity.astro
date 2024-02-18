@@ -1,7 +1,6 @@
 ---
 
-import Layout from '../../layouts/Layout.astro';
-import ProjectCard from '../../components/ProjectCard.astro';
+import ProjectPage from '../../layouts/ProjectPage.astro';
 
 import Cellular1 from '../../img/cellular1.png'
 import Cellular2 from '../../img/cellular2.png'
@@ -18,47 +17,70 @@ const project = {
     images: [Cellular1, Cellular2, Cellular3, Cellular4, Cellular5, Cellular6, Cellular7], 
     artist: "Çağdaş Çeçen",
     verticaltext: "The Cellular Fidelity",
-    description: `The Cellular Fidelity creates a three-dimensional aquarium that breaks its boundaries using 
-    light and sound. Audio is encoded into lasers that project through microscopic aquatic
-                            environments into the gallery space. On the floor is a cast, colorful view of what, in reality, is
-                            floating tiny and suspended above the visitors' heads. The laser reveals its sound when a
-                            visitor steps into the shared aquatic space holding a sensor. Field recordings from the
-                            collection sites of 30 groups of marine microbes fill the space- bending, humming, and
-                            distorting with the visitor's movement. But the audio changes without a visitor, as well.
-                            Because the audio-encoded laser first travels through the microbes' environment, they are
-                            the first beings to make contact with it. When a cellular shape 'runs' across the floor, the
-                            audio reshapes in response to the actual microbe's interaction with the laser up above,
-                            picking up movement from above and making it visible and audible from below. The
-                            potential for interaction permeates this whole work. That is, interaction exists in what is
-                            visual and loud and in what is potential. If every visitor stood perfectly still, holding out their
-                            sensors, they would still hear the audio change in a memorable chorus of microbial
-                            decisions. You see, the microbes have shadowed spaces and,, therefore,, the option to
-                            engage with the laser. Nobody is obligated to communicate in cellular Fidelity. We can't
-                            talk, but we can hear each other. While one group sees, another sense. While only some
-                            microbe in these water samples are capable of sensing light, many are, and several also
-                            display different behaviours based on the volume and interference of sound. The microbes'
-                            movements create a sound for the visitors. The visitors' movements create a sound for the
-                            microbes. The light is shaped from both directions. Communication goes two ways. While
-                            one group sees, another sense. While not every microbe in these water samples can sense
-                            light, many are, and several also display different behaviours based on the volume and
-                            interference of sound. Dead and decaying cells remain motionless while their descendants'
-                            shadows distort them. Movements that would be invisible or indecipherable become visible
-                            and audible. We can stay and spend time here. A traditional aquarium is a meeting point
-                            that is also a boundary. We observe each other in our respective three-dimensional spaces,
-                            separate and uncommunicative. Outside of the aquarium, even this limited observation is
-                            fading. We are becoming more and more separated into our individual environments and
-                            roles. We can only be aware of each other on special occasions or moments of severe harm.
-                            Everything disconnects separate and moves on. Where is the value in being still, slow,
-                            spending time to observe and be in a relationship with another, watery, silent world? In The
-                            Cellular Fidelity, everyone is invited to step- or propel themselves- into a relationship of
-                            mutual observation.`,
-    link: "https://vimeo.com/708169950"
+    description: `
+    
+    The Cellular Fidelity is an immersive art installation that merges light and sound within a three-dimensional space, 
+    creating an interactive aquarium experience. Audio-encoded lasers project the microscopic aquatic world onto the 
+    gallery floor, revealing a vibrant, dynamic environment influenced by marine microbes' interactions with the lasers. 
+    Visitors, by stepping into the space with sensors, activate the audio, which shifts in response to the 
+    microbial activities rather than direct human interaction. This innovative project invites participants into 
+    a mutual relationship of observation, highlighting the unseen connections between humans and 
+    microbial life, and questioning the traditional boundaries of communication and 
+    observation in the natural world.`,
+    links: [
+        {
+            type: "Video",
+            url: "https://vimeo.com/708169950"
+        },
+        {
+            type: "Exhibition",
+            url: "https://esel.at/termin/113799/the-cellular-fidelity"
+        }
+    ]
 };
 
 ---
 
-<Layout title="Çağdaş Çeçen" description={project.description}>
-
-    <ProjectCard project={project} />
-
-</Layout>
+<ProjectPage 
+    title="Çağdaş Çeçen" 
+    description={project.description}
+    project={project}
+>
+    <p>
+        The Cellular Fidelity creates a three-dimensional aquarium that breaks its boundaries using light and sound. 
+        Audio is encoded into lasers that project through microscopic aquatic environments into the gallery space. 
+        On the floor is a cast, colorful view of what, in reality, is floating tiny and suspended above the visitors' heads. 
+        The laser reveals its sound when a visitor steps into the shared aquatic space holding a sensor. 
+        Field recordings from the collection sites of 30 groups of marine microbes fill the space—bending, humming, and 
+        distorting with the visitor's movement. 
+        
+    <p>
+        But the audio changes without a visitor, as well. Because the 
+        audio-encoded laser first travels through the microbes' environment, they are the first beings to make contact
+        with it. When a cellular shape 'runs' across the floor, the audio reshapes in response to the actual microbe's 
+        interaction with the laser up above, picking up movement from above and making it visible and audible from below. 
+        The potential for interaction permeates this whole work. That is, interaction exists in what is visual and loud 
+        and in what is potential. If every visitor stood perfectly still, holding out their sensors, they would still hear 
+        the audio change in a memorable chorus of microbial decisions. You see, the microbes have shadowed spaces and, 
+        therefore, the option to engage with the laser.
+    </p>
+    <p> 
+        Nobody is obligated to communicate in Cellular Fidelity. We can't talk, 
+        but we can hear each other. While one group sees, another senses. While only some microbes in these water samples are 
+        capable of sensing light, many are, and several also display different behaviors based on the volume and 
+        interference of sound. The microbes' movements create a sound for the visitors. The visitors' movements create a 
+        sound for the microbes. The light is shaped from both directions. Communication goes two ways. While one group sees, 
+        another senses. While not every microbe in these water samples can sense light, many are, and several also display 
+        different behaviors based on the volume and interference of sound. Dead and decaying cells remain motionless while their 
+        descendants' shadows distort them. Movements that would be invisible or indecipherable become visible and audible. 
+    </p>
+    <p>
+        We can stay and spend time here. A traditional aquarium is a meeting point that is also a boundary. We observe each 
+        other in our respective three-dimensional spaces, separate and uncommunicative. Outside of the aquarium, even this 
+        limited observation is fading. We are becoming more and more separated into our individual environments and roles. 
+        We can only be aware of each other on special occasions or moments of severe harm. Everything disconnects, separate
+        and moves on. Where is the value in being still, slow, spending time to observe and be in a relationship with
+        another, watery, silent world? In The Cellular Fidelity, everyone is invited to step—or propel themselves—into 
+        a relationship of mutual observation.
+    </p>
+</ProjectPage>

@@ -1,7 +1,5 @@
 ---
-
-import Layout from '../../layouts/Layout.astro';
-import ProjectCard from '../../components/ProjectCard.astro';
+import ProjectPage from '../../layouts/ProjectPage.astro';
 
 import Moneyment1 from '../../img/moneyment1.png'
 import Moneyment2 from '../../img/moneyment2.png'
@@ -20,13 +18,21 @@ const project = {
                 If you like, every human action finds its place in the value chain, and every
                 move is profitable.
                 Moneyment is dedicated to all those who do not play this game.`,
-    link: "#"
+    links: []
 };
 
 ---
 
-<Layout title="Çağdaş Çeçen" description={project.description}>
+<ProjectPage 
+    title="Çağdaş Çeçen" 
+    description={project.description}
+    project={project} 
+>
+    <p>
+        Money needs people, and people need money - an almost perfect circle.
+        If you like, every human action finds its place in the value chain, and every
+        move is profitable.
+        Moneyment is dedicated to all those who do not play this game.
+    </p>
 
-    <ProjectCard project={project} />
-
-</Layout>
+</ProjectPage>

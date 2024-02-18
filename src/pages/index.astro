@@ -20,7 +20,7 @@ import MoneyMentImage from '../img/moneyment.png'
 
 import { Image } from 'astro:assets';
 
-import '../styles/global.css';
+import '../styles/index.css';
 
 /* Addd new projects here in reverse chronological order (newest = last) */
 const projects = [
@@ -187,7 +187,7 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 				<div class="header-card">
 					<div class="card-content">
 						<p class="banner-title font-family-header font-extrabold">DESIGN.TECH.A</p>
-						<p class="sub-title">Çağdaş Çeçen</p>
+						<h1 class="sub-title">Çağdaş Çeçen</h1>
 					</div>	
 				</div>
 					
@@ -416,9 +416,9 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 
 			<div class="about-me--header-area">
 				<div class="about-me--header-img-wrapper">
-					<h2 class="about-me--title-back">ABOUT ME</h1>
+					<h2 class="about-me--title-back">ABOUT ME</h2>
 					<Image src={CcProfileImage} alt="Cagdas Cecen Profile Image" />
-					<h2 class="about-me--title-front">ABOUT ME</h1>	
+					<h2 class="about-me--title-front">ABOUT ME</h2>	
 				</div>
 				<hr class="contact-line glow">
 				<div class="about-me--header--social-wrapper">
@@ -663,19 +663,8 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 			>SteinCode</a>
 		</div>
 	</footer>
-
-	<script>
-		const today = new Date();
-			
-		const copyrightYearLabels = document.querySelectorAll(".copyright-year")
-		copyrightYearLabels.forEach(item => {
-			if (item !== null) {
-				item.innerHTML = today.getFullYear().toString();
-			}
-		})
-	</script>
-
 </Layout>
 
+<script src="../scripts/copyright-year-updater.js"></script>
 <script src="../scripts/index.js"></script>
 
