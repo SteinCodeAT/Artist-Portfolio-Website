@@ -47,6 +47,10 @@ a:has(img):hover {
   transition: filter 0.2s ease-in-out;
 }
 
+h1 {
+  font-family: poppins;
+}
+
 hr {
     border: none; /* Remove default border */
     width: 100%;
@@ -109,20 +113,25 @@ hr {
    height: 75vh;
 }
 
-.description-body {
+.description {
   height: 100%;
   overflow-y: auto;
 }
 
-.additional-links-title {
-  font-size: 100%;
-  margin: 2rem 0 0.5rem 0;
-  margin-top: auto;
-  padding-top: 1rem;
-}
 .additional-links-list {
   list-style: none;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  padding-top: 2rem;
+}
+
+.additional-links-list li {
+  padding: 0.5rem 0;
+}
+
+.additional-links-list a {
+  border-left: 1px solid black;
+  margin: 0.5rem 0;
+  padding-left: 0.5rem;
 }
 
 .videos-container {

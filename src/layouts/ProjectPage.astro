@@ -54,10 +54,9 @@ const { title, description, project } = Astro.props;
                         </div> 
                         : null
                     }
-                    <div class="description-body">
+                    <div class="description">
                         <h1 class="project-title">{project.title}</h1>
                         <slot />
-                        {project.links.length > 0? <h2 class="additional-links-title">Links</h2> : null}
                         <ul class="additional-links-list">
                             {project.links.map(link => {
                                 return <li><a target="_blank" class="additional-link" href={link.url}>{link.type}</a></li>
