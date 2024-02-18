@@ -104,6 +104,8 @@ document.addEventListener("DOMContentLoaded", () => {
             return
         }
 
+        stackArea.dataset.currentFocusIndex = index
+
         const stackItems = Array.from(document.querySelectorAll(".stack-item"))
 
         if (index > stackItems.length){
@@ -113,29 +115,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let reversedIndex = stackItems.length - index
 
-        console.warn(reversedIndex)
-
         const passedStackItems = stackItems.slice(reversedIndex + 1, stackArea.length)
         const focusStackItem = stackItems[reversedIndex]
         const stillAvailableStackItems = stackItems.slice(0, reversedIndex)
 
-        console.log(passedStackItems)
-        console.log(focusStackItem)
-        console.log(stillAvailableStackItems)
-
         passedStackItems.forEach(item => {
             item.classList.remove("focus")
             item.classList.add("passed")
-
+            item.classList.remove("display-at-top")
             item.querySelector(".stack-item--image-area").style.transform = null
         })
 
         focusStackItem.classList.remove("passed")
         focusStackItem.classList.add("focus")
+        
+        setTimeout(() => {
+            /* The stack item must be at the top of the pile 
+            * so that it is selectable and links are clickable
+            * However, if that happens to soon, the card that is 
+            * removed gets stuck below the new focus card. 
+            * Therefore, the z-index class is added a bit later
+            * so that the card removal animation had time to 
+            * progress more.
+             */
+            focusStackItem.classList.add("display-at-top")
+            console.log("focus")
+        }, 500)
+        
 
         stillAvailableStackItems.forEach(item => {
             item.classList.remove("focus")
             item.classList.remove("passed")
+            item.classList.remove("display-at-top")
         })
 
         rotateNotPassedImages()

@@ -172,7 +172,7 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 `
 ---
 
-<Layout title="Çağdaş Çeçen" description={description}>
+<Layout title="Çağdaş Çeçen - Media Artist" description={description}>
 	<main>
 		<section class="banner-section">			
 			<div class="vertical-lines-container">
@@ -380,7 +380,14 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 					padding-left: 1rem;
 				}
 
-
+				@media (max-width: 1400px) {
+					.about-me--header-img-wrapper h2 {
+						font-size: 3rem;
+						line-height: 1rem;
+						color: var(--text-color);
+						-webkit-text-stroke: unset;
+					}
+				}
 
 				@media (max-width:762px) {
 					#about-me-section {
@@ -403,9 +410,10 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 					}
 
 					.about-me--header-img-wrapper h2 {
-						font-size: 3.8rem;
+						font-size: 3rem;
+						line-height: 1rem;
 						color: var(--text-color);
-					-webkit-text-stroke: unset;
+						-webkit-text-stroke: unset;
 					}
 
 					.contact-line {
