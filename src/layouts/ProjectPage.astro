@@ -3,10 +3,21 @@ import Layout from "../layouts/Layout.astro"
 
 import { Image } from 'astro:assets';
 
+interface Video {
+	url: string;
+}
+
+interface Link {
+	url: string;
+    type: string
+}
+
 import '../styles/project-card-page.css';
 import { Icon } from "astro-icon/components";
 
 const { title, description, project } = Astro.props;
+
+console.log(project.images[0])
 ---
 <Layout title={title} description={description}>
     <main>
@@ -26,7 +37,7 @@ const { title, description, project } = Astro.props;
 
             {project.videos.length > 1 ? 
                 <div class="videos-container top-video-container">
-                    {project.videos.map(video =>
+                    {project.videos.map((video: Video) =>
                         <iframe 
                             title="Project Video"
                             class="mbr-embedded-video" 
@@ -43,7 +54,7 @@ const { title, description, project } = Astro.props;
                 <div class="project-info">
                     {project.videos.length==1 ? 
                         <div class="videos-container">
-                            {project.videos.map(video =>
+                            {project.videos.map((video: Video) =>
                                 <iframe 
                                     title="Project Video"
                                     class="mbr-embedded-video" 
@@ -60,7 +71,7 @@ const { title, description, project } = Astro.props;
                         <h1 class="project-title">{project.title}</h1>
                         <slot />
                         <ul class="additional-links-list">
-                            {project.links.map(link => {
+                            {project.links.map((link: Link) => {
                                 return <li><a target="_blank" class="additional-link" href={link.url}>{link.type}</a></li>
                             })}
                         </ul>
@@ -71,21 +82,21 @@ const { title, description, project } = Astro.props;
             
                 <div class="image-container">
                     <div class="image-wrapper columns-1">
-                        {project.images.map(image =>
-                            <Image src={image} alt={`Image ${image + 1}`} class="project-image" />
+                        {project.images.map((image: ImageMetadata) =>
+                            <Image src={image} alt={`Project Image`} class="project-image" />
                         )}
-                        {project.images.map(image =>
-                            <Image src={image} alt={`Image ${image + 1}`} class="project-image duplicate" />
+                        {project.images.map((image: ImageMetadata) =>
+                            <Image src={image} alt={`Project Image`} class="project-image duplicate" />
                         )}
                     </div>  
                     
                     <div class="image-wrapper columns-2">
                             <!-- Check if there are videos -->
-                        {project.images.slice(0).reverse().map(image =>
-                            <Image src={image} alt={`Image ${image + 1}`} class="project-image duplicate" />
+                        {project.images.slice(0).reverse().map((image: ImageMetadata) =>
+                            <Image src={image} alt={`Project Image`} class="project-image duplicate" />
                         )}
-                        {project.images.slice(0).reverse().map(image =>
-                            <Image src={image} alt={`Image ${image + 1}`} class="project-image duplicate" />
+                        {project.images.slice(0).reverse().map((image: ImageMetadata) =>
+                            <Image src={image} alt={`Project Image`} class="project-image duplicate" />
                         )}
                     </div>
 
