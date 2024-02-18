@@ -109,9 +109,7 @@ const { title, description, project } = Astro.props;
 
             document.querySelectorAll('.image-wrapper .project-image').forEach(image => {
                 image.addEventListener("click", (event) => {
-                    console.log("click")
-                    const modal = document.querySelector(".modal")
-                    modal?.classList.add("show")
+                    document.querySelector(".modal")?.classList.add("show")
 
                     const currentTarget = event.currentTarget as HTMLImageElement
 
@@ -127,9 +125,8 @@ const { title, description, project } = Astro.props;
             
             document.addEventListener("DOMContentLoaded", () => {    
                 const images = document.querySelectorAll(".project-image:not(.duplicate)")
-                console.log(images)
                 const imageList = Array.from(images).map(image => (image as HTMLImageElement).src)
-                console.log(imageList)
+
                 function getCurrentImageIndex() {
                     const currentImage = document.querySelector(".modal--image-wrapper img")
 
@@ -140,28 +137,17 @@ const { title, description, project } = Astro.props;
 
                 document.querySelector(".modal--previous")?.addEventListener("click", () => {
                     const index = getCurrentImageIndex()
-                    console.log(index)
 
-                    let imageSrc;
-                    if (index === 0){
-                        imageSrc = imageList[imageList.length - 1]
-                    } else {
-                        imageSrc = imageList[index - 1]
-                    }
+                    let previousIndex = (index === 0) ? imageList.length - 1 : index - 1
 
-                    setNewImageInModal({imageSrc: imageSrc})
+                    setNewImageInModal({imageSrc: imageList[previousIndex]})
                 })
                 document.querySelector(".modal--next")?.addEventListener("click", () => {
                     const index = getCurrentImageIndex()
                     
-                    let imageSrc;
-                    if (index === imageList.length - 1) {
-                        imageSrc = imageList[0]
-                    } else {
-                        imageSrc = imageList[index + 1]
-                    }
+                    let nextIndex = (index === imageList.length - 1) ? 0 : index + 1
 
-                    setNewImageInModal({imageSrc: imageSrc})
+                    setNewImageInModal({imageSrc: imageList[nextIndex]})
                 })
 
                 document.querySelector(".modal--close")?.addEventListener("click", () => {
@@ -171,8 +157,7 @@ const { title, description, project } = Astro.props;
                     setTimeout(() => {
                         modal?.classList.remove("fade-out")
                         modal?.classList.remove("show")
-                    }, 500)
-                    
+                    }, 500)      
                 })
             })
         </script>
