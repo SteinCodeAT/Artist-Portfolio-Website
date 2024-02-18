@@ -171,6 +171,10 @@ hr {
     flex-direction: column;
     gap: 1vh;
   }
+
+  .image-wrapper img {
+    cursor: pointer;
+  }
   
   /* Different animation durations for varying speeds */
 .image-wrapper:has(img) {
@@ -189,11 +193,15 @@ hr {
   
  
   /* Ensure images fill their cells and maintain aspect ratio */
-  .image-container img {
+  .image-container .project-image {
     width: 100%;
     height: 24vh;
     object-fit: cover; /* Cover the area of the cell without stretching */
     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4); 
+  }
+
+  .image-container .project-image:hover {
+    filter: brightness(120%);
   }
   
   
@@ -272,3 +280,126 @@ hr {
       font-size: 1.7rem;
     }
   }
+
+  /* Modal */
+  /* Button to open modal */
+.modal-button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #ffffff;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* Modal styles */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+  display: none;
+  opacity: 0; /* Initial state of the modal is fully transparent */
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* Show modal when checkbox is checked */
+.modal.show {
+  display: flex;
+  opacity: 1;
+}
+
+.modal.show.fade-out {
+  opacity: 0;
+  animation: fadeOut 0.5s ease forwards;
+}
+
+.modal--content {
+  background-color: var(--main-bg);
+  padding: 1rem;
+  border-radius: 5px;
+  width: 95dvw;
+  height: 95dvh;
+  position: relative;
+  background: rgba(0, 0, 0, 0.8);
+}
+
+
+/* Close button */
+.modal--close {
+  gap: 0.5rem;
+  font-size: 1.3rem;
+  border-radius: 0.25rem; 
+}
+
+.modal--image-wrapper {
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+}
+
+.modal--navigation {
+  width: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal--navigation button {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0.25rem 1rem;
+  transition: background 0.2s ease-in-out;
+  color: var(--card-bg);
+}
+
+.modal--navigation button:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.modal--next-previous-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  color: var(--card-bg);
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0.25rem 1rem;
+}
+
+.modal--next-previous-buttons svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.modal--image-wrapper img {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+@media (max-width: 762px) {
+  .modal--content {
+    height: 100dvh;
+  }
+
+  .modal--navigation {
+    padding-top: 1rem;
+  }
+  .modal--navigation .modal--previous {
+    padding-left: 0;
+  }
+}

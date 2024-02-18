@@ -4,6 +4,7 @@ import Layout from "../layouts/Layout.astro"
 import { Image } from 'astro:assets';
 
 import '../styles/project-card-page.css';
+import { Icon } from "astro-icon/components";
 
 const { title, description, project } = Astro.props;
 ---
@@ -71,28 +72,20 @@ const { title, description, project } = Astro.props;
                 <div class="image-container">
                     <div class="image-wrapper columns-1">
                         {project.images.map(image =>
-                            <a target="_blank" class="image-link">
-                                <Image src={image} alt={`Image ${image + 1}`} class="large" />
-                            </a>
+                            <Image src={image} alt={`Image ${image + 1}`} class="project-image" />
                         )}
                         {project.images.map(image =>
-                            <a target="_blank" class="image-link">
-                                <Image src={image} alt={`Image ${image + 1}`} class="large" />
-                            </a>
+                            <Image src={image} alt={`Image ${image + 1}`} class="project-image duplicate" />
                         )}
                     </div>  
                     
                     <div class="image-wrapper columns-2">
                             <!-- Check if there are videos -->
                         {project.images.slice(0).reverse().map(image =>
-                            <a target="_blank" class="image-link">
-                                <Image src={image} alt={`Image ${image + 1}`} class="project-image large" />
-                            </a>
+                            <Image src={image} alt={`Image ${image + 1}`} class="project-image duplicate" />
                         )}
                         {project.images.slice(0).reverse().map(image =>
-                            <a target="_blank" class="image-link">
-                                <Image src={image} alt={`Image ${image + 1}`} class="project-image large" />
-                            </a>
+                            <Image src={image} alt={`Image ${image + 1}`} class="project-image duplicate" />
                         )}
                     </div>
 
@@ -101,15 +94,108 @@ const { title, description, project } = Astro.props;
         </div>
 
         <script>
-            document.querySelectorAll('.image-wrapper a').forEach(link => {
-                const image = link.querySelector("img")
-                
-                if (image !== null) {
-                    link.setAttribute("href", image.src)
+            /* Image viewer */
+            function setNewImageInModal({imageSrc}){
+                const imageWrapper = document.querySelector(".modal--image-wrapper")
+                    if (imageWrapper === null) {
+                        console.error("ERROR: Could not find modal-image-wrapper")
+                        return
+                    }
+
+                    imageWrapper.innerHTML = `
+                        <img src="${imageSrc}">
+                    `
+            }
+
+            document.querySelectorAll('.image-wrapper .project-image').forEach(image => {
+                image.addEventListener("click", (event) => {
+                    console.log("click")
+                    const modal = document.querySelector(".modal")
+                    modal?.classList.add("show")
+
+                    const currentTarget = event.currentTarget as HTMLImageElement
+
+                    if (currentTarget === null){
+                        console.error("ERROR: Could not find target image")
+                        return
+                    }
+
+                    setNewImageInModal({imageSrc: currentTarget.src})
+                })
+            })
+
+            
+            document.addEventListener("DOMContentLoaded", () => {    
+                const images = document.querySelectorAll(".project-image:not(.duplicate)")
+                console.log(images)
+                const imageList = Array.from(images).map(image => (image as HTMLImageElement).src)
+                console.log(imageList)
+                function getCurrentImageIndex() {
+                    const currentImage = document.querySelector(".modal--image-wrapper img")
+
+                    return (currentImage !== null) 
+                        ? imageList.indexOf((currentImage as HTMLImageElement).src) 
+                        : 0
                 }
+
+                document.querySelector(".modal--previous")?.addEventListener("click", () => {
+                    const index = getCurrentImageIndex()
+                    console.log(index)
+
+                    let imageSrc;
+                    if (index === 0){
+                        imageSrc = imageList[imageList.length - 1]
+                    } else {
+                        imageSrc = imageList[index - 1]
+                    }
+
+                    setNewImageInModal({imageSrc: imageSrc})
+                })
+                document.querySelector(".modal--next")?.addEventListener("click", () => {
+                    const index = getCurrentImageIndex()
+                    
+                    let imageSrc;
+                    if (index === imageList.length - 1) {
+                        imageSrc = imageList[0]
+                    } else {
+                        imageSrc = imageList[index + 1]
+                    }
+
+                    setNewImageInModal({imageSrc: imageSrc})
+                })
+
+                document.querySelector(".modal--close")?.addEventListener("click", () => {
+                    const modal = document.querySelector(".modal")
+                    modal?.classList.add("fade-out")
+
+                    setTimeout(() => {
+                        modal?.classList.remove("fade-out")
+                        modal?.classList.remove("show")
+                    }, 500)
+                    
+                })
             })
         </script>
+        
         <script src="../scripts/copyright-year-updater.js"></script>
         <script src="../scripts/sub.js"></script>
+
+        <div class="modal">
+            <div class="modal--content">
+                <div class="modal--navigation">
+                    
+                    <div class="modal--next-previous-buttons">
+                        <button class="modal--previous" aria-label="next image"><Icon name="mdi:arrow-left" /></button>
+                        <button class="modal--next" aria-label="next image"><Icon name="mdi:arrow-right" /></button>
+                    </div>
+
+                    <button class="modal--close" aria-label="close modal">Close</button>
+                </div>
+
+                <div class="modal--image-wrapper">
+
+                </div>
+            </div>
+        </div>
     </main>
 </Layout>
