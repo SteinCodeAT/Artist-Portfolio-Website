@@ -5,8 +5,8 @@ import sitemap from '@astrojs/sitemap'
 import compressor from "astro-compressor";
 
 export default defineConfig({
-  site: 'https://steincodeat.github.io',
-  base: '/Artist-Portfolio-Website',
+  site: 'https://cagdascecen.com',
+  base: '',
   integrations: [
     tailwind(),
     sitemap(),  
