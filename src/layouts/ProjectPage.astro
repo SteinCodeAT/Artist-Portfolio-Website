@@ -1,13 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro"
-// Import necessary components and utilities
+
 import { Image } from 'astro:assets';
+
 import '../styles/project-card-page.css';
 
-// Props passed to the component
-// Assuming 'project' contains all necessary data for rendering
 const { title, description, project } = Astro.props;
-
 ---
 <Layout title={title} description={description}>
     <main>
@@ -16,9 +14,12 @@ const { title, description, project } = Astro.props;
             <hr class="horizontal-line-large">
             
             <div class="header-container">
-                <small><a class="home-link" href={`${import.meta.env.BASE_URL}/`}>Home</a></small>
-                <small>{project.title} / {project.type} / {project.artist}</small>
-                <small>&copy; <span class="copyright-year">2024</span></small>
+                <small class="home-link-wrapper">
+                    <a class="home-link" href={`${import.meta.env.BASE_URL}/`}>Home</a>
+                    <span class="copyright-label-mobile">&copy; <span class="copyright-year">2024</span></span>
+                </small>
+                <small class="project-header-label">{project.title} / {project.type} / {project.artist}</small>
+                <small class="copyright-label">&copy; <span class="copyright-year">2024</span></small>
             </div>
             <hr class="horizontal-line-small">
 
