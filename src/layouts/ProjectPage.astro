@@ -3,6 +3,15 @@ import Layout from "../layouts/Layout.astro"
 
 import { Image } from 'astro:assets';
 
+interface Video {
+	url: string;
+}
+
+interface Link {
+	url: string;
+    type: string
+}
+
 import '../styles/project-card-page.css';
 import { Icon } from "astro-icon/components";
 
@@ -26,7 +35,7 @@ const { title, description, project } = Astro.props;
 
             {project.videos.length > 1 ? 
                 <div class="videos-container top-video-container">
-                    {project.videos.map(video =>
+                    {project.videos.map((video: Video) =>
                         <iframe 
                             title="Project Video"
                             class="mbr-embedded-video" 
@@ -43,7 +52,7 @@ const { title, description, project } = Astro.props;
                 <div class="project-info">
                     {project.videos.length==1 ? 
                         <div class="videos-container">
-                            {project.videos.map(video =>
+                            {project.videos.map((video: Video) =>
                                 <iframe 
                                     title="Project Video"
                                     class="mbr-embedded-video" 
@@ -60,7 +69,7 @@ const { title, description, project } = Astro.props;
                         <h1 class="project-title">{project.title}</h1>
                         <slot />
                         <ul class="additional-links-list">
-                            {project.links.map(link => {
+                            {project.links.map((link: Link) => {
                                 return <li><a target="_blank" class="additional-link" href={link.url}>{link.type}</a></li>
                             })}
                         </ul>
@@ -71,21 +80,21 @@ const { title, description, project } = Astro.props;
             
                 <div class="image-container">
                     <div class="image-wrapper columns-1">
-                        {project.images.map(image =>
-                            <Image src={image} alt={`Image ${image + 1}`} class="project-image" />
+                        {project.images.map((image: ImageMetadata) =>
+                            <Image src={image} alt={`Project Image`} class="project-image" />
                         )}
-                        {project.images.map(image =>
-                            <Image src={image} alt={`Image ${image + 1}`} class="project-image duplicate" />
+                        {project.images.map((image: ImageMetadata) =>
+                            <Image src={image} alt={`Project Image`} class="project-image duplicate" />
                         )}
                     </div>  
                     
                     <div class="image-wrapper columns-2">
                             <!-- Check if there are videos -->
-                        {project.images.slice(0).reverse().map(image =>
-                            <Image src={image} alt={`Image ${image + 1}`} class="project-image duplicate" />
+                        {project.images.slice(0).reverse().map((image: ImageMetadata) =>
+                            <Image src={image} alt={`Project Image`} class="project-image duplicate" />
                         )}
-                        {project.images.slice(0).reverse().map(image =>
-                            <Image src={image} alt={`Image ${image + 1}`} class="project-image duplicate" />
+                        {project.images.slice(0).reverse().map((image: ImageMetadata) =>
+                            <Image src={image} alt={`Project Image`} class="project-image duplicate" />
                         )}
                     </div>
 
@@ -109,9 +118,7 @@ const { title, description, project } = Astro.props;
 
             document.querySelectorAll('.image-wrapper .project-image').forEach(image => {
                 image.addEventListener("click", (event) => {
-                    console.log("click")
-                    const modal = document.querySelector(".modal")
-                    modal?.classList.add("show")
+                    document.querySelector(".modal")?.classList.add("show")
 
                     const currentTarget = event.currentTarget as HTMLImageElement
 
@@ -127,9 +134,8 @@ const { title, description, project } = Astro.props;
             
             document.addEventListener("DOMContentLoaded", () => {    
                 const images = document.querySelectorAll(".project-image:not(.duplicate)")
-                console.log(images)
                 const imageList = Array.from(images).map(image => (image as HTMLImageElement).src)
-                console.log(imageList)
+
                 function getCurrentImageIndex() {
                     const currentImage = document.querySelector(".modal--image-wrapper img")
 
@@ -140,28 +146,17 @@ const { title, description, project } = Astro.props;
 
                 document.querySelector(".modal--previous")?.addEventListener("click", () => {
                     const index = getCurrentImageIndex()
-                    console.log(index)
 
-                    let imageSrc;
-                    if (index === 0){
-                        imageSrc = imageList[imageList.length - 1]
-                    } else {
-                        imageSrc = imageList[index - 1]
-                    }
+                    let previousIndex = (index === 0) ? imageList.length - 1 : index - 1
 
-                    setNewImageInModal({imageSrc: imageSrc})
+                    setNewImageInModal({imageSrc: imageList[previousIndex]})
                 })
                 document.querySelector(".modal--next")?.addEventListener("click", () => {
                     const index = getCurrentImageIndex()
                     
-                    let imageSrc;
-                    if (index === imageList.length - 1) {
-                        imageSrc = imageList[0]
-                    } else {
-                        imageSrc = imageList[index + 1]
-                    }
+                    let nextIndex = (index === imageList.length - 1) ? 0 : index + 1
 
-                    setNewImageInModal({imageSrc: imageSrc})
+                    setNewImageInModal({imageSrc: imageList[nextIndex]})
                 })
 
                 document.querySelector(".modal--close")?.addEventListener("click", () => {
@@ -171,14 +166,12 @@ const { title, description, project } = Astro.props;
                     setTimeout(() => {
                         modal?.classList.remove("fade-out")
                         modal?.classList.remove("show")
-                    }, 500)
-                    
+                    }, 500)      
                 })
             })
         </script>
         
         <script src="../scripts/copyright-year-updater.js"></script>
-        <script src="../scripts/sub.js"></script>
 
         <div class="modal">
             <div class="modal--content">
