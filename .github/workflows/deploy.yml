@@ -2,8 +2,10 @@ name: Deploy to Production
 
 on:
     push:
-        branches: [main]
-
+        branches: 
+            - main
+    workflow_dispatch:
+        
 jobs:
     # Build the final app
     build:
@@ -39,5 +41,5 @@ jobs:
             - name: Deploy to GitHub Pages
               uses: peaceiris/actions-gh-pages@v3
               with:
-                  github_token: ${{ secrets.CI_CD_TOKEN }}
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
                   publish_dir: ./dist
