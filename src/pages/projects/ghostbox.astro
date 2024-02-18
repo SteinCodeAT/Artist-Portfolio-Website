@@ -2,7 +2,6 @@
 
 import Layout from '../../layouts/Layout.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
-import '../../styles/sub.css';
 
 import Ghostbox1 from '../../img/ghostbox1.png'
 import Ghostbox2 from '../../img/ghostbox2.png'
@@ -17,7 +16,7 @@ const project = {
     type: "Interactive Sound Installation",
     videos: [{url: "https://player.vimeo.com/video/708170162?autoplay=1&muted=1&loop=1&autopause=0&background=1&playsinline=1"},{url: "https://player.vimeo.com/video/708169950?autoplay=1&muted=1&loop=1&background=1&playsinline=1&autopause=0"}],
     images: [Ghostbox1, Ghostbox2, Ghostbox3, Ghostbox4, Ghostbox5, Ghostbox6], 
-    artist: "Cagdas Cecen",
+    artist: "Çağdaş Çeçen",
     verticaltext: "Ghostbox",
     description: `Ghostbox is a work in the medium of audio-visual experience within
                 a constructed environment. It is an attempt to investigate the
@@ -36,25 +35,10 @@ const project = {
     link: "https://vimeo.com/708169950"
 };
 
-const subdescription = `
-Cagdas Cecen is a Vienna based media artist. He studied Media Art : 
-Digital Art at University of Applied Arts Vienna and Physics at University  of Vienna. 
-Currently, his artistic practices focuses in the relationship between 
-human movement, space and uncertainity. Since 2018 he is developing 
-new ways of interaction between human and space by using synesthetic 
-nature of Quantum Physics not just symbolic or inspirational way 
-but as an active element in his artworks. He strongly believes that 
-democratization of Quantum Physics will open new artistic ways 
-to reexplore our surroundings and improving our synesthetic sensation. 
-His projects have been already presented in several countries: 
-Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
-`
 ---
 
-<Layout title="Çağdaş Çeçen" description={subdescription}>
+<Layout title="Çağdaş Çeçen" description={project.description}>
 
     <ProjectCard project={project} />
 
 </Layout>
-
-<script src="../../scripts/sub.js"></script>

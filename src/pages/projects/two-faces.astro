@@ -1,7 +1,6 @@
 ---
 
 import Layout from '../../layouts/Layout.astro';
-import '../../styles/sub.css';
 
 import TwoFaces1 from '../../img/two_faces.png'
 import TwoFaces2 from '../../img/two_faces2.png'
@@ -9,14 +8,13 @@ import TwoFaces3 from '../../img/two_faces3.png'
 import TwoFaces4 from '../../img/two_faces4.png'
 
 import ProjectCard from '../../components/ProjectCard.astro';
-import '../../styles/sub.css';
 
 const project = {
     title: "Two Faces",
     type: "Video Installation",
     videos: [],
     images: [TwoFaces1, TwoFaces2, TwoFaces3, TwoFaces4], 
-    artist: "Cagdas Cecen",
+    artist: "Çağdaş Çeçen",
     verticaltext: "Two Faces",
     description: `"Palimpsest" is an artistic audio walk through "Ankerbrotfabrik" and its history.
                             Once the largest bakery in Europe, now leaving Vienna after 130 years. What remains
@@ -30,25 +28,10 @@ const project = {
     link: "https://www.ots.at/presseaussendung/OTS_20230516_OTS0053/artwalk-palimpsest-einkuenstlerischer-hoerspaziergang-durch-die-brotfabrik-bild"
 };
 
-const subdescription = `
-Cagdas Cecen is a Vienna based media artist. He studied Media Art : 
-Digital Art at University of Applied Arts Vienna and Physics at University  of Vienna. 
-Currently, his artistic practices focuses in the relationship between 
-human movement, space and uncertainity. Since 2018 he is developing 
-new ways of interaction between human and space by using synesthetic 
-nature of Quantum Physics not just symbolic or inspirational way 
-but as an active element in his artworks. He strongly believes that 
-democratization of Quantum Physics will open new artistic ways 
-to reexplore our surroundings and improving our synesthetic sensation. 
-His projects have been already presented in several countries: 
-Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
-`
 ---
 
-<Layout title="Çağdaş Çeçen" description={subdescription}>
+<Layout title="Çağdaş Çeçen" description={project.description}>
 
 	<ProjectCard project={project} />
 
 </Layout>
-
-<script src="../../scripts/sub.js"></script>
