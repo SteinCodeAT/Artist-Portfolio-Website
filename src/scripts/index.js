@@ -113,15 +113,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let reversedIndex = stackItems.length - index
 
-        console.warn(reversedIndex)
-
         const passedStackItems = stackItems.slice(reversedIndex + 1, stackArea.length)
         const focusStackItem = stackItems[reversedIndex]
         const stillAvailableStackItems = stackItems.slice(0, reversedIndex)
-
-        console.log(passedStackItems)
-        console.log(focusStackItem)
-        console.log(stillAvailableStackItems)
 
         passedStackItems.forEach(item => {
             item.classList.remove("focus")
