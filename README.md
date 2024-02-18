@@ -92,7 +92,9 @@ All projects (not just exhibitions) that are highlighted using a card in the pro
 
 To add a new project:
 
-1. tbd
+1. Upload any images for the new project in `src/img`
+2. create a new astro-file for your project sub-page and provide all necessary information and import the images.
+3. Update the project-list in index.astro. Include relevant information and a fitting image.
 
 ### Adding a new exhibition
 

@@ -1,0 +1,210 @@
+
+:root {
+  --main-bg: #141414;
+  --card-bg: #E4E4E4;
+
+  --scrollbar-accent: #c4c4c4;
+  --scrollbar-accent-bg: #d8d8d8;
+
+  --text-color: #E4E4E4;
+
+  scrollbar-face-color: var(--scrollbar-accent-bg);
+  scrollbar-base-color: var(--scrollbar-accent-bg);
+  scrollbar-3dlight-color: var(--scrollbar-accent-bg);
+  scrollbar-highlight-color: var(--scrollbar-accent-bg);
+  scrollbar-track-color: var(--scrollbar-accent-bg);
+  scrollbar-arrow-color: var(--scrollbar-accent-bg);
+  scrollbar-shadow-color: var(--scrollbar-accent-bg);
+}
+
+::-webkit-scrollbar { width: 0.7rem; height: 3px;}
+::-webkit-scrollbar-button { display: none;  background-color: var(--scrollbar-accent-bg); }
+::-webkit-scrollbar-track {  background-color: var(--scrollbar-accent);}
+::-webkit-scrollbar-track-piece { background-color: var(--scrollbar-accent-bg);}
+::-webkit-scrollbar-thumb { height: 4rem; background-color: var(--scrollbar-accent); border-radius: 3px;}
+::-webkit-scrollbar-corner { background-color: var(--scrollbar-accent-bg);}
+::-webkit-resizer { background-color: var(--scrollbar-accent-bg);}
+
+body{
+  background-color: #141414;
+  height: fit-content;
+}
+
+a {
+  text-decoration: underline;
+}
+
+p {
+  margin-bottom: 0.5rem;
+}
+
+a:hover {
+  color: #3d3d3d
+}
+
+a:has(img):hover {
+  filter: brightness(120%);
+  transition: filter 0.2s ease-in-out;
+}
+
+hr {
+    border: none; /* Remove default border */
+    width: 100%;
+}
+
+.project-card{
+  position: relative;
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  align-items: center; /* Center children horizontally */
+  margin: auto;
+  width: 90dvw;
+  min-height: 92dvh;
+  background-color: #E4E4E4;
+  border-radius: 7px;
+  margin-top: 3%;
+  padding: 0 2rem;
+}
+
+.horizontal-line-large {
+    border-top: 1rem solid #141414; /* Only show the top border */
+    margin-top: 2rem;
+}
+
+.horizontal-line-small {
+   
+    border-top: 1px solid #141414; /* Only show the top border */
+    margin-top: 1rem;
+}
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%; /* Match the width of the horizontal line */
+    padding: 0 0.1rem; /* Adjust padding as necessary */
+    margin-top: 1rem;
+}
+
+/* project info and slider images */
+.project-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 1rem;
+  width: 100%;
+  min-height: 60vh;
+  height: 77vh;
+}
+
+.project-title {
+  float: left;
+  margin: 0.5rem 0.5rem 0.5rem 0;
+  white-space: nowrap;
+  font-weight: bolder;
+  font-size: 2.8rem;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);        
+}
+
+.project-info:not(:has(.videos-container)) {
+   height: 75vh;
+}
+
+.description-body {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.additional-links-title {
+  font-size: 100%;
+  margin: 2rem 0 0.5rem 0;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+.additional-links-list {
+  list-style: none;
+  margin-bottom: 2rem;
+}
+
+.videos-container {
+  width: 100%;
+  margin-top: 1rem;
+  min-height: 25vh;
+  display: flex;
+  justify-content: space-between;
+  background: var(--main-bg);
+}
+
+.videos-container iframe {
+  height: 25vh;
+}
+
+.project-info .videos-container {
+  margin: 0 0 2vh 0;
+  width: 100%;
+  background: black;
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4); 
+}
+
+.project-info .videos-container iframe {
+  width: 100%;
+}
+
+.image-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 3 columns */
+    gap: 1vh;
+    height: 75vh;
+    overflow: hidden;    
+  }
+  
+  .image-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+  }
+  
+  /* Different animation durations for varying speeds */
+.image-wrapper:has(img) {
+    animation: scrollImages 15s linear infinite;
+  }
+  
+  .image-wrapper:last-of-type:has(img) {
+    animation: scrollImages 20s linear infinite;
+  }
+  
+  /* Keyframes for each column */
+  @keyframes scrollImages {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+  }
+  
+ 
+  /* Ensure images fill their cells and maintain aspect ratio */
+  .image-container img {
+    width: 100%;
+    height: 24vh;
+    object-fit: cover; /* Cover the area of the cell without stretching */
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4); 
+  }
+  
+  
+/*left side - project description */
+.project-info {
+    height: 75vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  
+
+  @media (min-width: 1420px) {
+    .project-card {
+      width: 80vw;
+    }
+  }
+
+  @media (min-width: 1720px) {
+    .project-card {
+      width: 70vw;
+    }
+  }

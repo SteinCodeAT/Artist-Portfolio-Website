@@ -1,8 +1,6 @@
 ---
 
-import Layout from '../../layouts/Layout.astro';
-import ProjectCard from '../../components/ProjectCard.astro';
-import '../../styles/sub.css';
+import ProjectPage from '../../layouts/ProjectPage.astro';
 
 import Ghostbox1 from '../../img/ghostbox1.png'
 import Ghostbox2 from '../../img/ghostbox2.png'
@@ -15,46 +13,55 @@ import Ghostbox6 from '../../img/ghostbox6.png'
 const project = {
     title: "Ghostbox",
     type: "Interactive Sound Installation",
-    videos: [{url: "https://player.vimeo.com/video/708170162?autoplay=1&muted=1&loop=1&autopause=0&background=1&playsinline=1"},{url: "https://player.vimeo.com/video/708169950?autoplay=1&muted=1&loop=1&background=1&playsinline=1&autopause=0"}],
+    videos: [
+        {
+            url: "https://player.vimeo.com/video/708170162?autoplay=1&muted=1&loop=1&autopause=0&playsinline=1"
+        },
+        {
+            url: "https://player.vimeo.com/video/708169950?autoplay=1&muted=1&loop=1&playsinline=1&autopause=0"
+        }
+    ],
     images: [Ghostbox1, Ghostbox2, Ghostbox3, Ghostbox4, Ghostbox5, Ghostbox6], 
-    artist: "Cagdas Cecen",
+    artist: "Çağdaş Çeçen",
     verticaltext: "Ghostbox",
-    description: `Ghostbox is a work in the medium of audio-visual experience within
-                a constructed environment. It is an attempt to investigate the
-                “Observer Effect” in the real world. The action takes place in a dark
-                space filled with ten constantly-powered, audio-modulated, red
-                laser modules.
-                While the lasers are physically identical, the audio information they
-                carry differs. This creates an entangled, amorphous audiovisual scape,
-                lending it a patterned structure. Although the structure appears
-                uniform, it reveals its synthesized nature upon interaction.
-                Visitors wearing light-sensitive devices on both fists explore the layers
-                of the soundscape through their body movements, as they interact with
-                the linear-patterned space of laser beams. The devices on their wrists
-                receive the modulated laser rays, transmitting the information to
-                speakers, and making the rays audible inside the space`,
-    link: "https://vimeo.com/708169950"
+    description: `Ghostbox is an immersive audio-visual installation that explores the 
+    "Observer Effect" through interactive engagement with audio-modulated laser beams in
+     a dark space. Equipped with light-sensitive wrist devices, visitors navigate a
+      complex, patterned landscape created by ten unique laser modules, transforming light
+       into sound through movement. This interactive experience reveals the dynamic interplay 
+       between observer and observed, making abstract scientific concepts 
+       perceptible and engaging.
+    `,
+    links: [
+        {
+            type: "Video",
+            url: "https://vimeo.com/708169950"
+        }
+    ]
 };
 
-const subdescription = `
-Cagdas Cecen is a Vienna based media artist. He studied Media Art : 
-Digital Art at University of Applied Arts Vienna and Physics at University  of Vienna. 
-Currently, his artistic practices focuses in the relationship between 
-human movement, space and uncertainity. Since 2018 he is developing 
-new ways of interaction between human and space by using synesthetic 
-nature of Quantum Physics not just symbolic or inspirational way 
-but as an active element in his artworks. He strongly believes that 
-democratization of Quantum Physics will open new artistic ways 
-to reexplore our surroundings and improving our synesthetic sensation. 
-His projects have been already presented in several countries: 
-Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
-`
 ---
 
-<Layout title="Çağdaş Çeçen" description={subdescription}>
+<ProjectPage 
+    title="Çağdaş Çeçen" 
+    description={project.description}
+    project={project}
+>
+<p>
+    Ghostbox is an audio-visual experience set within a specially constructed environment, 
+    designed to explore the "Observer Effect" in the tangible world. The installation unfolds 
+    in a darkened space, where ten continuously powered, audio-modulated red laser modules 
+    fill the area. Despite these lasers being physically identical, the audio content they
+     convey is distinct, creating a complex, intertwined audiovisual landscape that presents 
+     a patterned structure. This structure, while seemingly uniform, discloses its synthesized 
+     essence when interacted with.
+</p>
 
-    <ProjectCard project={project} />
+<p>
+    Visitors, equipped with light-sensitive devices on their wrists, navigate this soundscape 
+    by moving through the space, engaging with the linear patterns of laser beams. These wrist-mounted
+    devices capture the modulated laser light, converting it into sound that is 
+    then played through speakers, allowing the laser beams to be heard within the environment.
+</p>
 
-</Layout>
-
-<script src="../../scripts/sub.js"></script>
+</ProjectPage>

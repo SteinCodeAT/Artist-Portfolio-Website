@@ -1,8 +1,6 @@
 ---
 
-import Layout from '../../layouts/Layout.astro';
-import ProjectCard from '../../components/ProjectCard.astro';
-import '../../styles/sub.css';
+import ProjectPage from '../../layouts/ProjectPage.astro';
 
 import Virtual1 from '../../img/virtual1.png'
 import Virtual2 from '../../img/virtual2.png'
@@ -14,9 +12,9 @@ import Virtual4 from '../../img/virtual4.png'
 const project = {
     title: "Visual Isolation",
     type: "Wearable device, interactive Installation",
-    videos: [{url: "https://player.vimeo.com/video/429057286?autoplay=1&muted=1&loop=1&autopause=0&background=1&playsinline=1"}],
+    videos: [{url: "https://player.vimeo.com/video/429057286?autoplay=1&muted=1&loop=1&autopause=0&playsinline=1"}],
     images: [Virtual1, Virtual2, Virtual3, Virtual4], 
-    artist: "Cagdas Cecen",
+    artist: "Çağdaş Çeçen",
     verticaltext: "Visual Isolation",
     description: `Visual Isolation is a wearable interactive object with a display which
                 demonstrates real-time vital readings and memories.
@@ -28,28 +26,30 @@ const project = {
                 “Is surviving alone enough to stay human, what is left without memories
                 with others ? “ - this was the question that lead me to develop this
                 project`,
-    link: "https://vimeo.com/429057286"
+    links: [
+        {
+            type: "Video",
+            url: "https://vimeo.com/429057286"
+        }
+    ]
 };
 
-const subdescription = `
-Cagdas Cecen is a Vienna based media artist. He studied Media Art : 
-Digital Art at University of Applied Arts Vienna and Physics at University  of Vienna. 
-Currently, his artistic practices focuses in the relationship between 
-human movement, space and uncertainity. Since 2018 he is developing 
-new ways of interaction between human and space by using synesthetic 
-nature of Quantum Physics not just symbolic or inspirational way 
-but as an active element in his artworks. He strongly believes that 
-democratization of Quantum Physics will open new artistic ways 
-to reexplore our surroundings and improving our synesthetic sensation. 
-His projects have been already presented in several countries: 
-Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
-`
 ---
 
-<Layout title="Çağdaş Çeçen" description={subdescription}>
+<ProjectPage 
+    title="Çağdaş Çeçen" 
+    description={project.description}
+    project={project} 
+>
+    <p>
+        Visual Isolation is a wearable interactive object equipped with a display that shows
+         real-time vital readings and memories. Our lives have been dominated by numbers and
+          graphs for quite some time. Society is attempting to navigate a new relationship 
+          between our survival and our social interactions during periods of isolation, yet
+           the future remains uncertain. Despite human memory being deeply dependent on our 
+           social interactions, we find ourselves caught between fear and the loss of social 
+           abilities. "Is surviving alone enough to stay human, and what remains without shared 
+           memories?" - this question inspired the development of this project.
+    </p>
 
-    <ProjectCard project={project} />
-
-</Layout>
-
-<script src="../../scripts/sub.js"></script>
+</ProjectPage>
