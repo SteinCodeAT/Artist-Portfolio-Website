@@ -110,7 +110,7 @@ hr {
     position: relative;
     grid-template-columns: 10% 90%; /* 10% for the vertical text and 90% for the description */
     gap: 1px;
-    align-items: start; /* Align items to the start of the container */
+    align-items: flex-start; /* Align items to the start of the container */
     height: 100%; /* Make sure it takes the full height of its container */
   }
   
