@@ -178,11 +178,23 @@ hr {
   
   /* Different animation durations for varying speeds */
 .image-wrapper:has(img) {
-    animation: scrollImages 15s linear infinite;
+  --animation-duration: 25s;
+  animation: scrollImages var(--animation-duration) linear infinite;
   }
   
   .image-wrapper:last-of-type:has(img) {
-    animation: scrollImages 20s linear infinite;
+    --animation-duration: 30s;
+  }
+
+  @media (prefers-reduced-motion) {
+    .image-wrapper:has(img) {
+      --animation-duration: 55s;
+      }
+      
+      .image-wrapper:last-of-type:has(img) {
+        --animation-duration: 50s;
+      }
+    
   }
   
   /* Keyframes for each column */
