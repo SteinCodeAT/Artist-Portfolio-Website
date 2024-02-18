@@ -4,7 +4,7 @@ import icon from "astro-icon";
 import sitemap from '@astrojs/sitemap'
 
 export default defineConfig({
-  site: 'https://cagdascecen.com',
+  site: 'https://steincodeat.github.io/Artist-Portfolio-Website/',
   integrations: [
     tailwind(),
     sitemap(),  
