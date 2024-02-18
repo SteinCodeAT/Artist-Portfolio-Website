@@ -278,21 +278,17 @@ a:hover {
     width: 10vh;
     right: 2%;
     top: 80%;
-
+    
+    background-color: rgb(85, 85, 85);
+    
     display: flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
-}
 
-.btn {
-    width: 2rem;
-    height: 2rem;
-    
     text-align: center;
-    background-color: #3F3F3F;
     color:#E8E8E8 ;
-    opacity: .6;
+    opacity: 0.8;
     border: solid #E8E8E8;
 }
 

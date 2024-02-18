@@ -1,7 +1,6 @@
 ---
 import { Image } from "astro:assets"
 
-
 const {classes, slug, title, projectType, description, imageObject, year} = Astro.props
 ---
 
@@ -138,6 +137,10 @@ const {classes, slug, title, projectType, description, imageObject, year} = Astr
     @media (max-width: 762px) {
         .stack-item {
             padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
 
         .stack-item--col {
@@ -148,9 +151,10 @@ const {classes, slug, title, projectType, description, imageObject, year} = Astr
         }
 
         .stack-item .stack-item--image-area {
-            width: 100dvw;
-            height: 100%;
             aspect-ratio: unset;
+            transform: unset !important;
+            height: 80dvh;
+            width: 80dvw;
         }
     }
 
@@ -179,7 +183,7 @@ const {classes, slug, title, projectType, description, imageObject, year} = Astr
                     </p>
                     <a 
                         class="stack-item--image-link"
-                        href={`/projects/${slug}`}
+                        href={`${import.meta.env.BASE_URL}/projects/${slug}`}
                     >
                         More Details
                     </a>
