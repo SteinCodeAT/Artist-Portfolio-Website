@@ -1,7 +1,7 @@
 {
   "name": "cagdas-cecen-portfolio-website",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
