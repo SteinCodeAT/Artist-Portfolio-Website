@@ -12,6 +12,9 @@
 
     --text-color: #E4E4E4;
 
+    --accent: rgba(0, 182, 133, 0.6);
+    --tertiary: rgba(176, 38, 38, 0.6);
+
     scrollbar-face-color: var(--scrollbar-accent);
 	scrollbar-base-color: var(--scrollbar-accent);
 	scrollbar-3dlight-color: var(--scrollbar-accent);

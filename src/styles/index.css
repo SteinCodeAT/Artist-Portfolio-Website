@@ -157,7 +157,7 @@ a:hover {
     opacity: 0.7;
 }
 
-.header-card .banner-title { 
+.header-card .header-title { 
     transform: translateY(-2rem);
     line-height: normal;
     color:#E4E4E4;
@@ -425,6 +425,23 @@ a:hover {
 
   
 @media (max-width: 762px) {
+    .header-card {
+        height: 15dvh;
+    }
+    .header-card .card-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+    .header-card .header-title { 
+        display: none;
+    }
+
+    .header-card .sub-title {
+        transform: translate(0);
+        margin-bottom: 0.5rem;
+    }
+
     .banner-card {
         margin-bottom: 20vh;
     }
@@ -461,7 +478,7 @@ a:hover {
     }
 
     .banner-card .content-card-2 .front-numbers {
-        font-size: 2rem;
+        font-size: 1.8rem;
         margin-top: 30vh;
     }
 
@@ -529,16 +546,12 @@ a:hover {
     50% { opacity: 1; }
 }
 
-/* Dot styles */
 .dot {
     position: absolute;
     border-radius: 100%;
     background-color: rgba(255, 255, 255, 0.6); /* Starting color and opacity */
     /* Sizes and exact positions will be set by JavaScript */
   }
-
-
-/* psuedo lines */
 
 /* psuedo lines */
 
