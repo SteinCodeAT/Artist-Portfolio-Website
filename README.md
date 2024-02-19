@@ -72,12 +72,10 @@ All commands are run from the root of the project, from a terminal:
 
 ## Continuous Integration and Deployment
 
-![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
-
 This repository leverages GitHub Actions to ensure seamless deployment:
 
 - <strong>Release Process</strong>: Merging changes from any development branch into `main` or committing directly to `main` initiates the deployment pipeline. The main branch is automatically deployed to GitHub Pages, making the latest version of the website readily available.
 
-# License
+## License
 
 The code in this repository can be used as an inspiration or reference for your own developments. Copying this repository and just changing the contents or any form of substantial reproduction of parts are not permitted without prior written permission.
