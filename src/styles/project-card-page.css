@@ -364,15 +364,27 @@ hr {
 
 .modal--navigation {
   width: 100%;
+}
+
+.modal--navigation-top {
+  position: absolute;
   top: 0;
   left: 0;
-  position: absolute;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+}
+
+.modal--navigation-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+
+  display: flex;
+  justify-content: center;
 }
 
 .modal--navigation button {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.2);
   padding: 0.25rem 1rem;
   transition: background 0.2s ease-in-out;
   color: var(--card-bg);
@@ -387,7 +399,6 @@ hr {
   gap: 1rem;
   align-items: center;
   color: var(--card-bg);
-  background: rgba(0, 0, 0, 0.1);
   padding: 0.25rem 1rem;
 }
 
@@ -407,10 +418,16 @@ hr {
   .modal--content {
     height: 100dvh;
   }
-  .modal--navigation {
+
+  .modal--navigation button {
+    padding: 0.5rem 5vw;
+  }
+
+  .modal--navigation-top {
     padding-top: 1rem;
   }
-  .modal--navigation .modal--previous {
-    padding-left: 0;
+
+  .modal--navigation-bottom {
+    padding-bottom: 2rem;
   }
 }

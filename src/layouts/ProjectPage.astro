@@ -104,8 +104,21 @@ const { title, description, project } = Astro.props;
 
         <script>
             /* Image viewer */
-            function setNewImageInModal({imageSrc}){
-                const imageWrapper = document.querySelector(".modal--image-wrapper")
+            document.addEventListener("DOMContentLoaded", () => {    
+                // variables
+                const images = document.querySelectorAll(".project-image:not(.duplicate)")
+                const imageList = Array.from(images).map(image => (image as HTMLImageElement).src)
+
+                let touchstartX = 0;
+                let touchstartY = 0;
+                let touchendX = 0;
+                let touchendY = 0;
+
+                const minimumTouchDistance = 100;
+
+                // functions
+                function setNewImageInModal({imageSrc}){
+                    const imageWrapper = document.querySelector(".modal--image-wrapper")
                     if (imageWrapper === null) {
                         console.error("ERROR: Could not find modal-image-wrapper")
                         return
@@ -114,27 +127,17 @@ const { title, description, project } = Astro.props;
                     imageWrapper.innerHTML = `
                         <img src="${imageSrc}">
                     `
-            }
+                }
 
-            document.querySelectorAll('.image-wrapper .project-image').forEach(image => {
-                image.addEventListener("click", (event) => {
-                    document.querySelector(".modal")?.classList.add("show")
+                function closeModal(){
+                    const modal = document.querySelector(".modal")
+                        modal?.classList.add("fade-out")
 
-                    const currentTarget = event.currentTarget as HTMLImageElement
-
-                    if (currentTarget === null){
-                        console.error("ERROR: Could not find target image")
-                        return
-                    }
-
-                    setNewImageInModal({imageSrc: currentTarget.src})
-                })
-            })
-
-            
-            document.addEventListener("DOMContentLoaded", () => {    
-                const images = document.querySelectorAll(".project-image:not(.duplicate)")
-                const imageList = Array.from(images).map(image => (image as HTMLImageElement).src)
+                        setTimeout(() => {
+                            modal?.classList.remove("fade-out")
+                            modal?.classList.remove("show")
+                        }, 500)      
+                }
 
                 function getCurrentImageIndex() {
                     const currentImage = document.querySelector(".modal--image-wrapper img")
@@ -144,29 +147,86 @@ const { title, description, project } = Astro.props;
                         : 0
                 }
 
-                document.querySelector(".modal--previous")?.addEventListener("click", () => {
+                function loadPreviousImage(){
                     const index = getCurrentImageIndex()
 
                     let previousIndex = (index === 0) ? imageList.length - 1 : index - 1
 
                     setNewImageInModal({imageSrc: imageList[previousIndex]})
-                })
-                document.querySelector(".modal--next")?.addEventListener("click", () => {
+                }
+
+                function loadNextImage(){
                     const index = getCurrentImageIndex()
                     
                     let nextIndex = (index === imageList.length - 1) ? 0 : index + 1
 
                     setNewImageInModal({imageSrc: imageList[nextIndex]})
+                }
+                
+                // add event listeners    
+                document.querySelectorAll('.image-wrapper .project-image').forEach(image => {
+                    image.addEventListener("click", (event) => {
+                        document.querySelector(".modal")?.classList.add("show")
+
+                        const currentTarget = event.currentTarget as HTMLImageElement
+
+                        if (currentTarget === null){
+                            console.error("ERROR: Could not find target image")
+                            return
+                        }
+
+                        setNewImageInModal({imageSrc: currentTarget.src})
+                    })
+                })
+                
+                document.querySelector(".modal--previous")?.addEventListener("click", () => {
+                    loadNextImage()
+                })
+                document.querySelector(".modal--next")?.addEventListener("click", () => {
+                    loadPreviousImage()
                 })
 
-                document.querySelector(".modal--close")?.addEventListener("click", () => {
-                    const modal = document.querySelector(".modal")
-                    modal?.classList.add("fade-out")
+                document.querySelector(".modal")?.addEventListener("touchstart", (event: TouchEvent) => {
+                    event.preventDefault()
+                    
+                    const touchLocation = event.targetTouches[0];
+                    touchstartX = touchLocation.screenX;
+                    touchstartY = touchLocation.screenY;
 
-                    setTimeout(() => {
-                        modal?.classList.remove("fade-out")
-                        modal?.classList.remove("show")
-                    }, 500)      
+                    touchendX = 0;
+                    touchendY = 0;
+                }, false)
+
+                document.querySelector(".modal")?.addEventListener("touchend", (event: TouchEvent) => {
+                    const touchLocation = event.changedTouches[0];
+                    touchendX = touchLocation.screenX;
+                    touchendY = touchLocation.screenY;
+
+                    const distanceX = touchendX - touchstartX
+                    const distanceY = touchendY - touchstartY
+
+                    if (distanceX < 0 && Math.abs(distanceX) > minimumTouchDistance){
+                        // swipe left
+                        loadPreviousImage()
+                    } else if (distanceX > 0 && Math.abs(distanceX) > minimumTouchDistance){
+                        // swipe left
+                        loadNextImage()
+                    } else if (Math.abs(distanceY) > minimumTouchDistance) {
+                        // swipe up or down
+                        closeModal()
+                    }
+                }, false)
+
+                document.querySelector(".modal")?.addEventListener("touchcancel", () => {
+                    // reset touch recorded points
+                    touchstartX = 0;
+                    touchstartY = 0;
+                    touchendX = 0;
+                    touchendY = 0;
+                }, false)
+
+                document.querySelector(".modal--close")?.addEventListener("click", () => {
+                    closeModal()    
                 })
             })
         </script>
@@ -175,18 +235,19 @@ const { title, description, project } = Astro.props;
 
         <div class="modal">
             <div class="modal--content">
-                <div class="modal--navigation">
-                    
-                    <div class="modal--next-previous-buttons">
-                        <button class="modal--previous" aria-label="next image"><Icon name="mdi:arrow-left" /></button>
-                        <button class="modal--next" aria-label="next image"><Icon name="mdi:arrow-right" /></button>
-                    </div>
-
+                <div class="modal--navigation modal--navigation-top">
                     <button class="modal--close" aria-label="close modal">Close</button>
                 </div>
 
                 <div class="modal--image-wrapper">
 
+                </div>
+
+                <div class="modal--navigation modal--navigation-bottom">
+                    <div class="modal--next-previous-buttons">
+                        <button class="modal--previous" aria-label="next image"><Icon name="mdi:arrow-left" /></button>
+                        <button class="modal--next" aria-label="next image"><Icon name="mdi:arrow-right" /></button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -7,7 +7,7 @@ import StackItem from '../components/StackItem.astro'
 import Exhibition from '../components/Exhibition.astro'
 
 import PixelBallImage from '../img/pixel_ball.png';
-import CcProfileImage from '../img/cc.png';
+import CcProfileImage from '../img/cc-public.png'
 
 import TwoFacesImage from '../img/two_faces.png'
 import CellularFidelityImage from '../img/cellular_fidelity.png'
@@ -157,16 +157,12 @@ const projects = [
 
 
 const description = `
-Cagdas Cecen is a Vienna based media artist. He studied Media Art : 
-Digital Art at University of Applied Arts Vienna and Physics at University 
-of Vienna. 
+Cagdas Cecen is a Vienna based media artist.
 Currently, his artistic practices focuses in the relationship between 
-human movement, space and uncertainity. Since 2018 he is developing 
+human movement, space and uncertainity and he is developing 
 new ways of interaction between human and space by using synesthetic 
 nature of Quantum Physics not just symbolic or inspirational way 
-but as an active element in his artworks. He strongly believes that 
-democratization of Quantum Physics will open new artistic ways 
-to reexplore our surroundings and improving our synesthetic sensation. 
+but as an active element in his artworks. 
 His projects have been already presented in several countries: 
 Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 `
@@ -186,14 +182,12 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 					
 				<div class="header-card">
 					<div class="card-content">
-						<p class="banner-title font-family-header font-extrabold">DESIGN.TECH.A</p>
+						<p class="header-title font-family-header font-extrabold">DESIGN.TECH.A</p>
 						<h1 class="sub-title">Çağdaş Çeçen</h1>
 					</div>	
 				</div>
 					
 				<div class="banner-card">
-					
-
 					<div class="content-card">
 						<div class="circle-images">
 							<Image class="main-circle" src={PixelBallImage} alt="main circle in illustration" />
@@ -318,6 +312,7 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 					text-align: center;
 					width: 100%;
 					line-height: 4.5rem;
+					margin-bottom: 0;
 				}
 
 				.about-me--title-front {
@@ -383,7 +378,7 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 				@media (max-width: 1400px) {
 					.about-me--header-img-wrapper h2 {
 						font-size: 3rem;
-						line-height: 1rem;
+						line-height: 2rem;
 						color: var(--text-color);
 						-webkit-text-stroke: unset;
 					}
@@ -411,7 +406,7 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 
 					.about-me--header-img-wrapper h2 {
 						font-size: 3rem;
-						line-height: 1rem;
+						line-height: 2.1rem;
 						color: var(--text-color);
 						-webkit-text-stroke: unset;
 					}
