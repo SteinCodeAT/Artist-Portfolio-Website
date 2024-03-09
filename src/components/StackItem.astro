@@ -57,6 +57,11 @@ const {classes, slug, title, projectType, description, imageObject, year} = Astr
         aspect-ratio: 1;
         overflow: hidden;
     }
+
+    .stack-item--image-area:hover {
+        filter: brightness(90%);
+    }
+
     .stack-item--image {
         width: 100%;
         height: 100%;
@@ -111,6 +116,7 @@ const {classes, slug, title, projectType, description, imageObject, year} = Astr
         font-weight: bold;
         border-radius: 0.25rem;
         cursor: pointer;
+        text-decoration: underline;
     }
 
     .stack-item--image-link:hover {
@@ -119,7 +125,7 @@ const {classes, slug, title, projectType, description, imageObject, year} = Astr
 
     /* Styles for hiding / showing stack-items */
     .stack-item .stack-item--image-area{
-        transition: transform 0.5s ease-in-out;
+        transition: transform 0.5s ease-in-out, filter 0.2s ease-in-out;
     }
     .stack-item.focus .stack-item--image-area {
         transform: rotate(0deg);
@@ -174,7 +180,7 @@ const {classes, slug, title, projectType, description, imageObject, year} = Astr
         </p>
     </div>
     <div class="stack-item--col">
-        <div class="stack-item--image-area">
+        <a href={`/projects/${slug}`} class="stack-item--image-area">
             <Image class="stack-item--image" src={imageObject} alt="Image" />
             <div class="stack-item--image-text">
                 <div class="stack-item--image-title-area">
@@ -185,14 +191,14 @@ const {classes, slug, title, projectType, description, imageObject, year} = Astr
                     <p class="stack-item--image-short-description">
                         {description}
                     </p>
-                    <a 
+                    <p 
                         class="stack-item--image-link"
-                        href={`/projects/${slug}`}
+                        
                     >
                         More Details
-                    </a>
+                    </p>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
 </div>

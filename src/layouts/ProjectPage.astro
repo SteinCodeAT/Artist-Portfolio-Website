@@ -186,9 +186,7 @@ const { title, description, project } = Astro.props;
                     loadPreviousImage()
                 })
 
-                document.querySelector(".modal")?.addEventListener("touchstart", (event: TouchEvent) => {
-                    event.preventDefault()
-                    
+                document.querySelector(".modal")?.addEventListener("touchstart", (event: TouchEvent) => {                    
                     const touchLocation = event.targetTouches[0];
                     touchstartX = touchLocation.screenX;
                     touchstartY = touchLocation.screenY;
@@ -226,6 +224,7 @@ const { title, description, project } = Astro.props;
                 }, false)
 
                 document.querySelector(".modal--close")?.addEventListener("click", () => {
+                    console.log("hello")
                     closeModal()    
                 })
             })
