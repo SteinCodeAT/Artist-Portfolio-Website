@@ -2,6 +2,8 @@
 
 import ProjectPage from '../../layouts/ProjectPage.astro';
 
+import {videoTypes} from '../../const.js'
+
 import Five1 from '../../img/5_1.png'
 import Five2 from '../../img/5_2.png'
 import Five3 from '../../img/5_3.png'
@@ -17,7 +19,8 @@ const project = {
     type: "Wearable device, Audio Installation",
     videos: [
         {
-            url: "https://player.vimeo.com/video/504789015?autoplay=1&muted=1&loop=1&autopause=0&playsinline=1"
+            src: "https://player.vimeo.com/video/504789015?autoplay=1&muted=1&loop=1&autopause=0&playsinline=1",
+            type: videoTypes.external
         }
     ],
     images: [Five1, Five2, Five3, Five4, Five5, Five6, Five7, Five8], 

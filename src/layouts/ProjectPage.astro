@@ -3,8 +3,14 @@ import Layout from "../layouts/Layout.astro"
 
 import { Image } from 'astro:assets';
 
+import {videoTypes} from '../const.js'
+
+import EmbeddedMp4Gif from '../components/projectPage/Mp4Gif.astro'
+import EmbeddedVideo from '../components/projectPage/Video.astro'
+
 interface Video {
-	url: string;
+	src: string;
+    type: string
 }
 
 interface Link {
@@ -36,14 +42,11 @@ const { title, description, project } = Astro.props;
             {project.videos.length > 1 ? 
                 <div class="videos-container top-video-container">
                     {project.videos.map((video: Video) =>
-                        <iframe 
-                            title="Project Video"
-                            class="mbr-embedded-video" 
-                            src={video.url} 
-                            width="100%" height="100%"  
-                            allow="autoplay; fullscreen" 
-                            allowfullscreen>
-                        </iframe>
+                        (video.type === videoTypes.external) ? 
+                            <EmbeddedVideo src={video.src} />
+                        : (video.type === videoTypes.mp4Gif) ? 
+                            <EmbeddedMp4Gif src={video.src} />
+                        : null
                     )}
                 </div> 
             : null }
@@ -53,14 +56,11 @@ const { title, description, project } = Astro.props;
                     {project.videos.length==1 ? 
                         <div class="videos-container">
                             {project.videos.map((video: Video) =>
-                                <iframe 
-                                    title="Project Video"
-                                    class="mbr-embedded-video" 
-                                    src={video.url} 
-                                    width="100%" height="100%"  
-                                    allow="autoplay; fullscreen" 
-                                    allowfullscreen>
-                                </iframe>
+                                (video.type === videoTypes.external) ? 
+                                    <EmbeddedVideo src={video.src} />
+                                : (video.type === videoTypes.mp4Gif) ? 
+                                    <EmbeddedMp4Gif src={video.src} />
+                                : null
                             )}
                         </div> 
                         : null

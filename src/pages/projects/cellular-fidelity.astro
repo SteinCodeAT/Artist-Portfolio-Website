@@ -2,6 +2,8 @@
 
 import ProjectPage from '../../layouts/ProjectPage.astro';
 
+import {videoTypes} from '../../const.js'
+
 import Cellular1 from '../../img/cellular1.png'
 import Cellular2 from '../../img/cellular2.png'
 import Cellular3 from '../../img/cellular3.png'
@@ -10,10 +12,21 @@ import Cellular5 from '../../img/cellular5.png'
 import Cellular6 from '../../img/cellular6.png'
 import Cellular7 from '../../img/cellular7.png'
 
+import CellularGif from '../../img/cellular-fidelity-gif.mp4'
+
 const project = {
     title: "The Cellular Fidelity",
     type: "Interactive Sound Installation",
-    videos: [{url: "https://player.vimeo.com/video/715293038?autoplay=1&muted=1&autopause=0&loop=1&playsinline=1"}],
+    videos: [
+        {
+            src: "https://player.vimeo.com/video/715293038?autoplay=1&muted=1&autopause=0&loop=1&playsinline=1",
+            type: videoTypes.external
+        },
+        {
+            src: CellularGif,
+            type: videoTypes.mp4Gif
+        }
+    ],
     images: [Cellular1, Cellular2, Cellular3, Cellular4, Cellular5, Cellular6, Cellular7], 
     artist: "Çağdaş Çeçen",
     verticaltext: "The Cellular Fidelity",

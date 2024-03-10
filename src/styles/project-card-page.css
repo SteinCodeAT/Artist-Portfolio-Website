@@ -140,11 +140,13 @@ hr {
   min-height: 25vh;
   display: flex;
   justify-content: space-between;
-  background: var(--main-bg);
+  background: black;
 }
 
-.videos-container iframe {
+.videos-container iframe,
+.videos-container video {
   height: 25vh;
+  width: 100%;
 }
 
 .project-info .videos-container {

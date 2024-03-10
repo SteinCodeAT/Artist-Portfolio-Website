@@ -2,6 +2,8 @@
 
 import ProjectPage from '../../layouts/ProjectPage.astro';
 
+import {videoTypes} from '../../const.js'
+
 import Ghostbox1 from '../../img/ghostbox1.png'
 import Ghostbox2 from '../../img/ghostbox2.png'
 import Ghostbox3 from '../../img/ghostbox3.png'
@@ -15,10 +17,12 @@ const project = {
     type: "Interactive Sound Installation",
     videos: [
         {
-            url: "https://player.vimeo.com/video/708170162?autoplay=1&muted=1&loop=1&autopause=0&playsinline=1"
+            src: "https://player.vimeo.com/video/708170162?autoplay=1&muted=1&loop=1&autopause=0&playsinline=1",
+            type: videoTypes.external
         },
         {
-            url: "https://player.vimeo.com/video/708169950?autoplay=1&muted=1&loop=1&playsinline=1&autopause=0"
+            src: "https://player.vimeo.com/video/708169950?autoplay=1&muted=1&loop=1&playsinline=1&autopause=0",
+            type: videoTypes.external
         }
     ],
     images: [Ghostbox1, Ghostbox2, Ghostbox3, Ghostbox4, Ghostbox5, Ghostbox6], 
