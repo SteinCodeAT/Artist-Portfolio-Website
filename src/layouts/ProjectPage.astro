@@ -230,6 +230,27 @@ const randomlySortedImages = project.images.reverse().sort((a, b) => 0.5 - Math.
                 })
             })
         </script>
+
+        <script>
+            const prefersReducedMotion = window.matchMedia(`(prefers-reduced-motion: reduce)`).matches === true;
+
+            /* Adjust image animation speed so that the image scroll on all pages in the 
+            same speed independent of the number of images in the container */
+            document.querySelectorAll(".image-wrapper").forEach((container: HTMLElement, index: number) => {
+                /* pixels per second + offset so that each column has a slightly
+                * different speed
+                */
+                const baseSpeed = prefersReducedMotion ? 50 : 100
+
+                const speed = baseSpeed + 20 * index;
+
+                const duration = container.scrollHeight / speed; // seconds
+
+                // Set the animation duration dynamically
+                container.style.animationDuration = `${duration}s`;
+                console.log(container.style.animationDuration)
+            })
+        </script>
         
         <script src="../scripts/copyright-year-updater.js"></script>
 
