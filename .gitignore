@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # IDE
 .vscode
+
+# local drafts
+RawMedia/

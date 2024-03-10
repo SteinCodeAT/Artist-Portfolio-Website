@@ -1,0 +1,38 @@
+---
+import ProjectPage from '../../layouts/ProjectPage.astro';
+
+import Lumiscape1 from '../../img/lumiscape/lumiscape-1.jpeg'
+import Lumiscape2 from '../../img/lumiscape/lumiscape-2.jpg'
+import Lumiscape3 from '../../img/lumiscape/lumiscape-3.jpg'
+import Lumiscape4 from '../../img/lumiscape/lumiscape-4.jpg'
+import Lumiscape5 from '../../img/lumiscape/lumiscape-5.jpeg'
+
+
+const project = {
+    title: "Lumiscape",
+    type: "Reactive Video-Installation Vertical display, Camera, mini-computer, custom face recognition algorithm",
+    videos: [],
+    images: [Lumiscape1, Lumiscape2, Lumiscape3, Lumiscape4, Lumiscape5], 
+    artist: "Çağdaş Çeçen",
+    verticaltext: "Lumiscape",
+    description: `"Lumiscape" builds upon my established artistic exploration of veiled aspects of 
+        the human experience through interactive new media installations. This project 
+        utilizes my prior work with Li-Fi technology and my fascination with quantum 
+        physics to investigate the complex relationship between humans and nature.`,
+    links: []
+};
+---
+
+<ProjectPage 
+    title={`Çağdaş Çeçen - ${project.title}`} 
+    description={project.description}
+    project={project}    
+>
+    <p>
+        "Lumiscape" builds upon my established artistic exploration of veiled aspects of 
+        the human experience through interactive new media installations. This project 
+        utilizes my prior work with Li-Fi technology and my fascination with quantum 
+        physics to investigate the complex relationship between humans and nature.
+    </p>
+     
+</ProjectPage>
