@@ -1,0 +1,39 @@
+---
+import ProjectPage from '../../layouts/ProjectPage.astro';
+
+import Image1 from '../../img/quantum-synthesisia/quantum-synthesisia-1.jpeg'
+import Image2 from '../../img/quantum-synthesisia/quantum-synthesisia-2.jpeg'
+import Image3 from '../../img/quantum-synthesisia/quantum-synthesisia-3.jpeg'
+import Image4 from '../../img/quantum-synthesisia/quantum-synthesisia-4.jpeg'
+
+
+const project = {
+    title: "Quantum Synthesisia",
+    type: "Reactive Video-Installation Vertical display, Camera, mini-computer, custom face recognition algorithm",
+    videos: [],
+    images: [Image1, Image2, Image3, Image4], 
+    artist: "Çağdaş Çeçen",
+    verticaltext: "Quantum Synthesisia",
+    description: `The project explores the hypothetical concept of "quantum synesthesia," where 
+        individuals experience a merging of senses specifically related to quantum phenomena. 
+        However, I go beyond mere scientific exploration and posit quantum synesthesia 
+        as a powerful metaphor. This metaphor envisions the unseen forces shaping the 
+        universe as a symphony, expressed through an interactive experience.`,
+    links: []
+};
+---
+
+<ProjectPage 
+    title={`Çağdaş Çeçen - ${project.title}`} 
+    description={project.description}
+    project={project}    
+>
+    <p>
+        The project explores the hypothetical concept of "quantum synesthesia," where 
+        individuals experience a merging of senses specifically related to quantum phenomena. 
+        However, I go beyond mere scientific exploration and posit quantum synesthesia 
+        as a powerful metaphor. This metaphor envisions the unseen forces shaping the 
+        universe as a symphony, expressed through an interactive experience.
+    </p>
+     
+</ProjectPage>

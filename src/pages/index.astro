@@ -19,6 +19,9 @@ import MoneyMentImage from '../img/moneyment.png'
 
 import CellularGif from '../img/cellular-fidelity-gif.mp4'
 
+import LumiScapeImage from '../img/lumiscape/lumiscape-2.jpg'
+import QuantumSenesthesiaImage from '../img/quantum-synesthesisia/quantum-synesthesisia-3.jpeg'
+
 import { Image } from 'astro:assets';
 
 import {projectImageTypes} from '../const.js'
@@ -151,7 +154,7 @@ const projects = [
 	{
 		"slug": "two-faces",
 		"title": "Two Faces",
-		"projectType": "Video Installation",
+		"projectType": "-",
 		"description": `Once the largest bakery in Europe, now leaving Vienna after 130 years. What remains
 		behind? What can a place tell? Who remembers what and what seems to have been
 		completely forgotten? We make our research walkable and invite you to come along: A
@@ -162,7 +165,36 @@ const projects = [
 		see what is hidden behind it.`,
 		"imageObject": TwoFacesImage,
 		"imageType": projectImageTypes.image,
-		"year": 2023
+		"year": "In Progress"
+	}, 
+	{	
+		"slug": "quantum-synesthesia",
+		"title": "Quantum Synesthesia",
+		"projectType": "Upcoming Project",
+		"description": `
+			The project explores the hypothetical concept of "quantum synesthesia," where 
+			individuals experience a merging of senses specifically related to quantum phenomena. 
+			However, I go beyond mere scientific exploration and posit quantum synesthesia 
+			as a powerful metaphor. This metaphor envisions the unseen forces shaping the 
+			universe as a symphony, expressed through an interactive experience.
+		`,
+		"imageObject": QuantumSenesthesiaImage,
+		"imageType": projectImageTypes.image,
+		"year": "Upcoming Project"
+	},
+	{	
+		"slug": "lumiscape",
+		"title": "Lumiscape",
+		"projectType": "Upcoming Project",
+		"description": `
+		"Lumiscape" builds upon my established artistic exploration of veiled aspects of 
+        the human experience through interactive new media installations. This project 
+        utilizes my prior work with Li-Fi technology and my fascination with quantum 
+        physics to investigate the complex relationship between humans and nature.
+		`,
+		"imageObject": LumiScapeImage,
+		"imageType": projectImageTypes.image,
+		"year": "Upcoming Project"
 	}
 ]
 
@@ -221,7 +253,7 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 						<div class="content-card-2">
 							<h2 class="title font-family-header glow sub-title">MEDIA:ART<span class="tubelight">S</span></h2>
 							<div class="line-container"></div>
-							<p class="front-numbers">29.09.2023/200924</p>
+							<a href="#projects-section" class="highlight-link">&gt; Upcoming Projects</a>
 							<a class="btn dot" href="#about-me-section"> &gt; about</a>
 						</div>
 						
@@ -251,6 +283,9 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 				}
 
 				@media ((max-width:762px)) {
+					#projects-section {
+						padding-top: 10vh;
+					}
 					.stack-area {
 						position: relative;
 						display: flex;

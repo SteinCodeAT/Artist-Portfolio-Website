@@ -212,18 +212,22 @@ a:hover {
     padding-top: 5vh;
 }
 
-.banner-card .content-card-2 .front-numbers {
+.banner-card .content-card-2 .highlight-link {
     /* 1 pixel black shadow to left, top, right and bottom */
     text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
     text-align: center;
     font-size: 2.5rem;
     font-family: 'Lastica', sans-serif;
     text-transform: uppercase;;
-    color: transparent;
+    
     font-weight: 700;
     padding-top: 10%;
     rotate: 2deg;
     color: black;
+
+    display: block;
+    text-decoration: none;
+    transition: filter 0.2s ease;
 }
 
 .banner-card .content-card-2 .btn{
@@ -477,8 +481,8 @@ a:hover {
         display: none;
     }
 
-    .banner-card .content-card-2 .front-numbers {
-        font-size: 1.8rem;
+    .banner-card .content-card-2 .highlight-link {
+        font-size: 1.4rem;
         margin-top: 30vh;
     }
 
