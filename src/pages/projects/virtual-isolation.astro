@@ -2,17 +2,22 @@
 
 import ProjectPage from '../../layouts/ProjectPage.astro';
 
+import {videoTypes} from '../../const.js'
+
 import Virtual1 from '../../img/virtual1.png'
 import Virtual2 from '../../img/virtual2.png'
 import Virtual3 from '../../img/virtual3.png'
 import Virtual4 from '../../img/virtual4.png'
 
-
-
 const project = {
     title: "Visual Isolation",
     type: "Wearable device, interactive Installation",
-    videos: [{url: "https://player.vimeo.com/video/429057286?autoplay=1&muted=1&loop=1&autopause=0&playsinline=1"}],
+    videos: [
+        {
+            src: "https://player.vimeo.com/video/429057286?autoplay=1&muted=1&loop=1&autopause=0&playsinline=1",
+            type: videoTypes.external
+        }
+    ],
     images: [Virtual1, Virtual2, Virtual3, Virtual4], 
     artist: "Çağdaş Çeçen",
     verticaltext: "Visual Isolation",
