@@ -1,7 +1,11 @@
 ---
 import { Image } from "astro:assets"
 
-const {classes, slug, title, projectType, description, imageObject, year} = Astro.props
+import {projectImageTypes} from '../const.js'
+
+import EmbeddedMp4Gif from '../components/media/Mp4Gif.astro'
+
+const {classes, slug, title, projectType, description, imageObject, imageType, year} = Astro.props
 ---
 
 <style is:global>
@@ -69,6 +73,12 @@ const {classes, slug, title, projectType, description, imageObject, year} = Astr
         object-position: center;
         border: 1px solid rgb(59, 59, 59);
         filter: grayscale(20%);
+    }
+
+    .stack-item--gif {
+        min-width: 100%;
+        min-height: 100%;
+        object-fit: cover;
     }
 
     .stack-item--image-text {
@@ -181,7 +191,12 @@ const {classes, slug, title, projectType, description, imageObject, year} = Astr
     </div>
     <div class="stack-item--col">
         <a href={`/projects/${slug}`} class="stack-item--image-area">
-            <Image class="stack-item--image" src={imageObject} alt="Image" />
+            {(imageType === projectImageTypes.image) ? 
+                <Image class="stack-item--image" src={imageObject} alt="Image" />
+            : (imageType === projectImageTypes.mp4Gif) ?
+                <EmbeddedMp4Gif classes="stack-item--gif" src={imageObject} />
+            : null
+            }
             <div class="stack-item--image-text">
                 <div class="stack-item--image-title-area">
                     <h2 class="stack-item--image-title">{title}</h2>
