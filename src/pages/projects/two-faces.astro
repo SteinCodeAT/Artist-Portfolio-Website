@@ -1,16 +1,15 @@
 ---
 import ProjectPage from '../../layouts/ProjectPage.astro';
 
-import TwoFaces1 from '../../img/two_faces.png'
-import TwoFaces2 from '../../img/two_faces2.png'
-import TwoFaces3 from '../../img/two_faces3.png'
-import TwoFaces4 from '../../img/two_faces4.png'
+const images = await Astro.glob(`../../img/two-faces/*`).then(files => {
+    return files.map(file => file.default);
+});
 
 const project = {
     title: "Two Faces",
     type: "Video Installation",
     videos: [],
-    images: [TwoFaces1, TwoFaces2, TwoFaces3, TwoFaces4], 
+    images: images, 
     artist: "Çağdaş Çeçen",
     verticaltext: "Two Faces",
     description: `"Palimpsest" is an artistic audio walk through "Ankerbrotfabrik" 

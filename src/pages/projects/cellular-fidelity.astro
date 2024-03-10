@@ -4,15 +4,11 @@ import ProjectPage from '../../layouts/ProjectPage.astro';
 
 import {videoTypes} from '../../const.js'
 
-import Cellular1 from '../../img/cellular1.png'
-import Cellular2 from '../../img/cellular2.png'
-import Cellular3 from '../../img/cellular3.png'
-import Cellular4 from '../../img/cellular4.png'
-import Cellular5 from '../../img/cellular5.png'
-import Cellular6 from '../../img/cellular6.png'
-import Cellular7 from '../../img/cellular7.png'
+const images = await Astro.glob(`../../img/cellular-fidelity/*`).then(files => {
+    return files.map(file => file.default);
+});
 
-import CellularGif from '../../img/cellular-fidelity-gif.mp4'
+import CellularGif from '../../videos/cellular-fidelity-gif.mp4'
 
 const project = {
     title: "The Cellular Fidelity",
@@ -27,7 +23,7 @@ const project = {
             type: videoTypes.mp4Gif
         }
     ],
-    images: [Cellular1, Cellular2, Cellular3, Cellular4, Cellular5, Cellular6, Cellular7], 
+    images: images, 
     artist: "Çağdaş Çeçen",
     verticaltext: "The Cellular Fidelity",
     description: `

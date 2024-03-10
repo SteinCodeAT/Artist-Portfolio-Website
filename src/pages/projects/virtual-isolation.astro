@@ -4,10 +4,10 @@ import ProjectPage from '../../layouts/ProjectPage.astro';
 
 import {videoTypes} from '../../const.js'
 
-import Virtual1 from '../../img/virtual1.png'
-import Virtual2 from '../../img/virtual2.png'
-import Virtual3 from '../../img/virtual3.png'
-import Virtual4 from '../../img/virtual4.png'
+const images = await Astro.glob(`../../img/virtual-isolation/*`).then(files => {
+    return files.map(file => file.default);
+});
+
 
 const project = {
     title: "Visual Isolation",
@@ -18,7 +18,7 @@ const project = {
             type: videoTypes.external
         }
     ],
-    images: [Virtual1, Virtual2, Virtual3, Virtual4], 
+    images: images, 
     artist: "Çağdaş Çeçen",
     verticaltext: "Visual Isolation",
     description: `Visual Isolation is a wearable interactive object with a display which

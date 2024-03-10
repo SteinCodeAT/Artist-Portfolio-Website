@@ -1,18 +1,15 @@
 ---
 import ProjectPage from '../../layouts/ProjectPage.astro';
 
-import Lumiscape1 from '../../img/lumiscape/lumiscape-1.jpeg'
-import Lumiscape2 from '../../img/lumiscape/lumiscape-2.jpg'
-import Lumiscape3 from '../../img/lumiscape/lumiscape-3.jpg'
-import Lumiscape4 from '../../img/lumiscape/lumiscape-4.jpg'
-import Lumiscape5 from '../../img/lumiscape/lumiscape-5.jpeg'
-
+const images = await Astro.glob(`../../img/lumiscape/*`).then(files => {
+    return files.map(file => file.default);
+});
 
 const project = {
     title: "Lumiscape",
     type: "Upcoming Project",
     videos: [],
-    images: [Lumiscape1, Lumiscape2, Lumiscape3, Lumiscape4, Lumiscape5], 
+    images: images, 
     artist: "Çağdaş Çeçen",
     verticaltext: "Lumiscape",
     description: `"Lumiscape" builds upon my established artistic exploration of veiled aspects of 

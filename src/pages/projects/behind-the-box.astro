@@ -4,11 +4,9 @@ import ProjectPage from '../../layouts/ProjectPage.astro';
 
 import {videoTypes} from '../../const.js'
 
-import Behind1 from '../../img/behind1.png'
-import Behind2 from '../../img/behind2.png'
-import Behind3 from '../../img/behind3.png'
-import Behind4 from '../../img/behind4.png'
-
+const images = await Astro.glob(`../../img/behind-the-box/*`).then(files => {
+    return files.map(file => file.default);
+});
 
 const project = {
     title: "Behind the box",
@@ -19,7 +17,7 @@ const project = {
             type: videoTypes.external
         }
     ],
-    images: [Behind1, Behind2, Behind3, Behind4], 
+    images: images, 
     artist: "Cagdas Cecen",
     verticaltext: "Behind the box",
     description: `Cubic object with translucent lcd panel and multi channel mapped

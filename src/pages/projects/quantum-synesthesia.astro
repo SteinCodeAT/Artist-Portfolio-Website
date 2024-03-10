@@ -1,19 +1,17 @@
 ---
 import ProjectPage from '../../layouts/ProjectPage.astro';
 
-import Image1 from '../../img/quantum-synesthesisia/quantum-synesthesisia-1.jpeg'
-import Image2 from '../../img/quantum-synesthesisia/quantum-synesthesisia-2.jpeg'
-import Image3 from '../../img/quantum-synesthesisia/quantum-synesthesisia-3.jpeg'
-import Image4 from '../../img/quantum-synesthesisia/quantum-synesthesisia-4.jpeg'
-
+const images = await Astro.glob(`../../img/quantum-synesthesisia/*`).then(files => {
+    return files.map(file => file.default);
+});
 
 const project = {
-    title: "Quantum Synthesisia",
+    title: "Quantum Synesthesia",
     type: "Upcoming Project",
     videos: [],
-    images: [Image1, Image2, Image3, Image4], 
+    images: images, 
     artist: "Çağdaş Çeçen",
-    verticaltext: "Quantum Synthesisia",
+    verticaltext: "Quantum Synesthesia",
     description: `The project explores the hypothetical concept of "quantum synesthesia," where 
         individuals experience a merging of senses specifically related to quantum phenomena. 
         However, I go beyond mere scientific exploration and posit quantum synesthesia 
