@@ -10,7 +10,6 @@ import PixelBallImage from '../img/pixel_ball.png';
 import CcProfileImage from '../img/cc-public.png'
 
 import TwoFacesImage from '../img/two_faces.png'
-import CellularFidelityImage from '../img/cellular_fidelity.png'
 import GhostBoxImage from '../img/ghost_box.png'
 import VirtualIsolationImage from '../img/visual_isolation.png'
 import BehindTheBoxImage from '../img/behind_the_box.png'
@@ -18,7 +17,11 @@ import FiveDotFiveImage from '../img/5_5.png'
 import LimboImage from '../img/limbo.png'
 import MoneyMentImage from '../img/moneyment.png'
 
+import CellularGif from '../img/cellular-fidelity-gif.mp4'
+
 import { Image } from 'astro:assets';
+
+import {projectImageTypes} from '../const.js'
 
 import '../styles/index.css';
 
@@ -33,6 +36,7 @@ const projects = [
 		move is profitable.
 		Moneyment is dedicated to all those who do not play this game.`,
 		"imageObject": MoneyMentImage,
+		"imageType": projectImageTypes.image,
 		"year": "2018"
 	},
 	{
@@ -44,6 +48,7 @@ const projects = [
 		decided by their appearance. When the observer watches the screen, it
 		triggers a private story, which is trapped in time and space.`,
 		"imageObject": LimboImage,
+		"imageType": projectImageTypes.image,
 		"year": "2016 - 2018"
 	},
 	{
@@ -57,6 +62,7 @@ const projects = [
 		becomes an artificial sensory organ: follow the white noise, let your
 		ears guide you, and experience the space anew`,
 		"imageObject": FiveDotFiveImage,
+		"imageType": projectImageTypes.image,
 		"year": "2019"
 	},
 	{
@@ -79,6 +85,7 @@ const projects = [
 		audio mapped led arrays and when they move around with the
 		apparatus, they hear mixtures of mapped sounds.`,
 		"imageObject": BehindTheBoxImage,
+		"imageType": projectImageTypes.image,
 		"year": "2020"
 	},
 	{
@@ -96,6 +103,7 @@ const projects = [
 		with others ? “ - this was the question that lead me to develop this
 		project.`,
 		"imageObject": VirtualIsolationImage,
+		"imageType": projectImageTypes.image,
 		"year": "2020"
 	},
 	{
@@ -117,6 +125,7 @@ const projects = [
 		receive the modulated laser rays, transmitting the information to
 		speakers, and making the rays audible inside the space.`,
 		"imageObject": GhostBoxImage,
+		"imageType": projectImageTypes.image,
 		"year": "2020 - 2021"
 	},
 	{
@@ -135,7 +144,8 @@ const projects = [
 		audio reshapes in response to the actual microbe's interaction with the laser up above,
 		picking up movement from above and making it visible and audible from below. The
 		potential for interaction permeates this whole work.`,
-		"imageObject": CellularFidelityImage,
+		"imageObject": CellularGif,
+		"imageType": projectImageTypes.mp4Gif,
 		"year": 2022
 	},
 	{
@@ -151,6 +161,7 @@ const projects = [
 		Faces" is one of the eight artistic stations, we experience how layer after layer is removed to
 		see what is hidden behind it.`,
 		"imageObject": TwoFacesImage,
+		"imageType": projectImageTypes.image,
 		"year": 2023
 	}
 ]
@@ -225,7 +236,7 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 			<div class="vertical-line-2"></div>
 			<div class="vertical-line-2"></div>
 		</section>	
-		
+
 		<section id="projects-section" style={`height: ${100 * projects.length}vh;`}>
 			<style>
 				#projects-section {
@@ -263,6 +274,7 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 						projectType={project.projectType}
 						description={project.description}
 						imageObject={project.imageObject}
+						imageType={project.imageType}
 						year={project.year}
 					/>
 				})}					
