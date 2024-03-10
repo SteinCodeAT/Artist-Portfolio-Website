@@ -1,18 +1,16 @@
 ---
 import ProjectPage from '../../layouts/ProjectPage.astro';
 
-import Limbo1 from '../../img/limbo1.png'
-import Limbo2 from '../../img/limbo2.png'
-import Limbo3 from '../../img/limbo3.png'
-import Limbo4 from '../../img/limbo4.png'
-import Limbo5 from '../../img/limbo5.png'
 
+const images = await Astro.glob(`../../img/limbo/*`).then(files => {
+    return files.map(file => file.default);
+});
 
 const project = {
     title: "Limbo",
     type: "Reactive Video-Installation Vertical display, Camera, mini-computer, custom face recognition algorithm",
     videos: [],
-    images: [Limbo1, Limbo2, Limbo3, Limbo4, Limbo5], 
+    images: images, 
     artist: "Çağdaş Çeçen",
     verticaltext: "Limbo",
     description: `Replacing a specific space close to the stairs between two floors with a

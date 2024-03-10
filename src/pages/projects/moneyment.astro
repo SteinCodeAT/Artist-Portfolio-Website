@@ -1,17 +1,16 @@
 ---
 import ProjectPage from '../../layouts/ProjectPage.astro';
 
-import Moneyment1 from '../../img/moneyment1.png'
-import Moneyment2 from '../../img/moneyment2.png'
-import Moneyment3 from '../../img/moneyment3.png'
-import Moneyment4 from '../../img/moneyment4.png'
+const images = await Astro.glob(`../../img/moneyment/*`).then(files => {
+    return files.map(file => file.default);
+});
 
 
 const project = {
     title: "Moneyment",
     type: "Mixed-Media Installation, POS Device, Display, Striped bills",
     videos: [],
-    images: [Moneyment1, Moneyment2, Moneyment3, Moneyment4], 
+    images: images, 
     artist: "Çağdaş Çeçen",
     verticaltext: "Moneyment",
     description: `Money needs people, and people need money - an almost perfect circle.

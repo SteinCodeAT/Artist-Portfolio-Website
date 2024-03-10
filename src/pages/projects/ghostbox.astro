@@ -4,13 +4,9 @@ import ProjectPage from '../../layouts/ProjectPage.astro';
 
 import {videoTypes} from '../../const.js'
 
-import Ghostbox1 from '../../img/ghostbox1.png'
-import Ghostbox2 from '../../img/ghostbox2.png'
-import Ghostbox3 from '../../img/ghostbox3.png'
-import Ghostbox4 from '../../img/ghostbox4.png'
-import Ghostbox5 from '../../img/ghostbox5.png'
-import Ghostbox6 from '../../img/ghostbox6.png'
-
+const images = await Astro.glob(`../../img/ghostbox/*`).then(files => {
+    return files.map(file => file.default);
+});
 
 const project = {
     title: "Ghostbox",
@@ -25,7 +21,7 @@ const project = {
             type: videoTypes.external
         }
     ],
-    images: [Ghostbox1, Ghostbox2, Ghostbox3, Ghostbox4, Ghostbox5, Ghostbox6], 
+    images: images, 
     artist: "Çağdaş Çeçen",
     verticaltext: "Ghostbox",
     description: `Ghostbox is an immersive audio-visual installation that explores the 
