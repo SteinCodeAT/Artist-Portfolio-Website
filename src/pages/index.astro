@@ -200,7 +200,7 @@ const projects = [
 
 
 const description = `
-Cagdas Cecen is a Vienna based media artist.
+Çağdaş Çeçen is a Vienna based media artist.
 Currently, his artistic practices focuses in the relationship between 
 human movement, space and uncertainity and he is developing 
 new ways of interaction between human and space by using synesthetic 
@@ -212,8 +212,14 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 ---
 
 <Layout title="Çağdaş Çeçen - Media Artist" description={description}>
+
 	<main>
-		<section class="banner-section">			
+		<a href="#main-card" class="sr-skip-link">
+			Skip to main content
+		</a>
+
+	<section class="banner-section">			
+		
 			<div class="vertical-lines-container">
 				<!-- Generate multiple divs like this for more lines -->
 				<div class="vertical-line"></div>
@@ -221,16 +227,27 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 				<div class="vertical-line"></div>
 				<div class="vertical-line"></div>
 				<div class="vertical-line"></div>
-				<!-- ... -->
-					
-				<div class="header-card">
-					<div class="card-content">
-						<p class="header-title font-family-header font-extrabold">DESIGN.TECH.A</p>
-						<h1 class="sub-title">Çağdaş Çeçen</h1>
-					</div>	
-				</div>
-					
-				<div class="banner-card">
+				<!-- -->
+				
+
+				<header>
+					<a class="nav-link brand-link" href="/"><Icon name="logo-2" /></a>
+					<nav>
+						<ul>
+							<li>
+								
+							</li>
+							<li>
+								<a class="nav-link" href="#projects-section" aria-label="Projects">Projects</a>
+							</li>
+							<li>
+								<a class="nav-link" href="#about-me-section" aria-label="About Me">About Me</a>
+							</li>
+						</ul>
+					</nav>
+				</header>
+
+				<div class="banner-card" id="main-card">
 					<div class="content-card">
 						<div class="circle-images">
 							<Image class="main-circle" src={PixelBallImage} alt="main circle in illustration" />
@@ -254,7 +271,6 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 							<h2 class="title font-family-header glow sub-title">MEDIA:ART<span class="tubelight">S</span></h2>
 							<div class="line-container"></div>
 							<a href="#projects-section" class="highlight-link">&gt; Upcoming Projects</a>
-							<a class="btn dot" href="#about-me-section"> &gt; about</a>
 						</div>
 						
 						
@@ -467,7 +483,7 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 			<div class="about-me--header-area">
 				<div class="about-me--header-img-wrapper">
 					<h2 class="about-me--title-back">ABOUT ME</h2>
-					<Image src={CcProfileImage} alt="Cagdas Cecen Profile Image" />
+					<Image src={CcProfileImage} alt="Çağdaş Çeçen Profile Image" />
 					<h2 class="about-me--title-front">ABOUT ME</h2>	
 				</div>
 				<hr class="contact-line glow">
@@ -487,7 +503,7 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 			<div class="about-me--text-area">
 				
 				<p>
-					Cagdas Cecen is a Vienna based media artist. He studied Media Art :
+					Çağdaş Çeçen is a Vienna based media artist. He studied Media Art :
 					Digital Art at University of Applied Arts Vienna and Physics at University of Vienna.
 					Currently, his artistic practices focuses in the relationship between
 					human movement, space and uncertainity. Since 2018 he is developing
