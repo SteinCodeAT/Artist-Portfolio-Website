@@ -169,6 +169,7 @@ header {
     font-family: 'Lastica', sans-serif;
     text-transform: uppercase;
     font-size: 2rem;
+    position: relative;
 }
 
 header nav {
