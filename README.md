@@ -12,7 +12,7 @@ built with Astro, showcasing a modern, responsive design that highlights Çağda
 
 
 ## About the artist
-Cagdas Cecen is a Vienna based media artist.
+Çağdaş Çeçen is a Vienna based media artist.
 Currently, his artistic practices focuses in the relationship between 
 human movement, space and uncertainity and he is developing 
 new ways of interaction between human and space by using synesthetic 

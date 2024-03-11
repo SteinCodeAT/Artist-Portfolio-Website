@@ -1,14 +1,22 @@
 ---
 import ProjectPage from '../../layouts/ProjectPage.astro';
+import {videoTypes} from '../../const.js'
 
 const images = await Astro.glob(`../../img/lumiscape/*`).then(files => {
     return files.map(file => file.default);
 });
 
+import LumiscapeGif from '../../videos/lumiscape-gif.mp4'
+
 const project = {
     title: "Lumiscape",
     type: "Upcoming Project",
-    videos: [],
+    videos: [
+        {
+            src: LumiscapeGif,
+            type: videoTypes.mp4Gif
+        }
+    ],
     images: images, 
     artist: "Çağdaş Çeçen",
     verticaltext: "Lumiscape",
