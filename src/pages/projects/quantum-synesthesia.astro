@@ -1,14 +1,22 @@
 ---
 import ProjectPage from '../../layouts/ProjectPage.astro';
+import {videoTypes} from '../../const.js'
 
 const images = await Astro.glob(`../../img/quantum-synesthesisia/*`).then(files => {
     return files.map(file => file.default);
 });
 
+import QuantumSynthesiaGif from '../../videos/quantum-synthesia-gif.mp4'
+
 const project = {
     title: "Quantum Synesthesia",
     type: "Upcoming Project",
-    videos: [],
+    videos: [
+        {
+            src: QuantumSynthesiaGif,
+            type: videoTypes.mp4Gif
+        }
+    ],
     images: images, 
     artist: "Çağdaş Çeçen",
     verticaltext: "Quantum Synesthesia",
