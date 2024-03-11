@@ -53,36 +53,6 @@ function generateDots(containerClassName, numOfDots, getRandomPositionFunc, maxD
 document.addEventListener("DOMContentLoaded", function() {
     generateDots("circle-dots-container", 170, randomPositionInCircle, 45)
     generateDots("banner-dots-container", 20, randomPositionInSquare, 50)
-    /* 
-    const container = document.querySelector('.dots-container');
-    const numOfDots = 170; // Change this number based on how many dots you want
-  
-    for (var i = 0; i < numOfDots; i++) {
-      let dot = document.createElement('div');
-      dot.classList.add('dot');
-      
-      let size = Math.random() * 5 + 8; // Size between 2px and 7px
-      let opacity = Math.random(); // Opacity between 0 and 1
-      // Get a random position within a max distance from center
-
-        let position = randomCirclePosition(45); // Max distance from center in percent
-        let posX = 50 + position.x; // Center is 50% for left
-        let posY = 50 + position.y; // Center is 50% for top
-
-      // Set random animation delays and durations for the fading effect
-      let animationDelay = Math.random() * 5; // up to 5 seconds delay
-      let animationDuration = 3 + Math.random() * 5; // between 3 and 8 seconds long
-
-      dot.style.width = `${size}px`;
-      dot.style.height = `${size}px`;
-      dot.style.opacity = opacity;
-      dot.style.left = `${posX}%`;
-      dot.style.top = `${posY}%`;
-      dot.style.animation = `fadeEffect ${animationDuration}s infinite ${animationDelay}s`;
-  
-    
-      container.appendChild(dot);
-    }*/
   });
 
 // LINES 
