@@ -190,8 +190,8 @@ header nav li {
     text-decoration: none;
 
     --shadow-color: rgb(200, 200, 200);
-    text-shadow: -1px 0 var(--shadow-color), 0 1px var(--shadow-color), 1px 0 var(--shadow-color), 0 -1px var(--shadow-color);
-    
+    --shadow-distance: 1;
+    text-shadow: -2px 0 var(--shadow-color), 0 2px var(--shadow-color), 2px 0 var(--shadow-color), 0 -2px var(--shadow-color);
     font-size: 1.4rem;
     font-family: 'Lastica', sans-serif;
     text-transform: uppercase;
@@ -473,6 +473,31 @@ header nav li {
 
   
 @media (max-width: 762px) {
+    header {
+        flex-direction: column;
+        padding: 1rem 5vw;
+    }
+
+    header nav {
+        margin-left: unset;
+    }
+
+    .nav-link {
+        text-shadow: -2px 0 var(--shadow-color), 0 2px var(--shadow-color), 2px 0 var(--shadow-color), 0 -2px var(--shadow-color);
+    }
+
+    .banner-dots-container .dot {
+        scale: 1;
+    }
+
+    .banner-dots-container .dot:nth-child(2n) {
+        display: none;
+    }
+
+    .banner-dots-container .dot:nth-child(3n) {
+        display: none;
+    }
+
     .header-card {
         height: 15dvh;
     }
