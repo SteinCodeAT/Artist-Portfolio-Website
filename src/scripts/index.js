@@ -97,68 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const bannerSection = document.querySelector(".banner-section");
     const stackArea = document.querySelector(".stack-area")
 
-    let touchStartY = 0;
-    let touchEndY = 0;
-    let minimumTouchDistance = 1;
-    
-    stackArea.addEventListener("touchstart", (event) => {
-        const bannerAreaProportion = bannerSection.getBoundingClientRect().bottom/(window.innerHeight * 0.8);
-
-        if (bannerAreaProportion > 0){
-            /* stack area is not visible */
-            return
-        }
-        event.preventDefault()
-
-        const touchLocation = event.targetTouches[0];
-        touchStartY = touchLocation.screenY;
-        touchEndY = 0;
-    }, false)
-
-    stackArea.addEventListener("touchend", (event) => {
-        const bannerAreaProportion = bannerSection.getBoundingClientRect().bottom/(window.innerHeight * 0.8);
-
-        if (bannerAreaProportion > 0){
-            /* stack area is not visible */
-            return
-        }
-
-        const touchLocation = event.changedTouches[0];
-        touchEndY = touchLocation.screenY;
-
-        const distanceY = touchEndY - touchStartY
-
-        if (distanceY < 0 && Math.abs(distanceY) > minimumTouchDistance){
-            // move one card down
-            window.scrollBy({
-                top: (window.innerHeight) * 0.99,
-                left: 0,
-                behavior: "smooth",
-            })
-
-        } else if (distanceY > 0 && Math.abs(distanceY) > minimumTouchDistance){
-            // move one card up
-            window.scrollBy({
-                top: (window.innerHeight) * (-0.99),
-                left: 0,
-                behavior: "smooth",
-            })
-        }
-        switchCard()
-    }, false)
-
-    stackArea.addEventListener("touchcancel", () => {
-        // reset touch recorded points
-        touchStartY = 0;
-        touchEndY = 0;
-    }, false)
-
-
     window.addEventListener("scroll", () => {
-        switchCard()  
-    })
-
-    function switchCard() {
         const propotion = bannerSection.getBoundingClientRect().bottom/(window.innerHeight * 0.8);
         
         if (propotion > 0){
@@ -167,7 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const index = Math.floor(propotion) * -1
-        console.log(index)
 
         if (index == stackArea.dataset.currentFocusIndex){
             /* return if the focus card would remain the same */
@@ -219,5 +157,5 @@ document.addEventListener("DOMContentLoaded", () => {
         })
 
         rotateNotPassedImages()
-    }
+    })
 })

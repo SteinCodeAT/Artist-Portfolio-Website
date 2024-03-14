@@ -499,7 +499,7 @@ header nav li {
     }
 
     .header-card {
-        height: 15dvh;
+        height: 15vh;
     }
     .header-card .card-content {
         display: flex;

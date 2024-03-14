@@ -62,8 +62,8 @@ hr {
   flex-direction: column; /* Stack children vertically */
   align-items: center; /* Center children horizontally */
   margin: auto;
-  width: 90dvw;
-  min-height: 92dvh;
+  width: 90vw;
+  min-height: 92vh;
   background-color: #E4E4E4;
   border-radius: 7px;
   margin-top: 3%;
@@ -344,8 +344,8 @@ hr {
   background-color: var(--main-bg);
   padding: 1rem;
   border-radius: 5px;
-  width: 95dvw;
-  height: 95dvh;
+  width: 95vw;
+  height: 95vh;
   position: relative;
   background: rgba(0, 0, 0, 0.8);
 }
@@ -418,7 +418,7 @@ hr {
 
 @media (max-width: 762px) {
   .modal--content {
-    height: 100dvh;
+    height: 100vh;
   }
 
   .modal--navigation button {
