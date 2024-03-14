@@ -282,7 +282,7 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 			<div class="vertical-line-2"></div>
 		</section>	
 
-		<section id="projects-section" style={`height: ${100 * projects.length}vh;`}>
+		<section id="projects-section" style={`height: ${90 * projects.length}vh;`}>
 			<style>
 				#projects-section {
 					width: 100vw;
@@ -295,23 +295,7 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 					top: 0;
 				}
 
-				@media ((max-width:762px)) {
-					#projects-section {
-						padding-top: 10vh;
-					}
-					.stack-area {
-						position: relative;
-						display: flex;
-						flex-direction: column;
-						gap: 20dvh;
-						flex-flow: column-reverse;
-						justify-content: flex-end;
-					}
-				}
 			</style>
-			<script>
-				
-			</script>
 
 			<div class="stack-area">
 				{projects.map((project) => {
@@ -339,6 +323,7 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 					gap: 1rem;
 					padding: 0 10vw;					
 					padding-top: 2rem;
+					margin-top: 10vh;
 				}
 
 				.about-me--header-area {
@@ -446,17 +431,20 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 				@media (max-width:762px) {
 					#about-me-section {
 						grid-template-columns: 1fr;
+						margin-top: 0;
 					}
 
 					.about-me--header-area {
-						position: unset;
-						margin-top: 20vh;
-						margin-bottom: 2rem;
+						position: sticky;
+						margin-top: 0;
+						top: 0;
+						background: var(--main-bg);
+						padding-bottom: 2rem;
 						height: unset;
 					}
 
-					.about-me--header--social-wrapper {
-						flex-direction: column;
+					.about-me--header-img-wrapper {
+						height: 20vh;
 					}
 
 					.about-me--header-img-wrapper img {
@@ -484,11 +472,13 @@ Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
 				<div class="about-me--header--social-wrapper">
 
 					<a href="https://www.instagram.com/nihilprophet/">
-						<Icon name="mdi:instagram" /> @nihilprophet
+						<Icon name="mdi:instagram" /> <span class="desktop-only">@nihilprophet</span>
+						<span class="mobile-only">Instagram</span>
 					</a>
 				
 					<a href="mailto:nihilprophet@gmail.com">
-						<Icon name="mdi:email" /> nihilprophet@gmail.com
+						<Icon name="mdi:email" /> <span class="desktop-only">nihilprophet@gmail.com</span>
+						<span class="mobile-only">E-Mail</span>
 					</a>
 					
 				</div>

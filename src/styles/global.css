@@ -59,3 +59,20 @@ h3 {
     font-weight: bold;
     margin-bottom: 1rem;
 }
+
+.mobile-only {
+    display: none;
+}
+
+.desktop-only {
+    display: block;
+}
+
+@media (max-width: 762px) {
+    .mobile-only {
+        display: block;
+    }
+    .desktop-only {
+        display: none;
+    }
+}
