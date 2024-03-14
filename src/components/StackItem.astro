@@ -157,8 +157,10 @@ const {classes, slug, title, projectType, description, imageObject, imageType, y
     @media (max-width: 762px) {
         .stack-item {
             padding: 0;
-            gap: 0;
-            grid-template-columns: 1fr;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
 
         .stack-item--col {
@@ -170,6 +172,7 @@ const {classes, slug, title, projectType, description, imageObject, imageType, y
 
         .stack-item .stack-item--image-area {
             aspect-ratio: unset;
+            transform: unset !important;
             height: 60vh;
             width: 80vw;
             margin: 5vh 5vw;
