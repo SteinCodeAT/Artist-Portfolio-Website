@@ -252,6 +252,11 @@ header nav li {
    
 }
 
+
+.banner-card .content-card .title-prefix {
+    display: none;
+}
+
 .banner-card .content-card-2 {
     padding-top: 5vh;
 }

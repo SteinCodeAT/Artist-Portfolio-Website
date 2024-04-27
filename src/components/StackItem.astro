@@ -6,6 +6,20 @@ import {projectImageTypes} from '../const.js'
 import EmbeddedMp4Gif from '../components/media/Mp4Gif.astro'
 
 const {classes, slug, title, projectType, description, imageObject, imageType, year} = Astro.props
+
+/*
+* We want to create a shortened description but it should not cut through a word but end in a whitespace
+* to make it more readable.
+*/
+// cut the description at a desired minimum length
+const minimumDescriptionLength = 170;
+const descriptionEnd = description.slice(minimumDescriptionLength, description.length)
+
+// find the first whitespace after the cut
+const firstWhiteSpaceIndex = descriptionEnd.indexOf(" ")
+
+// perform the final truncation of the description to the target whitespace 
+const shortDescription = description.slice(0, minimumDescriptionLength + firstWhiteSpaceIndex) + " ..."
 ---
 
 <style is:global>
@@ -200,12 +214,12 @@ const {classes, slug, title, projectType, description, imageObject, imageType, y
             }
             <div class="stack-item--image-text">
                 <div class="stack-item--image-title-area">
-                    <h2 class="stack-item--image-title">{title}</h2>
+                    <p class="stack-item--image-title">{title}</p>
                     <small class="stack-item--image-sub-title">{year}</small>
                 </div>
                 <div class="stack-item--image-text-bottom">
                     <p class="stack-item--image-short-description">
-                        {description}
+                        {shortDescription}
                     </p>
                     <p 
                         class="stack-item--image-link"
