@@ -1,7 +1,9 @@
 ---
 const {src, classes} = Astro.props
+
+import VideoPlaceHolderImage from './../../img/loading-placeholder-image.png'
 ---
 
-<video class={(classes !== undefined) ? classes : ''} autoplay loop muted playsinline>
+<video class={(classes !== undefined) ? classes : ''} autoplay loop muted playsinline poster={VideoPlaceHolderImage.src}>
     <source src={src} type="video/mp4" />
 </video>
