@@ -79,49 +79,54 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // projects section
 document.addEventListener("DOMContentLoaded", () => {
-    function rotateNotPassedImages() {
+    const isMobile = !window.matchMedia('only screen and (min-width: 768px)').matches
+
+    function transformNotPassedImages() {
         const stackItemImageAreas = document.querySelectorAll(
             ".stack-item:not(.passed) .stack-item--image-area"
         )
 
         for (let i = stackItemImageAreas.length - 1; i >= 0; i--) {
-            stackItemImageAreas[i].style.transform = `rotate(-${0.75 * (stackItemImageAreas.length - i - 1)}deg)`
+            let transformStyle = ''
+            const offsetFactor = stackItemImageAreas.length - i
+            
+            if (isMobile) {
+                transformStyle = `translate(${offsetFactor * 10}px, ${offsetFactor * 2}px)`
+            } else {
+                transformStyle = `rotate(-${0.75 * (offsetFactor - 1)}deg)`
+            }
+            stackItemImageAreas[i].style.transform = transformStyle
         }
     }
     
     // Set initial rotation
-    rotateNotPassedImages()
+    transformNotPassedImages()
 
     document.querySelector(".stack-item:last-of-type").classList.add("focus")
 
     const bannerSection = document.querySelector(".banner-section");
     const stackArea = document.querySelector(".stack-area")
+    const stackItems = Array.from(document.querySelectorAll(".stack-item"))
 
-    window.addEventListener("scroll", () => {
-        const propotion = bannerSection.getBoundingClientRect().bottom/(window.innerHeight * 0.8);
-        
-        if (propotion > 0){
-            /* stack area is not visible */
-            return
-        }
-
-        const index = Math.floor(propotion) * -1
-
+    function showProjectCardByIndex({index}) {
         if (index == stackArea.dataset.currentFocusIndex){
             /* return if the focus card would remain the same */
             return
         }
 
-        stackArea.dataset.currentFocusIndex = index
+        console.log(index)
 
-        const stackItems = Array.from(document.querySelectorAll(".stack-item"))
-
-        if (index > stackItems.length){
-            /* return if the index would be larger than the stack items */
+        if (index > stackItems.length || index < 0){
+            /* return if the index would be larger than the stack items or less than 0 */
             return
         }
 
+        stackArea.dataset.currentFocusIndex = index
+
         let reversedIndex = stackItems.length - index
+        console.log("index ", index)
+        console.log("stackItems.length, ", stackItems.length)
+        console.log("reversedIndex ", reversedIndex)
 
         const passedStackItems = stackItems.slice(reversedIndex + 1, stackArea.length)
         const focusStackItem = stackItems[reversedIndex]
@@ -156,6 +161,90 @@ document.addEventListener("DOMContentLoaded", () => {
             item.classList.remove("display-at-top")
         })
 
-        rotateNotPassedImages()
-    })
+        transformNotPassedImages()
+    }
+
+    /* Add touch event listeners for mobile screens 
+    * This should only be applied if it is a mobile device
+    * All larger screens should work with the standard scroll animation
+    */
+    if (isMobile){
+        let touchstartX = 0;
+        let touchstartY = 0;
+        let touchendX = 0;
+        let touchendY = 0;
+    
+        const minimumTouchDistance = 25;
+    
+        document.querySelector(".stack-area")?.addEventListener("touchstart", (event) => {                    
+            const touchLocation = event.targetTouches[0];
+            touchstartX = touchLocation.screenX;
+            touchstartY = touchLocation.screenY;
+    
+            touchendX = 0;
+            touchendY = 0;
+        }, false)
+    
+        document.querySelector(".stack-area")?.addEventListener("touchend", (event) => {
+            const touchLocation = event.changedTouches[0];
+            touchendX = touchLocation.screenX;
+            touchendY = touchLocation.screenY;
+    
+            const distanceX = touchendX - touchstartX
+            const distanceY = touchendY - touchstartY
+    
+            /* parse the currently set focus index as int or set to a reasonable default value */
+            let currentFocusIndex = stackArea.dataset.currentFocusIndex
+    
+            if (currentFocusIndex === undefined) {
+                currentFocusIndex = 0
+            } else {
+                currentFocusIndex = parseInt(currentFocusIndex)
+            }
+            
+            if (distanceX < 0 && Math.abs(distanceX) > minimumTouchDistance){
+                // swipe left
+                let targetIndex = currentFocusIndex + 1
+
+                if (targetIndex > stackItems.length) {
+                    targetIndex = 1
+                }
+
+                showProjectCardByIndex({index: targetIndex})
+            } else if (distanceX > 0 && Math.abs(distanceX) > minimumTouchDistance){
+                // swipe right
+                let targetIndex = currentFocusIndex - 1
+
+                if (targetIndex <= 0) {
+                    targetIndex = stackItems.length
+                }
+
+                showProjectCardByIndex({index: targetIndex})
+            } else if (Math.abs(distanceY) > minimumTouchDistance) {
+                // swipe up or down - do nothing
+            }
+        }, false)
+    
+        document.querySelector(".stack-area")?.addEventListener("touchcancel", () => {
+            // reset touch recorded points
+            touchstartX = 0;
+            touchstartY = 0;
+            touchendX = 0;
+            touchendY = 0;
+        }, false)
+    } else {
+        /* Add general scroll animation event listener for larger screens */
+        window.addEventListener("scroll", () => {
+            const propotion = bannerSection.getBoundingClientRect().bottom/(window.innerHeight * 0.8);
+            
+            if (propotion > 0){
+                /* stack area is not visible */
+                return
+            }
+
+            const index = Math.floor(propotion) * -1
+            
+            showProjectCardByIndex({index: index})
+        })
+    }
 })
