@@ -280,29 +280,30 @@ new ways of interaction between humans and spaces.
 		<section id="projects-section" style={`height: ${90 * projects.length}vh;`}>
 			<style>
 				#projects-section {
-					width: 100vw;
+					width: 98vw;
 				}
 
 				.stack-area {
 					position: sticky;
-					width: 100vw;
+					width: 97vw;
 					height: 100vh;
 					top: 0;
 				}
 
-				@media ((max-width:762px)) {
+				@media (max-width: 762px) {
 					#projects-section {
-						padding-top: 10vh;
 						margin-bottom: 10vh;
+						position: relative;	
+						height: 100vh !important;
+						overflow-x: hidden;
 					}
 					
 					.stack-area {
-						position: relative;
+						top: 0;
+						position: absolute;
 						display: flex;
-						flex-direction: column;
-						gap: 20vh;
-						flex-flow: column-reverse;
-						justify-content: flex-end;
+						flex-direction: row-reverse;
+						gap: 0;
 					}
 				}
 			</style>
@@ -338,7 +339,7 @@ new ways of interaction between humans and spaces.
 
 				.about-me--header-area {
 					width: 100%;
-					height: 40vh;
+					height: 20vh;
 					position: sticky;
 					top: 5vh;
 					padding-top: 1.5rem;
@@ -347,7 +348,7 @@ new ways of interaction between humans and spaces.
 				.about-me--header-img-wrapper {
 					width: 100%;
 					position: relative;
-					height: 40vh;
+					height: 20vh;
 					display: flex;
 					justify-content: center;
 				}
@@ -452,6 +453,7 @@ new ways of interaction between humans and spaces.
 						background: var(--main-bg);
 						padding-bottom: 2rem;
 						height: unset;
+						width: 79vw;
 					}
 
 					.about-me--header-img-wrapper {
@@ -726,8 +728,9 @@ new ways of interaction between humans and spaces.
 			>SteinCode</a>
 		</div>
 	</footer>
+
+	<script src="../scripts/copyright-year-updater.js"></script>
+	<script src="../scripts/index.js"></script>
 </Layout>
 
-<script src="../scripts/copyright-year-updater.js"></script>
-<script src="../scripts/index.js"></script>
 
