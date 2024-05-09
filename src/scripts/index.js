@@ -164,6 +164,34 @@ document.addEventListener("DOMContentLoaded", () => {
         transformNotPassedImages()
     }
 
+    function getCurrentFocusIndex(){
+        /* parse the currently set focus index as int or set to a reasonable default value */
+        let currentFocusIndex = stackArea.dataset.currentFocusIndex
+        return currentFocusIndex === undefined ? 0 : parseInt(currentFocusIndex)
+    }
+
+    function showPreviousCard() {
+        const currentFocusIndex = getCurrentFocusIndex()
+        let targetIndex = currentFocusIndex - 1
+
+        if (targetIndex <= 0) {
+            targetIndex = stackItems.length
+        }
+
+        showProjectCardByIndex({index: targetIndex})
+    }
+    
+    function showNextCard(){
+        const currentFocusIndex = getCurrentFocusIndex()
+        let targetIndex = currentFocusIndex + 1
+
+        if (targetIndex > stackItems.length) {
+            targetIndex = 1
+        }
+
+        showProjectCardByIndex({index: targetIndex})
+    }
+
     /* Add touch event listeners for mobile screens 
     * This should only be applied if it is a mobile device
     * All larger screens should work with the standard scroll animation
@@ -174,7 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let touchendX = 0;
         let touchendY = 0;
     
-        const minimumTouchDistance = 25;
+        const minimumTouchDistance = 75;
     
         document.querySelector(".stack-area")?.addEventListener("touchstart", (event) => {                    
             const touchLocation = event.targetTouches[0];
@@ -183,8 +211,8 @@ document.addEventListener("DOMContentLoaded", () => {
     
             touchendX = 0;
             touchendY = 0;
-        }, false)
-    
+        }, {passive: true})
+
         document.querySelector(".stack-area")?.addEventListener("touchend", (event) => {
             const touchLocation = event.changedTouches[0];
             touchendX = touchLocation.screenX;
@@ -193,37 +221,16 @@ document.addEventListener("DOMContentLoaded", () => {
             const distanceX = touchendX - touchstartX
             const distanceY = touchendY - touchstartY
     
-            /* parse the currently set focus index as int or set to a reasonable default value */
-            let currentFocusIndex = stackArea.dataset.currentFocusIndex
-    
-            if (currentFocusIndex === undefined) {
-                currentFocusIndex = 0
-            } else {
-                currentFocusIndex = parseInt(currentFocusIndex)
-            }
-            
             if (distanceX < 0 && Math.abs(distanceX) > minimumTouchDistance){
                 // swipe left
-                let targetIndex = currentFocusIndex + 1
-
-                if (targetIndex > stackItems.length) {
-                    targetIndex = 1
-                }
-
-                showProjectCardByIndex({index: targetIndex})
+                showNextCard()
             } else if (distanceX > 0 && Math.abs(distanceX) > minimumTouchDistance){
                 // swipe right
-                let targetIndex = currentFocusIndex - 1
-
-                if (targetIndex <= 0) {
-                    targetIndex = stackItems.length
-                }
-
-                showProjectCardByIndex({index: targetIndex})
+                showPreviousCard()
             } else if (Math.abs(distanceY) > minimumTouchDistance) {
                 // swipe up or down - do nothing
             }
-        }, false)
+        }, {passive: true})
     
         document.querySelector(".stack-area")?.addEventListener("touchcancel", () => {
             // reset touch recorded points
@@ -232,6 +239,14 @@ document.addEventListener("DOMContentLoaded", () => {
             touchendX = 0;
             touchendY = 0;
         }, false)
+
+        document.querySelector(".stack-back-button")?.addEventListener('click', (event) => {
+            console.log(event)
+            showPreviousCard()
+        })
+        document.querySelector(".stack-next-button")?.addEventListener('click', () => {
+            showNextCard()
+        })
     } else {
         /* Add general scroll animation event listener for larger screens */
         window.addEventListener("scroll", () => {

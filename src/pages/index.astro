@@ -294,16 +294,36 @@ new ways of interaction between humans and spaces.
 					#projects-section {
 						margin-bottom: 10vh;
 						position: relative;	
-						height: 100vh !important;
+						height: 120vh !important;
 						overflow-x: hidden;
 					}
 					
 					.stack-area {
-						top: 0;
-						position: absolute;
+						position: relative;
 						display: flex;
 						flex-direction: row-reverse;
 						gap: 0;
+						height: 90vh;
+					}
+
+					.mobile-stack-controls {
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						gap: 1rem;
+						z-index: 500;
+						width: 100vw;
+					}
+
+					.mobile-stack-controls button {
+						border-radius: 100%;
+						background: var(--card-bg);
+						padding: 0.5rem;
+					}
+
+					.mobile-stack-controls svg {
+						height: 2rem;
+						width: 2rem;
 					}
 				}
 			</style>
@@ -321,6 +341,15 @@ new ways of interaction between humans and spaces.
 						year={project.year}
 					/>
 				})}					
+			</div>
+			
+			<div class="mobile-only mobile-stack-controls">
+				<button class="stack-back-button">
+					<Icon name="mdi:arrow-left" aria-label="previous card" />
+				</button>
+				<button class="stack-next-button">
+					<Icon name="mdi:arrow-right" aria-label="next card" />
+				</button>
 			</div>
 		</section>
 

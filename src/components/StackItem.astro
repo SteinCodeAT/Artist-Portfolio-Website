@@ -71,9 +71,16 @@ const shortDescription = description.slice(0, minimumDescriptionLength + firstWh
 
     .stack-item--image-area {
         position: relative;
-        width: 40vw;
+        width: 30vw;
         aspect-ratio: 1;
         overflow: hidden;
+    }
+
+    @media screen and (max-width: 1400px) {
+        /* Increase image width on medium screens */
+        .stack-item--image-area {
+            width: 40vw;
+        }
     }
 
     .stack-item--image-area:hover {
@@ -171,9 +178,11 @@ const shortDescription = description.slice(0, minimumDescriptionLength + firstWh
     @media (max-width: 762px) {
         .stack-item {
             padding: 0;
+            height: 90vh;
         }
         .stack-item--col {
             padding: 0;
+            height: 90vh;
         }
         .stack-item .stack-item--text-area {
             display: none;
