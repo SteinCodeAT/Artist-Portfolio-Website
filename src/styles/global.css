@@ -1,6 +1,11 @@
 @font-face {
     font-family: "Rubik";
-    src: url("/fonts/Rubik/static/Rubik-Regular.ttf");
+    src: url("/fonts/Rubik/static/Rubik-Regular.woff2");
+}
+
+@font-face {
+    font-family: "Poppins";
+    src: url("/fonts/Poppins/Poppins-Regular.woff2");
 }
 
 :root {

@@ -202,7 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let touchendX = 0;
         let touchendY = 0;
     
-        const minimumTouchDistance = 75;
+        const minimumTouchDistance = 50;
     
         document.querySelector(".stack-area")?.addEventListener("touchstart", (event) => {                    
             const touchLocation = event.targetTouches[0];
