@@ -392,13 +392,14 @@ new ways of interaction between humans and spaces.
 					width: 50%;
 				}
 
-				.about-me--header-img-wrapper h2 {
+				.about-me--header-img-wrapper .about-me--title {
 					font-family: poppins;
 					font-size: 6rem;
 					text-align: center;
 					width: 100%;
 					line-height: 4.5rem;
 					margin-bottom: 0;
+					font-weight: bold;
 				}
 
 				.about-me--title-front {
@@ -442,10 +443,6 @@ new ways of interaction between humans and spaces.
 					margin-top: 2rem;
 				}
 
-				.about-me--exhibitions h2 {
-					text-align: center;
-				}
-
 				.about-me--exhibitions h3 {
 					color: transparent;
 					margin-top: 3rem;
@@ -462,7 +459,7 @@ new ways of interaction between humans and spaces.
 				}
 
 				@media (max-width: 1400px) {
-					.about-me--header-img-wrapper h2 {
+					.about-me--header-img-wrapper .about-me--title {
 						font-size: 3rem;
 						line-height: 2rem;
 						-webkit-text-stroke: 2px #E4E4E4;
@@ -493,9 +490,10 @@ new ways of interaction between humans and spaces.
 						width: 70%;
 					}
 
-					.about-me--header-img-wrapper h2 {
+					.about-me--header-img-wrapper .about-me--title {
 						font-size: 3rem;
 						line-height: 2.1rem;
+						font-family: "poppins";
 					}
 
 					.contact-line {
@@ -506,9 +504,9 @@ new ways of interaction between humans and spaces.
 
 			<div class="about-me--header-area">
 				<div class="about-me--header-img-wrapper">
-					<h2 class="about-me--title-back">ABOUT</h2>
+					<h2 class="about-me--title about-me--title-back">ABOUT ME</h2>
 					<Image src={CcProfileImage} alt="Çağdaş Çeçen Profile Image" />
-					<h2 class="about-me--title-front">ABOUT</h2>	
+					<span class="about-me--title about-me--title-front">ABOUT ME</span>	
 				</div>
 				<hr class="contact-line glow">
 				<div class="about-me--header--social-wrapper">
