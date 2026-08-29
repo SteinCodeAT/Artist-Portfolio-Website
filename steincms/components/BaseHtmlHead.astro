@@ -1,0 +1,90 @@
+---
+import { siteConfig } from '../../src/site.config';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const canonicalURL = new URL(Astro.url.pathname, siteConfig.baseUrl)
+
+const { title, description = siteConfig.description } = Astro.props;
+
+const websiteStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: siteConfig.name,
+  description: siteConfig.description,
+  url: siteConfig.baseUrl,
+}
+
+const webPageStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: title,
+  url: canonicalURL,
+  description,
+  isPartOf: {
+    "@type": "WebSite",
+	url: siteConfig.baseUrl,
+  },
+  inLanguage: "de"
+};
+
+
+const organizationStructuredData = {
+	"@context": "https://schema.org",
+	"@type": "Organization",
+	"url": siteConfig.baseUrl,
+	"name": siteConfig.name,
+	"description": siteConfig.organization.description,
+	"email": siteConfig.mainContact.email,
+	logo: {
+      "@type": "ImageObject",
+      url: siteConfig.organization.logo.url,
+	    width: siteConfig.organization.logo.width,
+      height: siteConfig.organization.logo.height,
+    },
+	"contactPoint":
+	{
+		"@type": "ContactPoint",
+		"email": siteConfig.mainContact.email,
+		"contactType": "sales contact"
+	}
+}
+---
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="canonical" href={canonicalURL} />
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content="website" />
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+
+<!-- Structured Data -->
+<script is:inline type="application/ld+json" set:html={JSON.stringify(websiteStructuredData)} />
+<script is:inline type="application/ld+json" set:html={JSON.stringify(webPageStructuredData)} />
+<script is:inline type="application/ld+json" set:html={JSON.stringify(organizationStructuredData)} />

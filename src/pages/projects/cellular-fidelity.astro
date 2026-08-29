@@ -4,9 +4,7 @@ import ProjectPage from '../../layouts/ProjectPage.astro';
 
 import {videoTypes} from '../../const.js'
 
-const images = await Astro.glob(`../../img/cellular-fidelity/*`).then(files => {
-    return files.map(file => file.default);
-});
+const images = Object.values(import.meta.glob('../../img/cellular-fidelity/*', { eager: true })).map((file) => file.default);
 
 import CellularGif from '../../videos/cellular-fidelity-gif.mp4'
 
@@ -61,8 +59,8 @@ const project = {
         On the floor is a cast, colorful view of what, in reality, is floating tiny and suspended above the visitors' heads. 
         The laser reveals its sound when a visitor steps into the shared aquatic space holding a sensor. 
         Field recordings from the collection sites of 30 groups of marine microbes fill the space—bending, humming, and 
-        distorting with the visitor's movement. 
-        
+        distorting with the visitor's movement.
+    </p>
     <p>
         But the audio changes without a visitor, as well. Because the 
         audio-encoded laser first travels through the microbes' environment, they are the first beings to make contact

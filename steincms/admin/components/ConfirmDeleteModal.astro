@@ -1,0 +1,97 @@
+<dialog class="event-modal" id="delete-event-modal" aria-labelledby="delete-event-title">
+    <div class="modal-card">
+        <header class="modal-header">
+            <h2 id="delete-event-title">Termin löschen</h2>
+            <button class="modal-close" type="button" id="delete-event-close" aria-label="Schließen">&times;</button>
+        </header>
+        <div class="modal-content">
+            <p id="delete-event-message">Sind Sie sicher, dass Sie diesen Termin löschen möchten?</p>
+            <p class="form-error" id="delete-event-error" hidden></p> 
+        </div>
+        <footer class="modal-footer">
+                <button type="button" class="btn-ghost" id="delete-event-cancel">Abbrechen</button>
+                <button type="button" class="btn-primary" id="delete-event-confirm">Löschen</button>
+        </footer>
+    </div>
+</dialog>
+
+
+<style>
+	.event-modal {
+		border: none;
+		padding: 0;
+		background: transparent;
+		max-width: calc(100vw - 2rem);
+	}
+
+	.event-modal::backdrop {
+		background: rgba(15, 15, 15, 0.45);
+		backdrop-filter: blur(2px);
+	}
+
+	.modal-card {
+		width: min(480px, 100%);
+		margin: 0;
+		padding: 1.25rem;
+		border: none;
+		border-radius: 14px;
+		background: #fff;
+		box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+		display: grid;
+		gap: 0.85rem;
+	}
+
+	.modal-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.modal-header h2 {
+		margin: 0;
+		font-size: 1.15rem;
+		font-weight: 700;
+	}
+
+	.modal-close {
+		width: 32px;
+		height: 32px;
+		border: none;
+		border-radius: 8px;
+		background: #f5f5f5;
+		font-size: 1.25rem;
+		line-height: 1;
+		cursor: pointer;
+		color: #666;
+	}
+
+	.modal-content p {
+		margin: 0;
+		font-size: 0.95rem;
+		line-height: 1.4;
+		color: #555;
+	}
+
+	.form-error {
+		margin: 0;
+		padding: 0.55rem 0.75rem;
+		border-radius: 8px;
+		background: #fdecea;
+		color: #a93226;
+		font-size: 0.82rem;
+	}
+
+	.modal-footer {
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.5rem;
+		padding-top: 0.25rem;
+	}
+
+	@media (max-width: 640px) {
+		.field-row {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

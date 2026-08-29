@@ -1,0 +1,172 @@
+---
+import AdminIcon from '../icons/AdminIcon.astro';
+
+interface Props {
+	id: string;
+	title: string;
+	excerpt: string;
+	meta: string;
+	coverSrc: string;
+	editHref: string;
+	viewHref?: string;
+	viewLabel?: string;
+	editLabel?: string;
+	badge?: string;
+	group?: 'upcoming' | 'archive';
+	peopleCount?: number;
+}
+
+const {
+	id,
+	title,
+	excerpt,
+	meta,
+	coverSrc,
+	editHref,
+	viewHref,
+	viewLabel = 'Ansehen',
+	editLabel = 'Bearbeiten',
+	badge,
+	group = 'archive',
+	peopleCount = 0,
+} = Astro.props;
+---
+
+<li
+	class:list={['post-card', { 'post-card--upcoming': group === 'upcoming' }]}
+	data-post-card
+	data-post-id={id}
+	data-post-group={group}
+	data-title={title}
+	data-description={excerpt}
+>
+	<a class="post-card-link" href={editHref}>
+		<div class="post-card-cover">
+			<img src={coverSrc} alt="" loading="lazy" />
+		</div>
+		<div class="post-card-body">
+			<p class="post-card-meta">{meta}</p>
+			<h2 class="post-card-title">{title}</h2>
+			{badge && (
+				<p
+					class="post-card-badge"
+					style={
+						peopleCount > 0
+							? 'background-color: #e8f4e8; color: #248f24;'
+							: 'background-color: #f4e8e8; color: #8f2424;'
+					}
+				>
+					<AdminIcon name="users" class="post-card-badge-icon" />
+					{badge}
+				</p>
+			)}
+			<p class="post-card-excerpt">{excerpt}</p>
+		</div>
+	</a>
+	<div class="post-card-actions">
+		{viewHref && (
+			<a class="btn-ghost btn-sm" href={viewHref} target="_blank" rel="noopener">
+				{viewLabel}
+			</a>
+		)}
+		<a class="btn-ghost btn-sm" href={editHref}>
+			{editLabel}
+		</a>
+	</div>
+</li>
+
+<style>
+	.post-card {
+		background: #fff;
+		border-radius: 12px;
+		border: 1px solid #eceff3;
+		overflow: hidden;
+		list-style: none;
+	}
+
+	.post-card.is-hidden {
+		display: none;
+	}
+
+	.post-card--upcoming {
+		border-color: #e4d5d5;
+		border-left: 3px solid #b02e2e;
+	}
+
+	.post-card-link {
+		display: grid;
+		grid-template-columns: 120px 1fr;
+		gap: 1rem;
+		padding: 1rem;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.post-card-cover {
+		aspect-ratio: 4 / 3;
+		border-radius: 8px;
+		overflow: hidden;
+		background: #f3f4f6;
+	}
+
+	.post-card-cover img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	.post-card-meta {
+		margin: 0 0 0.35rem;
+		font-size: 0.82rem;
+		color: #667085;
+	}
+
+	.post-card-title {
+		margin: 0 0 0.35rem;
+		font-size: 1.05rem;
+	}
+
+	.post-card-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		margin: 0 0 0.45rem;
+		padding: 0.22rem 0.6rem 0.22rem 0.45rem;
+		border-radius: 999px;
+		background: #f4e8e8;
+		color: #8f2424;
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+	}
+
+	:global(svg.post-card-badge-icon) {
+		width: 0.95rem;
+		height: 0.95rem;
+		flex-shrink: 0;
+	}
+
+	.post-card-excerpt {
+		margin: 0;
+		color: #475467;
+		font-size: 0.92rem;
+		line-height: 1.45;
+	}
+
+	.post-card-actions {
+		display: flex;
+		gap: 0.5rem;
+		padding: 0 1rem 1rem;
+	}
+
+	@media (max-width: 640px) {
+		.post-card-link {
+			grid-template-columns: 1fr;
+		}
+
+		.post-card-cover {
+			max-height: 180px;
+		}
+	}
+</style>

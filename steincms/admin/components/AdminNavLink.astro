@@ -1,0 +1,37 @@
+---
+import AdminIcon from '../icons/AdminIcon.astro';
+import type { AdminNavItem } from '../types/admin-nav';
+
+interface Props {
+	item: AdminNavItem;
+	activeSection: string;
+	variant: 'sidebar' | 'mobile';
+}
+
+const { item, activeSection, variant } = Astro.props;
+const isActive = activeSection === item.id;
+---
+
+{
+	variant === 'sidebar' ? (
+		<a
+			href={item.href}
+			class:list={['sidebar-btn', { 'is-active': isActive }]}
+			title={item.title ?? item.label}
+			data-section={item.id}
+			aria-current={isActive ? 'page' : undefined}
+		>
+			<AdminIcon name={item.icon} class="sidebar-icon" />
+			<span class="sidebar-label">{item.label}</span>
+		</a>
+	) : (
+		<a
+			href={item.href}
+			class:list={['mobile-nav-tab', { 'is-active': isActive }]}
+			aria-current={isActive ? 'page' : undefined}
+		>
+			<AdminIcon name={item.icon} class="mobile-nav-icon" />
+			{item.label}
+		</a>
+	)
+}

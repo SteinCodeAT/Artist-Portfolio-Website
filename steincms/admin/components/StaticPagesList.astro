@@ -1,0 +1,24 @@
+---
+import DashboardCard from './DashboardCard.astro';
+import DashboardCardList from './DashboardCardList.astro';
+import type { StaticPageEntry } from '../nav';
+
+interface Props {
+	pages: StaticPageEntry[];
+}
+
+const { pages } = Astro.props;
+---
+
+<DashboardCardList>
+	{
+		pages.map((page) => (
+			<DashboardCard
+				href={page.href}
+				title={page.label}
+				description="Inhalte der öffentlichen Seite bearbeiten"
+				icon="pages"
+			/>
+		))
+	}
+</DashboardCardList>

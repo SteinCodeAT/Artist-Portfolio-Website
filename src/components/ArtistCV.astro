@@ -1,0 +1,421 @@
+---
+// The "About" section: a barely-visible, VHS-degraded portrait on the left
+// (sticky, so it stays in view) and a scrollable CV — bio + full exhibition
+// history — on the right, styled to match the Signal TV hero.
+import { Icon } from 'astro-icon/components';
+import { Image } from 'astro:assets';
+import Exhibition from './Exhibition.astro';
+
+const { photo } = Astro.props;
+---
+
+<section id="about-me-section" class="cv-section">
+	<svg width="0" height="0" style="position:absolute">
+		<filter id="cvNoise" color-interpolation-filters="sRGB">
+			<feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise" />
+			<feColorMatrix in="noise" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.08 0" />
+		</filter>
+		<filter id="cvRChan" color-interpolation-filters="sRGB">
+			<feColorMatrix type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" />
+		</filter>
+		<filter id="cvBChan" color-interpolation-filters="sRGB">
+			<feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" />
+		</filter>
+	</svg>
+
+	<div class="cv-photo-col">
+		<div class="cv-photo-frame">
+			<Image class="cv-photo cv-photo--base" src={photo} alt="Çağdaş Çeçen" width={800} height={1067} />
+			<img class="cv-photo cv-photo--ghost cv-photo--r" src={photo.src} alt="" aria-hidden="true" />
+			<img class="cv-photo cv-photo--ghost cv-photo--b" src={photo.src} alt="" aria-hidden="true" />
+			<div class="cv-photo-noise"></div>
+			<div class="cv-photo-scanlines"></div>
+			<div class="cv-photo-tracking"></div>
+			<div class="cv-photo-vignette"></div>
+		</div>
+
+		<div class="cv-social">
+			<a href="https://www.instagram.com/nihilprophet/">
+				<Icon name="mdi:instagram" /> <span class="desktop-only">@nihilprophet</span>
+				<span class="mobile-only">Instagram</span>
+			</a>
+			<a href="mailto:nihilprophet@gmail.com">
+				<Icon name="mdi:email" /> <span class="desktop-only">nihilprophet@gmail.com</span>
+				<span class="mobile-only">E-Mail</span>
+			</a>
+		</div>
+	</div>
+
+	<div class="cv-text-col">
+		<div class="cv-eyebrow">Vienna — Media Art</div>
+		<h2 class="cv-heading">About</h2>
+		<p class="cv-bio">
+			Çağdaş Çeçen is a Vienna based media artist. He studied Media Art :
+			Digital Art at University of Applied Arts Vienna and Physics at University of Vienna.
+			Currently, his artistic practices focuses in the relationship between
+			human movement, space and uncertainty. Since 2018 he is developing
+			new ways of interaction between human and space by using synesthetic
+			nature of Quantum Physics not just symbolic or inspirational way
+			but as an active element in his artworks. He strongly believes that
+			democratization of Quantum Physics will open new artistic ways
+			to reexplore our surroundings and improving our synesthetic sensation.
+			His projects have been already presented in several countries:
+			Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
+		</p>
+
+		<div class="cv-timeline">
+			<h3>2022</h3>
+			<Exhibition
+				title="TRAUMATRAUMA"
+				organization="feat. B.A.D."
+				organizationUrl="https://www.bad-art.org/"
+				location="Vienna - Austria"
+			/>
+			<Exhibition
+				title="Distance Fog"
+				organization="feat. B.A.D. Wienstation"
+				location="Vienna - Austria"
+			/>
+			<Exhibition
+				title="The Cellular Fidelity"
+				organization="Alte Schieberkammer"
+				location="Vienna - Austria"
+			/>
+
+			<h3>2021</h3>
+			<Exhibition
+				title="Transform-Arte 2021"
+				organization="Participating artist"
+				location="Eisenstadt - Austria"
+			/>
+			<Exhibition
+				title="Angewandte Festival 2021"
+				organization="Paricipating artist"
+				location="Vienna - Austria"
+			/>
+
+			<h3>2019</h3>
+			<Exhibition
+				title="“KAIROS” Recall of Earth Part 2"
+				organization="Collective exhibition"
+				location="Thessalonikki - Greece"
+			/>
+			<Exhibition
+				title="“Spannung!”-Medienwerkstatt"
+				organization="Collective exhibition"
+				location="Vienna - Austria"
+			/>
+			<Exhibition
+				title="Fabrikraum #01"
+				organization="Collective exhibition"
+				location="Vienna - Austria"
+			/>
+			<Exhibition
+				title="“5.5” Mixed media installation"
+				organization="La Biennale di Venezia, Biennale Sessions"
+				location="Venice - Italy"
+			/>
+			<Exhibition
+				title="Offene Ateliers in Margareten"
+				organization="Künstlerhaus, Participating artist"
+				location="Vienna - Austria"
+			/>
+			<Exhibition
+				title="Reflecting Records"
+				organization="Collective exhibition"
+				location="Vienna - Austria"
+			/>
+
+			<h3>2018</h3>
+			<Exhibition
+				title="A community of individuals"
+				organization="SOHO Festival, Collective exhibition"
+				location="Vienna - Austria"
+			/>
+
+			<h3>2017</h3>
+			<Exhibition
+				title="DIGITAL WORKFLOW"
+				organization="Collective exhibition"
+				location="Vienna - Austria"
+			/>
+			<Exhibition
+				title="UNTAPPED SUR-PLUS"
+				organization="Künstlerhaus, Collective exhibition"
+				location="Vienna - Austria"
+			/>
+			<Exhibition
+				title="Disintegrate"
+				organization="Stop-Motion PSA movie for “Ministerium für ein lebenswertes Österreich”, “Danube Projekt”- Der Haus der Europäischen Union"
+				location="Vienna - Austria"
+			/>
+
+			<h3>2016</h3>
+			<Exhibition
+				title="Infected Structures"
+				organization="Collective exhibition"
+				location="Sokolowsko - Poland"
+			/>
+			<Exhibition
+				title="Smells Like Sh.t"
+				organization="Video Documenary “TV916”"
+				location="Trebinje - Bosnia and Herzegovina"
+			/>
+			<Exhibition
+				title="....Sowohl als auch....."
+				organization="Performance"
+				location="Vienna - Austria"
+			/>
+		</div>
+	</div>
+</section>
+
+<style>
+	.cv-section,
+	.cv-section *,
+	.cv-section *::before,
+	.cv-section *::after {
+		box-sizing: border-box;
+	}
+
+	.cv-section {
+		--cv-void: #030406;
+		--cv-static: #e4e4e4;
+		--cv-static-dim: #9a9da4;
+		--cv-signal: #00c896;
+
+		/* overflow:hidden here would break position:sticky on .cv-photo-col
+		   below it — sticky stops working the moment any ancestor (other than
+		   the actual scroll container) clips overflow. */
+		position: relative;
+		display: grid;
+		grid-template-columns: 0.8fr 1.2fr;
+		gap: 3.5rem;
+		background: var(--cv-void);
+		color: var(--cv-static);
+		padding: 6rem 6vw;
+	}
+
+	.cv-text-col {
+		min-width: 0;
+	}
+
+	.cv-photo-col {
+		position: sticky;
+		top: 2rem;
+		align-self: start;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.25rem;
+	}
+
+	.cv-photo-frame {
+		position: relative;
+		width: 100%;
+		max-width: 340px;
+		aspect-ratio: 3 / 4;
+		overflow: hidden;
+		background: #000;
+		animation: cv-breathe 9s ease-in-out infinite;
+	}
+
+	/* A slow, smooth scale breathe — trippy without ever "blinking". */
+	@keyframes cv-breathe {
+		0%, 100% { transform: scale(1); }
+		50% { transform: scale(1.035); }
+	}
+
+	/* A thin tracking-line sweep, like a CRT losing its hold — travels the
+	   full height of the frame rather than sitting at a fixed band. */
+	.cv-photo-tracking {
+		position: absolute;
+		left: 0;
+		right: 0;
+		height: 12%;
+		pointer-events: none;
+		z-index: 3;
+		background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.22) 48%, rgba(255, 255, 255, 0.22) 52%, transparent);
+		mix-blend-mode: overlay;
+		animation: cv-track-scroll 6.5s linear infinite;
+	}
+
+	@keyframes cv-track-scroll {
+		0% { transform: translateY(-100%); }
+		100% { transform: translateY(900%); }
+	}
+
+	.cv-photo {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.cv-photo--base {
+		/* screen-blended ghost layers below add brightness back, so this has
+		   to overshoot dark on its own to end up actually obscured. Saturation
+		   is cranked up (not down) so the hue-cycle actually reads as color
+		   instead of just shifting shades of grey. */
+		animation: cv-trip 16s linear infinite;
+	}
+
+	@keyframes cv-trip {
+		0%   { filter: contrast(1.7) brightness(0.3) saturate(2.2) hue-rotate(0deg) blur(2.5px); }
+		25%  { filter: contrast(1.8) brightness(0.32) saturate(2.6) hue-rotate(90deg) blur(3px); }
+		50%  { filter: contrast(1.7) brightness(0.3) saturate(2.3) hue-rotate(180deg) blur(2.5px); }
+		75%  { filter: contrast(1.8) brightness(0.32) saturate(2.6) hue-rotate(270deg) blur(3px); }
+		100% { filter: contrast(1.7) brightness(0.3) saturate(2.2) hue-rotate(360deg) blur(2.5px); }
+	}
+
+	.cv-photo--ghost {
+		mix-blend-mode: screen;
+		opacity: 0.14;
+		pointer-events: none;
+	}
+
+	.cv-photo--r {
+		filter: url(#cvRChan) contrast(1.6) brightness(0.35);
+		transform: translateX(4px);
+		animation: cv-jitter-r 0.6s steps(3) infinite;
+	}
+
+	.cv-photo--b {
+		filter: url(#cvBChan) contrast(1.6) brightness(0.35);
+		transform: translateX(-4px);
+		animation: cv-jitter-b 0.7s steps(3) infinite;
+	}
+
+
+	@keyframes cv-jitter-r {
+		0% { transform: translateX(4px); }
+		33% { transform: translate(6px, -1px); }
+		66% { transform: translate(3px, 1px); }
+	}
+	@keyframes cv-jitter-b {
+		0% { transform: translateX(-4px); }
+		33% { transform: translate(-6px, 1px); }
+		66% { transform: translate(-3px, -1px); }
+	}
+
+	.cv-photo-noise {
+		position: absolute;
+		inset: 0;
+		filter: url(#cvNoise);
+		opacity: 0.55;
+		mix-blend-mode: overlay;
+		pointer-events: none;
+	}
+
+	.cv-photo-scanlines {
+		position: absolute;
+		inset: 0;
+		background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 1px, rgba(0, 0, 0, 0.55) 2px, rgba(0, 0, 0, 0) 3px);
+		mix-blend-mode: multiply;
+		pointer-events: none;
+	}
+
+	/* The vignette's own transparent center used to sit right over the face —
+	   flattened it into a near-uniform dark wash instead of a radial hole. */
+	.cv-photo-vignette {
+		position: absolute;
+		inset: 0;
+		background:
+			radial-gradient(ellipse at 50% 38%, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.75) 60%, rgba(0, 0, 0, 0.96) 100%);
+		pointer-events: none;
+	}
+
+	.cv-social {
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+		font-family: 'JetBrains Mono', ui-monospace, monospace;
+		font-size: 0.78rem;
+	}
+
+	.cv-social a {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: var(--cv-static-dim);
+		text-decoration: none;
+		transition: color 0.15s ease;
+	}
+	.cv-social a:hover {
+		color: var(--cv-signal);
+	}
+	.cv-social svg {
+		width: 1.1rem;
+		height: 1.1rem;
+	}
+
+	.cv-eyebrow {
+		font-family: 'JetBrains Mono', ui-monospace, monospace;
+		font-size: 0.85rem;
+		letter-spacing: 0.28em;
+		text-transform: uppercase;
+		color: var(--cv-signal);
+		margin-bottom: 0.5rem;
+	}
+
+	.cv-heading {
+		font-family: 'Rajdhani', 'Arial Narrow', sans-serif;
+		font-weight: 700;
+		text-transform: uppercase;
+		font-size: clamp(2.4rem, 4.2vw, 3.8rem);
+		letter-spacing: 0.02em;
+		margin: 0 0 1.5rem;
+		color: var(--cv-static);
+	}
+
+	.cv-bio {
+		max-width: 65ch;
+		font-size: 1.1rem;
+		line-height: 1.7;
+		color: var(--cv-static-dim);
+		margin: 0 0 3rem;
+	}
+
+	.cv-timeline h3 {
+		font-family: 'JetBrains Mono', ui-monospace, monospace;
+		font-size: 0.85rem;
+		letter-spacing: 0.16em;
+		color: var(--cv-signal);
+		border-top: 1px solid rgba(228, 228, 228, 0.14);
+		padding-top: 0.75rem;
+		margin: 2rem 0 0.75rem;
+	}
+	.cv-timeline h3:first-child {
+		margin-top: 0;
+		border-top: none;
+		padding-top: 0;
+	}
+
+	@media (max-width: 900px) {
+		.cv-section {
+			grid-template-columns: 1fr;
+			padding: 4rem 6vw;
+		}
+		.cv-photo-col {
+			position: relative;
+			top: 0;
+			max-width: 340px;
+			margin: 0 auto 2rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.cv-photo--r,
+		.cv-photo--b,
+		.cv-photo--base,
+		.cv-photo-frame,
+		.cv-photo-tracking {
+			animation: none;
+		}
+		.cv-photo--base {
+			filter: contrast(1.7) brightness(0.3) saturate(2) blur(2.5px);
+		}
+	}
+</style>

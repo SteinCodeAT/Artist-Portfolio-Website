@@ -2,9 +2,7 @@
 import ProjectPage from '../../layouts/ProjectPage.astro';
 import {videoTypes} from '../../const.js'
 
-const images = await Astro.glob(`../../img/quantum-synesthesisia/*`).then(files => {
-    return files.map(file => file.default);
-});
+const images = Object.values(import.meta.glob('../../img/quantum-synesthesisia/*', { eager: true })).map((file) => file.default);
 
 import QuantumSynthesiaGif from '../../videos/quantum-synthesia-gif.mp4'
 

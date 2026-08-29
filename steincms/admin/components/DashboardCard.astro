@@ -1,0 +1,115 @@
+---
+import AdminIcon from '../icons/AdminIcon.astro';
+import { resolveAdminIconName, type AdminIconName } from '../icons/names';
+
+interface Props {
+	href: string;
+	title: string;
+	description: string;
+	stat?: string;
+	icon: AdminIconName;
+}
+
+const { href, title, description, stat, icon } = Astro.props;
+const iconName = resolveAdminIconName(icon);
+---
+
+<a class="dash-card" href={href}>
+	<span class:list={['dash-card-icon', `dash-card-icon--${iconName}`]} aria-hidden="true">
+		<AdminIcon name={iconName} class="dash-card-icon-svg" />
+	</span>
+	<h2 class="dash-card-title">{title}</h2>
+	<p class="dash-card-desc">{description}</p>
+	{stat && <p class="dash-card-stat">{stat}</p>}
+</a>
+
+<style>
+	.dash-card {
+		display: block;
+		padding: 1.25rem 1.35rem;
+		border-radius: 14px;
+		border: 1px solid #eef0f3;
+		background: linear-gradient(180deg, #fff 0%, #fafbfc 100%);
+		text-decoration: none;
+		color: inherit;
+		transition:
+			border-color 0.15s ease,
+			box-shadow 0.15s ease,
+			transform 0.15s ease;
+
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		gap: 0.5rem;
+	}
+
+	.dash-card:hover {
+		border-color: #d6dce8;
+		box-shadow: 0 4px 14px rgba(16, 24, 40, 0.06);
+		transform: translateY(-1px);
+	}
+
+	.dash-card-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: 8px;
+		background: #f2f4f7;
+		color: #475467;
+	}
+
+	.dash-card-icon--home {
+		background: #f4ebff;
+		color: #6941c6;
+	}
+
+	.dash-card-icon--calendar {
+		background: #eff8ff;
+		color: #1570ef;
+	}
+
+	.dash-card-icon--posts {
+		background: #fff6ed;
+		color: #b54708;
+	}
+
+	.dash-card-icon--pages {
+		background: #ecfdf3;
+		color: #067647;
+	}
+
+	:global(svg.dash-card-icon-svg) {
+		display: block;
+		width: 18px !important;
+		height: 18px !important;
+		max-width: 18px;
+		max-height: 18px;
+	}
+
+	.dash-card-title {
+		margin: 0;
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: #1a2744;
+	}
+
+	.dash-card-desc {
+		margin: 0;
+		font-size: 0.88rem;
+		line-height: 1.5;
+		color: #667085;
+	}
+
+	.dash-card-stat {
+		margin: 0.85rem 0 0;
+		margin-top: auto;
+		font-size: 0.78rem;
+		font-weight: 600;
+		color: #98a2b3;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+</style>

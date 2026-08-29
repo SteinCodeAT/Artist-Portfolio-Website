@@ -1,0 +1,1718 @@
+---
+import ContentSectionStyles from './ContentSectionStyles.astro';
+import type { EventEditorSource } from '@steincms/cms/events/event-body-blocks';
+import type { EventRecordBase } from '@steincms/cms/events/events-store';
+import {
+	DEFAULT_MAX_ATTENDEES,
+	DEFAULT_MAX_GUESTS,
+	EMPTY_REGISTRATION_FORM,
+	MAX_MAX_ATTENDEES,
+	MAX_MAX_GUESTS,
+} from '@steincms/cms/events/registration-form';
+import { eventEditorPanelsFromRecord, type RecordDef } from '@steincms/cms/schema';
+import type { EventEditorPaths } from '../event-editor-state';
+
+export interface CategoryOption {
+	value: string;
+	label: string;
+}
+
+export type EventEditorGuestTab = {
+	people: number;
+	registrationCount: number;
+};
+
+interface Props {
+	source: EventEditorSource | null;
+	paths: EventEditorPaths;
+	record: RecordDef;
+	event?: EventRecordBase | null;
+	editorEventId: string;
+	isEdit: boolean;
+	fromCalendar: boolean;
+	backHref: string;
+	backLabel: string;
+	categoryOptions: CategoryOption[];
+	fallbackCoverSrc: string;
+	prefillDate?: string | null;
+	coverAssetsHint?: string;
+	/** When set, shows Bearbeiten / Gästeliste tabs instead of stacking guest content above the form. */
+	guestTab?: EventEditorGuestTab | null;
+}
+
+const {
+	source,
+	paths,
+	record,
+	event = null,
+	editorEventId,
+	isEdit,
+	fromCalendar,
+	backHref,
+	backLabel,
+	categoryOptions,
+	fallbackCoverSrc,
+	prefillDate = null,
+	coverAssetsHint = 'Cover-Bilder werden beim Speichern in den Medienordner der Veranstaltung hochgeladen.',
+	guestTab = null,
+} = Astro.props;
+
+const hasGuestTab = Boolean(guestTab);
+
+const adminPath = paths.admin;
+const eventsPublicPath = paths.public;
+const eventsListPath = paths.list;
+const eventsCalendarPath = paths.calendar;
+
+const panels = eventEditorPanelsFromRecord(record);
+const showBlocksPanel = panels.showBlocksPanel;
+const showGalleryPanel = panels.showGalleryPanel;
+const showRegistrationPanel = panels.showRegistrationPanel;
+const blocksLabel = panels.blocksLabel ?? 'Artikeltext';
+const galleryLabel = panels.galleryLabel ?? 'Veranstaltungsbilder';
+const registrationLabel = panels.registrationLabel ?? 'Anmeldeformular';
+
+const eventTitle = source?.title ?? '';
+const eventDate = source?.date ?? null;
+const eventCategory = source?.category ?? event?.category;
+const eventLocation = event?.location ?? '';
+const eventExcerpt = source?.excerpt ?? '';
+const eventCover = source?.cover ?? '';
+const eventSlug = event?.slug;
+const editingDraft = source?.editingDraft ?? false;
+const hasPreviewDraft = Boolean(event?.previewDraft);
+const initialBlocks = source?.initialBlocks ?? [];
+const initialGallery = source?.initialGallery ?? [];
+const initialRegistrationForm = source?.registrationForm ?? EMPTY_REGISTRATION_FORM;
+---
+
+<ContentSectionStyles />
+
+<header class="editor-toolbar editor-toolbar-sticky">
+	<div class="editor-toolbar-left">
+		<a class="back-link" href={backHref}>{backLabel}</a>
+		<input
+			type="text"
+			id="event-title"
+			name="title"
+			class="editor-title-input"
+			placeholder="Titel der Veranstaltung"
+			required
+			value={eventTitle}
+		/>
+	</div>
+	<div class="toolbar-actions">
+		<slot name="toolbar-actions" />
+		<span class="save-status" id="save-status" aria-live="polite"></span>
+		{
+			editingDraft && (
+				<span class="draft-badge" title="Gespeicherter Entwurf — noch nicht veröffentlicht">
+					Entwurf
+				</span>
+			)
+		}
+		<button
+			type="button"
+			class="btn-ghost"
+			id="btn-preview"
+			title="Zeigt den Entwurf an, ohne die Website zu veröffentlichen"
+		>
+			Entwurfsvorschau
+		</button>
+		<div class="save-dropdown" data-save-dropdown>
+			<button type="button" class="btn-primary save-dropdown-trigger" data-save-dropdown-trigger>
+				Speichern ▾
+			</button>
+			<div class="save-dropdown-menu" data-save-dropdown-menu hidden>
+				<button type="button" class="save-dropdown-item" data-save-action="save-draft">
+					<strong>Entwurf speichern</strong>
+					<small>Nur Entwurf — Website bleibt unverändert</small>
+				</button>
+				<button type="button" class="save-dropdown-item" data-save-action="publish">
+					<strong>Speichern &amp; Veröffentlichen</strong>
+					<small>Entwurf übernehmen und live schalten</small>
+				</button>
+				<button
+					type="button"
+					class="save-dropdown-item save-dropdown-item-danger"
+					data-save-action="discard-draft"
+					hidden={!hasPreviewDraft}
+				>
+					<strong>Entwurf verwerfen</strong>
+					<small>Zurück zum veröffentlichten Stand</small>
+				</button>
+			</div>
+		</div>
+	</div>
+</header>
+
+{!hasGuestTab && <slot name="after-toolbar" />}
+
+<div class:list={['editor-body', { 'editor-shell': hasGuestTab }]} data-editor-shell={hasGuestTab ? '' : undefined}>
+	{
+		hasGuestTab && (
+			<nav class="editor-tab-bar" role="tablist" aria-label="Event-Bereiche">
+				<button
+					type="button"
+					class="editor-tab"
+					role="tab"
+					id="editor-tab-edit"
+					aria-controls="editor-panel-edit"
+					aria-selected="true"
+					data-editor-tab="edit"
+				>
+					<span class="editor-tab-icon" aria-hidden="true">✎</span>
+					<span class="editor-tab-copy">
+						<span class="editor-tab-label">Bearbeiten</span>
+						<span class="editor-tab-hint">Inhalt & Einstellungen</span>
+					</span>
+				</button>
+				<button
+					type="button"
+					class="editor-tab"
+					role="tab"
+					id="editor-tab-guests"
+					aria-controls="editor-panel-guests"
+					aria-selected="false"
+					data-editor-tab="guests"
+				>
+					<span class="editor-tab-icon editor-tab-icon--guests" aria-hidden="true">
+					<!-- svg for person icon -->
+					
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+						<path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438zM15.53 5.47a.75.75 0 1 0-1.06 1.06L16.94 8.5h-8.5a.75.75 0 0 0 0 1.5h8.5l-1.72 1.72a.75.75 0 1 0 1.06 1.06l3-3a.75.75 0 0 0 0-1.06l-3-3z" clip-rule="evenodd" />
+					</svg>
+					</span>
+					<span class="editor-tab-copy">
+						<span class="editor-tab-label">
+							Gästeliste
+							<span class="editor-tab-badge">{guestTab!.people}</span>
+						</span>
+						<span class="editor-tab-hint">
+							{guestTab!.registrationCount}{' '}
+							{guestTab!.registrationCount === 1 ? 'Anmeldung' : 'Anmeldungen'} · Auswertung
+						</span>
+					</span>
+				</button>
+			</nav>
+		)
+	}
+
+	<div class="editor-tab-root" data-editor-tabs={hasGuestTab ? '' : undefined}>
+		<div
+			class:list={[{ 'editor-tab-panel': hasGuestTab }]}
+			id={hasGuestTab ? 'editor-panel-edit' : undefined}
+			role={hasGuestTab ? 'tabpanel' : undefined}
+			aria-labelledby={hasGuestTab ? 'editor-tab-edit' : undefined}
+			data-editor-panel={hasGuestTab ? 'edit' : undefined}
+		>
+			<form class="editor-form" id="post-form" onsubmit="return false;">
+	<div class="editor-layout">
+		<div class="editor-main">
+			{
+				showBlocksPanel && (
+			<section
+				class="blocks-section editor-panel"
+				id="content-sections-root"
+				data-event-id={editorEventId}
+				data-event-persisted={isEdit ? 'true' : 'false'}
+				data-upload-content-type="events"
+				data-return-to={fromCalendar ? 'calendar' : 'list'}
+				data-admin-path={adminPath}
+				data-events-public-path={eventsPublicPath}
+				data-events-list-path={eventsListPath}
+				data-events-calendar-path={eventsCalendarPath}
+				data-event-slug={eventSlug ?? ''}
+				data-has-preview-draft={hasPreviewDraft ? 'true' : 'false'}
+				data-initial-blocks={JSON.stringify(initialBlocks)}
+			>
+				<div class="blocks-toolbar">
+					<div>
+						<h2 class="panel-title">{blocksLabel}</h2>
+						<p class="panel-subtitle">
+							Hier schreiben Sie den Beitrag. Für Eckdaten (Datum, Ort, …) fügen Sie eine
+							<strong>Tabelle</strong> ein.
+						</p>
+					</div>
+				</div>
+				<div data-section-list></div>
+
+				<div class="content-add-picker" aria-label="Neuen Abschnitt einfügen">
+					<p class="content-add-heading">Abschnitt einfügen</p>
+					<p class="content-add-hint">Wählen Sie, was als Nächstes folgen soll.</p>
+					<div class="content-add-options content-add-options--four">
+						<button type="button" class="content-add-option" data-add-text>
+							<span class="content-add-icon" aria-hidden="true">¶</span>
+							<span class="content-add-text">
+								<strong>Text</strong>
+								<small>Absätze, Überschriften, Listen</small>
+							</span>
+						</button>
+						<button type="button" class="content-add-option" data-add-image>
+							<span class="content-add-icon content-add-icon-image" aria-hidden="true">B</span>
+							<span class="content-add-text">
+								<strong>Einzelbild</strong>
+								<small>Ein Foto mit Bildunterschrift</small>
+							</span>
+						</button>
+						<button type="button" class="content-add-option" data-add-table>
+							<span class="content-add-icon content-add-icon-table" aria-hidden="true">⊞</span>
+							<span class="content-add-text">
+								<strong>Tabelle</strong>
+								<small>Eckdaten, Termine, Infokasten</small>
+							</span>
+						</button>
+					</div>
+				</div>
+			</section>
+				)
+			}
+
+			{
+				showGalleryPanel && (
+			<section
+				class="editor-panel event-gallery-panel"
+				id="event-gallery-root"
+				data-event-id={editorEventId}
+				data-initial-gallery={JSON.stringify(initialGallery)}
+				aria-labelledby="event-gallery-heading"
+			>
+				<div class="blocks-toolbar">
+					<div>
+						<h2 class="panel-title" id="event-gallery-heading">{galleryLabel}</h2>
+						<p class="panel-subtitle">
+							Fotos von der Veranstaltung — erscheinen am Ende der Seite, getrennt vom
+							Artikeltext. Hier keine Einzelbilder für den Fließtext einfügen.
+						</p>
+					</div>
+				</div>
+				<div class="block-gallery-body">
+					<div class="block-gallery-grid" data-event-gallery-grid></div>
+					<div class="block-upload">
+						<input
+							type="file"
+							accept="image/jpeg,image/png,image/webp,image/gif"
+							data-event-gallery-files
+							multiple
+							hidden
+						/>
+						<button type="button" class="block-action-btn" data-event-gallery-upload>
+							Bilder hochladen
+						</button>
+					</div>
+				</div>
+			</section>
+				)
+			}
+
+			{
+				showRegistrationPanel && (
+			<section
+				class="editor-panel reg-form-panel"
+				id="reg-form-builder"
+				data-reg-form-builder
+				aria-labelledby="reg-form-heading"
+			>
+				<div class="blocks-toolbar">
+					<div>
+						<h2 class="panel-title" id="reg-form-heading">
+							<span class="panel-title-icon" aria-hidden="true">&#9998;</span>
+							{registrationLabel}
+						</h2>
+						<p class="panel-subtitle">
+							Optional. Ohne Aktivierung erscheint auf der Eventseite kein Formular.
+						</p>
+					</div>
+				</div>
+
+				<input
+					type="hidden"
+					id="event-registration-form"
+					value={JSON.stringify(initialRegistrationForm)}
+				/>
+
+				<label class="reg-enable-toggle">
+					<input type="checkbox" data-reg-enabled checked={initialRegistrationForm.enabled} />
+					<span>
+						<strong>Anmeldung aktivieren</strong>
+						<small>Name, E-Mail und Personenanzahl plus Ihre Extra-Fragen</small>
+					</span>
+				</label>
+
+				<div class="reg-builder-body" data-reg-builder-body hidden={!initialRegistrationForm.enabled}>
+					<div class="reg-defaults-strip">
+						<span class="reg-default-chip">Name</span>
+						<span class="reg-default-chip">E-Mail</span>
+						<span class="reg-default-chip">Personenanzahl</span>
+					</div>
+
+					<div class="reg-limits">
+						<label class="field">
+							<span class="field-label-inline">Maximale Teilnehmerzahl</span>
+							<input
+								type="number"
+								data-reg-max-attendees
+								min="1"
+								max={MAX_MAX_ATTENDEES}
+								step="1"
+								value={initialRegistrationForm.maxAttendees ?? DEFAULT_MAX_ATTENDEES}
+								required
+							/>
+							<small class="field-hint-inline">Gesamtzahl der Personen für diese Veranstaltung.</small>
+						</label>
+						<label class="field">
+							<span class="field-label-inline">Max. Personen pro Anmeldung</span>
+							<input
+								type="number"
+								data-reg-max-guests
+								min="1"
+								max={MAX_MAX_GUESTS}
+								step="1"
+								value={initialRegistrationForm.maxGuests ?? DEFAULT_MAX_GUESTS}
+								required
+							/>
+							<small class="field-hint-inline">Obergrenze in einem einzelnen Formular.</small>
+						</label>
+					</div>
+
+					<div class="reg-fields-container" data-reg-fields></div>
+
+					<button type="button" class="reg-add-field-btn" data-reg-add-field>
+						<span class="reg-add-field-icon" aria-hidden="true">+</span>
+						Frage hinzufügen
+					</button>
+
+					<div class="reg-examples-hint">
+						<strong>Beispiele:</strong> Vegetarisch / Vegan? &middot; Parkplatz-Wunsch &middot; Wie reist du an? &middot; Besondere Wünsche
+					</div>
+				</div>
+			</section>
+				)
+			}
+
+			
+		</div>
+
+		<aside class="editor-sidebar" aria-label="Veranstaltungs-Einstellungen">
+			<div class="editor-sidebar-shell">
+				<header class="editor-sidebar-header">
+					<span class="sidebar-header-icon" aria-hidden="true">&#9881;</span>
+					<div>
+						<h2 class="sidebar-column-title">Event-Details</h2>
+						<p class="sidebar-column-hint">
+							Wann, wo, welche Kategorie und Teaser.
+						</p>
+					</div>
+				</header>
+
+				<section class="editor-sidebar-card editor-sidebar-card-highlight">
+					<h3 class="sidebar-card-title">
+						<span class="sidebar-card-icon" aria-hidden="true">&#128197;</span>
+						Termin &amp; Ort
+					</h3>
+					<label class="field">
+						<span class="field-label-inline">Datum</span>
+						<input type="date" id="event-date" name="date" value={eventDate ?? prefillDate ?? ''} />
+					</label>
+					<label class="field">
+						<span class="field-label-inline">Ort / Veranstaltungsort</span>
+						<input
+							type="text"
+							id="event-location"
+							name="location"
+							placeholder="z.B. Alte Donau, Vereinshaus, Online…"
+							value={eventLocation ?? ''}
+							maxlength="120"
+						/>
+					</label>
+					<label class="field">
+						<span class="field-label-inline">Kategorie</span>
+						<select id="event-category-select" name="category">
+							{categoryOptions.map((option) => (
+								<option
+									value={option.value}
+									selected={
+										eventCategory === option.value ||
+										(!eventCategory && option.value === categoryOptions[0]?.value)
+									}
+								>
+									{option.label}
+								</option>
+							))}
+							<option value="__new__" selected={Boolean(eventCategory && !categoryOptions.some((o) => o.value === eventCategory))}>
+								+ Neue Kategorie…
+							</option>
+						</select>
+						<input
+							type="text"
+							id="event-category-custom"
+							class="event-category-custom"
+							placeholder="Neue Kategorie eingeben…"
+							value={
+								eventCategory && !categoryOptions.some((o) => o.value === eventCategory)
+									? eventCategory
+									: ''
+							}
+							maxlength="40"
+							hidden={!eventCategory || categoryOptions.some((o) => o.value === eventCategory)}
+						/>
+						<small class="field-hint-inline">Bestehende Kategorie wählen oder „Neue Kategorie…" nutzen.</small>
+					</label>
+					{isEdit && eventSlug && (
+						<p class="sidebar-new-hint">
+							Öffentliche Seite:{' '}
+							<a href={`${eventsPublicPath}/${eventSlug}`} target="_blank" rel="noopener">
+								{eventsPublicPath}/{eventSlug}
+							</a>
+						</p>
+					)}
+				</section>
+
+				<section class="editor-sidebar-card">
+					<h3 class="sidebar-card-title">
+						<span class="sidebar-card-icon" aria-hidden="true">&#9998;</span>
+						Kurztext
+					</h3>
+					<label class="field">
+						<small class="field-hint">Teaser für die Veranstaltungs-Übersicht (max. 2–3 Sätze).</small>
+						<textarea
+							id="event-excerpt"
+							name="excerpt"
+							rows="4"
+							placeholder="Worum geht es bei dieser Veranstaltung?"
+						>{eventExcerpt}</textarea>
+					</label>
+				</section>
+
+
+				<section
+					class="editor-sidebar-card main-image-field"
+					aria-labelledby="main-image-label"
+					data-fallback-cover={fallbackCoverSrc}
+				>
+					<div class="field">
+						<span id="main-image-label" class="sidebar-card-title"><span class="sidebar-card-icon" aria-hidden="true">&#128247;</span> Cover-Bild</span>
+						<small class="field-hint">
+							{coverAssetsHint}
+						</small>
+					</div>
+					<div class="main-image-preview-wrap">
+						<div class="main-image-preview" id="main-image-preview"></div>
+					</div>
+					<label class="field">
+						<span class="field-label-inline">Dateiname / Upload-URL</span>
+						<input
+							type="text"
+							id="event-cover-filename"
+							placeholder="slug-01-01-2026.webp"
+							value={eventCover ?? ''}
+						/>
+					</label>
+					<input type="hidden" id="event-cover" value={eventCover ?? ''} />
+					<input
+						type="file"
+						id="event-cover-file"
+						accept="image/jpeg,image/png,image/webp,image/gif"
+						hidden
+					/>
+					<div class="main-image-actions">
+						<button type="button" class="btn-ghost btn-sm" id="btn-cover-upload">
+							Cover hochladen
+						</button>
+					</div>
+				</section>
+			</div>
+		</aside>
+	</div>
+			</form>
+		</div>
+
+		{
+			hasGuestTab && (
+				<div
+					class="editor-tab-panel"
+					id="editor-panel-guests"
+					role="tabpanel"
+					aria-labelledby="editor-tab-guests"
+					data-editor-panel="guests"
+					hidden
+				>
+					<div class="editor-guests-shell">
+						<slot name="guests-panel" />
+					</div>
+				</div>
+			)
+		}
+	</div>
+</div>
+
+{!hasGuestTab && <slot name="after-form" />}
+
+<script>
+	import '../scripts/event-form-editor.ts';
+</script>
+
+{
+	hasGuestTab && (
+		<script is:inline>
+			(() => {
+				const shell = document.querySelector('[data-editor-shell]');
+				if (!shell) return;
+
+				const tabButtons = shell.querySelectorAll('[data-editor-tab]');
+				const panels = shell.querySelectorAll('[data-editor-panel]');
+				if (!tabButtons.length || !panels.length) return;
+
+				const validTabs = new Set(['edit', 'guests']);
+
+				const setTab = (tabId, pushState = true) => {
+					if (!validTabs.has(tabId)) tabId = 'edit';
+
+					tabButtons.forEach((button) => {
+						const active = button.getAttribute('data-editor-tab') === tabId;
+						button.setAttribute('aria-selected', active ? 'true' : 'false');
+					});
+
+					panels.forEach((panel) => {
+						const active = panel.getAttribute('data-editor-panel') === tabId;
+						panel.hidden = !active;
+					});
+
+					if (pushState) {
+						const url = new URL(window.location.href);
+						if (tabId === 'guests') {
+							url.searchParams.set('tab', 'gaeste');
+						} else {
+							url.searchParams.delete('tab');
+						}
+						window.history.replaceState({}, '', url);
+					}
+				};
+
+				tabButtons.forEach((button) => {
+					button.addEventListener('click', () => {
+						setTab(button.getAttribute('data-editor-tab') ?? 'edit');
+					});
+				});
+
+				const initialTab = new URLSearchParams(window.location.search).get('tab');
+				setTab(initialTab === 'gaeste' ? 'guests' : 'edit', false);
+			})();
+		</script>
+	)
+}
+
+<style>
+	.editor-toolbar {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 1rem;
+		flex-wrap: wrap;
+	}
+
+	.editor-toolbar-sticky {
+		position: sticky;
+		top: 0;
+		z-index: 20;
+		background: #f5f6f8;
+		padding: 0.5rem 0 1rem;
+		margin: -0.5rem 0 1.25rem;
+		border-bottom: 1px solid #dde1e8;
+	}
+
+	.editor-toolbar-left {
+		flex: 1;
+		min-width: min(100%, 280px);
+	}
+
+	.back-link {
+		display: inline-block;
+		margin-bottom: 0.35rem;
+		color: #666;
+		text-decoration: none;
+		font-size: 0.85rem;
+	}
+
+	.back-link:hover {
+		color: #1a1a1a;
+	}
+
+	.editor-title-input {
+		display: block;
+		width: 100%;
+		max-width: 560px;
+		padding: 0.35rem 0;
+		border: none;
+		background: transparent;
+		font: inherit;
+		font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		color: #1a1a1a;
+	}
+
+	.editor-title-input::placeholder {
+		color: #9aa3af;
+		font-weight: 600;
+	}
+
+	.editor-title-input:focus {
+		outline: none;
+		box-shadow: inset 0 -2px 0 #a18b63;
+	}
+
+	.toolbar-actions {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+		align-items: center;
+	}
+
+	.editor-form {
+		display: block;
+	}
+
+	.editor-layout {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 340px;
+		gap: 1.5rem;
+		align-items: start;
+	}
+
+	.editor-main {
+		min-width: 0;
+	}
+
+	.editor-panel {
+		background: #fff;
+		border: 1px solid #e8e8e8;
+		border-radius: 12px;
+		padding: 1.25rem;
+		box-shadow: 0 1px 3px rgba(16, 24, 40, 0.04);
+	}
+
+	.editor-sidebar {
+		position: sticky;
+		top: 5.5rem;
+	}
+
+	.editor-sidebar-shell {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		padding: 1.15rem;
+		border-radius: 16px;
+		border: 2px solid #a18b63;
+		background: linear-gradient(180deg, #fefcf7 0%, #f8f5ef 100%);
+		box-shadow:
+			0 6px 24px rgba(161, 139, 99, 0.12),
+			0 2px 6px rgba(16, 24, 40, 0.06);
+	}
+
+	.editor-sidebar-header {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.6rem;
+		padding-bottom: 0.65rem;
+		border-bottom: 2px solid #e8dfce;
+		margin-bottom: 0.15rem;
+	}
+
+	.sidebar-header-icon {
+		font-size: 1.4rem;
+		line-height: 1;
+		margin-top: 0.1rem;
+	}
+
+	.sidebar-column-title {
+		margin: 0;
+		font-size: 1.2rem;
+		font-weight: 800;
+		color: #1a2744;
+		letter-spacing: -0.02em;
+	}
+
+	.sidebar-column-hint {
+		margin: 0.25rem 0 0;
+		font-size: 0.9rem;
+		line-height: 1.45;
+		color: #5a4a2a;
+	}
+
+	.editor-sidebar-card {
+		background: #fff;
+		border: 1px solid #e0dbd0;
+		border-radius: 12px;
+		padding: 1.1rem 1.15rem;
+		box-shadow: 0 1px 4px rgba(161, 139, 99, 0.06);
+	}
+
+	.editor-sidebar-card-highlight {
+		border-color: #c9b87a;
+		background: linear-gradient(135deg, #fffef8 0%, #faf7f0 100%);
+		box-shadow: 0 2px 8px rgba(161, 139, 99, 0.1);
+	}
+
+	.sidebar-card-icon {
+		margin-right: 0.35rem;
+	}
+
+	.field-hint-inline {
+		display: block;
+		margin-top: 0.2rem;
+		font-size: 0.78rem;
+		color: #8a7349;
+		line-height: 1.4;
+	}
+
+	.event-category-custom {
+		margin-top: 0.45rem;
+	}
+
+	.sidebar-new-hint {
+		margin: 0.75rem 0 0;
+		font-size: 0.95rem;
+		line-height: 1.5;
+		color: #4a5568;
+	}
+
+	.panel-title {
+		margin: 0;
+		font-size: 1.15rem;
+		font-weight: 700;
+		letter-spacing: -0.01em;
+		text-transform: none;
+		color: #1a2744;
+	}
+
+	.sidebar-card-title {
+		display: flex;
+		align-items: center;
+		margin: 0 0 0.65rem;
+		font-size: 0.88rem;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: #5a4a2a;
+	}
+
+	.panel-subtitle {
+		margin: 0.55rem 0 0;
+		max-width: 42rem;
+		font-size: 1.02rem;
+		color: #3f4a5a;
+		line-height: 1.55;
+	}
+
+	.panel-subtitle code {
+		font-size: 0.92em;
+		padding: 0.12em 0.4em;
+		border-radius: 4px;
+		background: #efece6;
+		color: #2d2d2d;
+	}
+
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		margin-bottom: 0.6rem;
+	}
+
+	.field span {
+		font-size: 0.88rem;
+		font-weight: 700;
+		color: #3d3017;
+	}
+
+	.field input,
+	.field textarea,
+	.field select {
+		padding: 0.6rem 0.8rem;
+		border: 1.5px solid #d6d0c4;
+		border-radius: 8px;
+		background: #fff;
+		font: inherit;
+		font-size: 0.95rem;
+		resize: vertical;
+		transition: border-color 0.15s, box-shadow 0.15s;
+	}
+
+	.field input:focus,
+	.field textarea:focus,
+	.field select:focus {
+		outline: none;
+		border-color: #a18b63;
+		box-shadow: 0 0 0 3px rgba(161, 139, 99, 0.12);
+	}
+
+	.field input::placeholder,
+	.field textarea::placeholder {
+		color: #b0a898;
+	}
+
+	.field-label-inline {
+		font-size: 0.88rem;
+		font-weight: 700;
+		color: #3d3017;
+	}
+
+	.field-hint {
+		display: block;
+		margin-top: 0.15rem;
+		font-size: 1rem;
+		font-weight: 400;
+		color: #777;
+		line-height: 1.45;
+	}
+
+	/* --- Registration Form Builder Panel --- */
+
+	.reg-form-panel {
+		margin-top: 1.25rem;
+		border: 2px solid #d4a853;
+		background: linear-gradient(180deg, #fffbf2 0%, #fff 100%);
+	}
+
+	.reg-form-panel.is-reg-off {
+		border-color: #d6dce8;
+		background: #fff;
+	}
+
+	.panel-title-icon {
+		margin-right: 0.4rem;
+	}
+
+	.reg-enable-toggle {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.75rem;
+		padding: 0.9rem 1rem;
+		margin-bottom: 1rem;
+		border: 1.5px solid #c9b87a;
+		border-radius: 12px;
+		background: #fffef8;
+		cursor: pointer;
+	}
+
+	.reg-enable-toggle input {
+		width: 1.15rem;
+		height: 1.15rem;
+		margin-top: 0.15rem;
+		accent-color: #a18b63;
+		flex-shrink: 0;
+	}
+
+	.reg-enable-toggle span {
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+	}
+
+	.reg-enable-toggle strong {
+		font-size: 0.98rem;
+		color: #3d3017;
+	}
+
+	.reg-enable-toggle small {
+		font-size: 0.85rem;
+		font-weight: 400;
+		color: #8a7349;
+		line-height: 1.4;
+	}
+
+	.reg-enable-toggle:has(input:checked) {
+		background: #fef3cd;
+		border-color: #c9952b;
+	}
+
+	.reg-defaults-strip {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		align-items: center;
+		margin-bottom: 1.25rem;
+		padding: 0.75rem 1rem;
+		background: #f0ede6;
+		border-radius: 8px;
+		border: 1px solid #e0dbd0;
+	}
+
+	.reg-default-chip {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.3rem 0.7rem;
+		border-radius: 999px;
+		background: #fff;
+		border: 1px solid #d6dce8;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: #4a5568;
+	}
+
+	.reg-limits {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+		gap: 0.85rem 1rem;
+		margin-bottom: 1.25rem;
+	}
+
+	.reg-limits .field {
+		margin: 0;
+	}
+
+	.reg-limits input[type='number'] {
+		width: 100%;
+		max-width: 8rem;
+	}
+
+	
+
+	.reg-fields-container {
+		display: flex;
+		flex-direction: column;
+		gap: 0.85rem;
+		min-height: 2rem;
+	}
+
+	:global(.reg-empty-state) {
+		padding: 1.5rem;
+		text-align: center;
+		color: #8a8a8a;
+		font-size: 0.95rem;
+		border: 2px dashed #ddd;
+		border-radius: 10px;
+		background: #fafafa;
+	}
+
+	:global(.reg-field-card) {
+		border: 1px solid #e4e7ec;
+		border-radius: 12px;
+		background: #fff;
+		padding: 1rem 1.25rem;
+		box-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
+		transition: border-color 0.15s, box-shadow 0.15s;
+	}
+
+	:global(.reg-field-card:hover) {
+		border-color: #c9b87a;
+		box-shadow: 0 4px 12px rgba(161, 139, 99, 0.1);
+	}
+
+	:global(.reg-field-header) {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		margin-bottom: 0.75rem;
+	}
+
+	:global(.reg-field-number) {
+		flex-shrink: 0;
+		width: 1.8rem;
+		height: 1.8rem;
+		display: grid;
+		place-items: center;
+		border-radius: 50%;
+		background: #a18b63;
+		color: #fff;
+		font-size: 0.8rem;
+		font-weight: 700;
+	}
+
+	:global(.reg-field-label-input) {
+		flex: 1;
+		min-width: 0;
+		padding: 0.55rem 0.8rem;
+		border: 1px solid #e4e7ec;
+		border-radius: 8px;
+		font: inherit;
+		font-size: 1rem;
+		font-weight: 600;
+		background: #fafbfd;
+		transition: border-color 0.15s;
+	}
+
+	:global(.reg-field-label-input:focus) {
+		outline: none;
+		border-color: #a18b63;
+		box-shadow: 0 0 0 3px rgba(161, 139, 99, 0.12);
+	}
+
+	:global(.reg-field-label-input::placeholder) {
+		font-weight: 400;
+		color: #9aa3af;
+	}
+
+	:global(.reg-field-settings) {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-bottom: 0.75rem;
+		padding: 0.5rem 0.75rem;
+		background: #f8f9fb;
+		border-radius: 8px;
+		border: 1px solid #eef0f4;
+	}
+
+	:global(.reg-field-type-group) {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	:global(.reg-field-type-label) {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: #667085;
+		white-space: nowrap;
+	}
+
+	:global(.reg-field-type-select) {
+		padding: 0.4rem 0.6rem;
+		border: 1px solid #d6dce8;
+		border-radius: 6px;
+		font: inherit;
+		font-size: 0.88rem;
+		background: #fff;
+		cursor: pointer;
+	}
+
+	:global(.reg-required-toggle) {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		margin-left: auto;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: #667085;
+		cursor: pointer;
+	}
+
+	:global(.reg-required-toggle input) {
+		width: 0.9rem;
+		height: 0.9rem;
+		accent-color: #a18b63;
+	}
+
+	:global(.reg-options-section) {
+		margin-top: 0.25rem;
+		padding: 0.75rem;
+		background: #f9fafb;
+		border-radius: 8px;
+		border: 1px solid #eef0f4;
+	}
+
+	:global(.reg-options-label) {
+		margin: 0 0 0.5rem;
+		font-size: 0.82rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: #667085;
+	}
+
+	:global(.reg-field-options) {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+	}
+
+	:global(.reg-option-row) {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+	}
+
+	:global(.reg-option-bullet) {
+		flex-shrink: 0;
+		width: 1.2rem;
+		text-align: center;
+		font-size: 0.9rem;
+		color: #9aa3af;
+	}
+
+	:global(.reg-option-row input) {
+		flex: 1;
+		min-width: 0;
+		padding: 0.45rem 0.65rem;
+		border: 1px solid #e4e7ec;
+		border-radius: 6px;
+		font: inherit;
+		font-size: 0.9rem;
+		background: #fff;
+		transition: border-color 0.15s;
+	}
+
+	:global(.reg-option-row input:focus) {
+		outline: none;
+		border-color: #a18b63;
+		box-shadow: 0 0 0 2px rgba(161, 139, 99, 0.1);
+	}
+
+	:global(.reg-option-row input::placeholder) {
+		color: #b0b8c4;
+	}
+
+	:global(.reg-icon-btn) {
+		border: 0;
+		background: transparent;
+		color: #98a2b3;
+		cursor: pointer;
+		font-size: 1rem;
+		padding: 0.25rem 0.4rem;
+		border-radius: 4px;
+		transition: color 0.15s, background 0.15s;
+	}
+
+	:global(.reg-icon-btn:hover) {
+		color: #b02e2e;
+		background: #fef3f2;
+	}
+
+	:global(.reg-icon-btn-delete) {
+		font-size: 0.9rem;
+	}
+
+	:global(.reg-add-option-btn) {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		margin-top: 0.5rem;
+		padding: 0.35rem 0.7rem;
+		border: 1px dashed #c9cdd4;
+		border-radius: 6px;
+		background: #fff;
+		font: inherit;
+		font-size: 0.82rem;
+		font-weight: 600;
+		color: #667085;
+		cursor: pointer;
+		transition: border-color 0.15s, color 0.15s;
+	}
+
+	:global(.reg-add-option-btn:hover) {
+		border-color: #a18b63;
+		color: #7a5f1e;
+	}
+
+	:global(.reg-type-preview) {
+		margin-top: 0.25rem;
+		padding: 0.5rem 0.75rem;
+		font-size: 0.85rem;
+		color: #667085;
+		background: #f9fafb;
+		border-radius: 6px;
+		border: 1px solid #eef0f4;
+	}
+
+	:global(.reg-yesno-preview) {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.45rem;
+	}
+
+	:global(.reg-yesno-chip) {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.25rem 0.65rem;
+		border-radius: 999px;
+		background: #fff;
+		border: 1px solid #d6dce8;
+		font-size: 0.82rem;
+		font-weight: 700;
+		color: #344054;
+	}
+
+	:global(.reg-yesno-hint) {
+		font-size: 0.8rem;
+		color: #667085;
+	}
+
+	.reg-add-field-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		width: 100%;
+		margin-top: 1rem;
+		padding: 0.85rem;
+		border: 2px dashed #c9b87a;
+		border-radius: 10px;
+		background: #fffef8;
+		font: inherit;
+		font-size: 1rem;
+		font-weight: 700;
+		color: #7a5f1e;
+		cursor: pointer;
+		transition: background 0.15s, border-color 0.15s, transform 0.1s;
+	}
+
+	.reg-add-field-btn:hover {
+		background: #fef3cd;
+		border-color: #a18b63;
+		transform: translateY(-1px);
+	}
+
+	.reg-add-field-icon {
+		font-size: 1.3rem;
+		font-weight: 700;
+		line-height: 1;
+	}
+
+	.reg-examples-hint {
+		margin-top: 0.85rem;
+		padding: 0.65rem 0.9rem;
+		border-radius: 8px;
+		background: #f5f0e6;
+		border: 1px solid #e8dfce;
+		font-size: 0.85rem;
+		color: #5a4a2a;
+		line-height: 1.5;
+	}
+
+	.reg-examples-hint strong {
+		color: #3d3017;
+	}
+
+	.main-image-field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.main-image-preview-wrap {
+		width: 100%;
+	}
+
+	.main-image-preview {
+		border: 2px solid #a18b63;
+		border-radius: 2px;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+		overflow: hidden;
+		aspect-ratio: 1 / 1;
+		background: #fff;
+	}
+
+	.main-image-preview :global(.main-image-preview-img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	.main-image-preview :global(.main-image-preview-img--fallback) {
+		object-fit: contain;
+	}
+
+	.main-image-actions {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.blocks-section {
+		margin: 0;
+	}
+
+	.blocks-toolbar {
+		margin-bottom: 1rem;
+	}
+
+	.content-add-picker {
+		margin-top: 1.25rem;
+		padding: 1rem;
+		border: 1px dashed #c9cdd4;
+		border-radius: 12px;
+		background: #fafbfc;
+	}
+
+	.content-add-heading {
+		margin: 0;
+		font-size: 1.05rem;
+		font-weight: 700;
+		color: #1a2744;
+	}
+
+	.content-add-hint {
+		margin: 0.25rem 0 0.85rem;
+		font-size: 0.95rem;
+		color: #4a5568;
+	}
+
+	.content-add-options {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 0.65rem;
+	}
+
+	.content-add-options--two {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.content-add-options--four {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.content-add-option[data-add-table] .content-add-icon {
+		background: #ecfdf3;
+		color: #027a48;
+	}
+
+	.event-gallery-panel {
+		margin-top: 1.25rem;
+		background: #fff;
+		border: 1px solid #e8e8e8;
+		border-radius: 12px;
+		padding: 1.25rem;
+		box-shadow: 0 1px 3px rgba(16, 24, 40, 0.04);
+	}
+
+	.content-add-option {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.65rem;
+		padding: 0.85rem;
+		border: 1px solid #e4e7ec;
+		border-radius: 10px;
+		background: #fff;
+		cursor: pointer;
+		text-align: left;
+		font: inherit;
+		transition:
+			border-color 0.15s ease,
+			box-shadow 0.15s ease;
+	}
+
+	.content-add-option:hover {
+		border-color: #a18b63;
+		box-shadow: 0 2px 8px rgba(16, 43, 64, 0.06);
+	}
+
+	.content-add-option:focus-visible {
+		outline: 2px solid #a18b63;
+		outline-offset: 2px;
+	}
+
+	.content-add-icon {
+		flex-shrink: 0;
+		width: 2rem;
+		height: 2rem;
+		display: grid;
+		place-items: center;
+		border-radius: 8px;
+		background: #eef2f6;
+		font-size: 0.95rem;
+		font-weight: 700;
+		line-height: 1;
+		color: #102b40;
+	}
+
+	.content-add-option[data-add-image] .content-add-icon {
+		background: #f5efe6;
+		color: #8a7349;
+	}
+
+	.content-add-option[data-add-gallery] .content-add-icon {
+		background: #f0f0f0;
+		color: #4b5563;
+	}
+
+	.content-add-text {
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+		min-width: 0;
+	}
+
+	.content-add-text strong {
+		font-size: 1rem;
+		color: #1a1a1a;
+	}
+
+	.content-add-text small {
+		font-size: 0.88rem;
+		line-height: 1.35;
+		color: #4a5568;
+	}
+
+	.save-status {
+		font-size: 0.82rem;
+		color: #667085;
+		align-self: center;
+	}
+
+	.save-status.is-dirty {
+		color: #b54708;
+	}
+
+	.save-status.is-saved {
+		color: #027a48;
+	}
+
+	.draft-badge {
+		font-size: 0.78rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		padding: 0.25rem 0.55rem;
+		border-radius: 999px;
+		background: #fef0c7;
+		color: #b54708;
+		border: 1px solid #fedf89;
+	}
+
+	.save-dropdown {
+		position: relative;
+	}
+
+	.save-dropdown-menu {
+		position: absolute;
+		top: calc(100% + 0.35rem);
+		right: 0;
+		z-index: 30;
+		min-width: 16.5rem;
+		padding: 0.35rem;
+		border: 1px solid #e4e7ec;
+		border-radius: 10px;
+		background: #fff;
+		box-shadow: 0 8px 24px rgba(16, 24, 40, 0.12);
+	}
+
+	.save-dropdown-item {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.15rem;
+		width: 100%;
+		padding: 0.65rem 0.75rem;
+		border: none;
+		border-radius: 8px;
+		background: transparent;
+		text-align: left;
+		font: inherit;
+		cursor: pointer;
+	}
+
+	.save-dropdown-item:hover {
+		background: #f5f6f8;
+	}
+
+	.save-dropdown-item strong {
+		font-size: 0.92rem;
+		color: #1a1a1a;
+	}
+
+	.save-dropdown-item small {
+		font-size: 0.78rem;
+		color: #667085;
+		line-height: 1.35;
+	}
+
+	.save-dropdown-item-danger strong {
+		color: #b42318;
+	}
+
+	/* ─── Edit / Gästeliste tabs (card style) ─── */
+
+	.editor-shell {
+		margin-top: 0.15rem;
+	}
+
+	.editor-tab-bar {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.55rem;
+		margin: 0 0 0;
+		padding: 0;
+		border-bottom: none;
+	}
+
+	.editor-tab {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.65rem;
+		min-width: min(100%, 11.5rem);
+		padding: 0.75rem 1rem;
+		border: 1px solid #d8dee8;
+		border-radius: 12px 12px 0 0;
+		background: #eef1f6;
+		font: inherit;
+		text-align: left;
+		color: #64748b;
+		cursor: pointer;
+		transition:
+			color 0.15s ease,
+			background 0.15s ease,
+			border-color 0.15s ease,
+			box-shadow 0.15s ease,
+			transform 0.15s ease;
+	}
+
+	.editor-tab:hover {
+		color: #334155;
+		background: #f8fafc;
+		border-color: #c5cad4;
+	}
+
+	.editor-tab[aria-selected='true'] {
+		color: #1a2744;
+		background: #fff;
+		border-color: #d8dee8;
+		border-bottom-color: #fff;
+		box-shadow: 0 -2px 12px rgba(26, 39, 68, 0.05);
+		transform: translateY(1px);
+		z-index: 1;
+		position: relative;
+	}
+
+	.editor-tab-icon {
+		display: grid;
+		place-items: center;
+		width: 2rem;
+		height: 2rem;
+		border-radius: 9px;
+		background: rgba(255, 255, 255, 0.65);
+		font-size: 0.95rem;
+		line-height: 1;
+		flex-shrink: 0;
+	}
+
+	.editor-tab-icon--guests {
+		font-size: 0.82rem;
+		font-weight: 800;
+	}
+
+	.editor-tab[aria-selected='true'] .editor-tab-icon {
+		background: #1a2744;
+		color: #fff;
+	}
+
+	.editor-tab-copy {
+		display: flex;
+		flex-direction: column;
+		gap: 0.12rem;
+		min-width: 0;
+	}
+
+	.editor-tab-label {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.92rem;
+		font-weight: 700;
+		line-height: 1.2;
+	}
+
+	.editor-tab-hint {
+		font-size: 0.72rem;
+		font-weight: 550;
+		color: #94a3b8;
+		line-height: 1.25;
+	}
+
+	.editor-tab[aria-selected='true'] .editor-tab-hint {
+		color: #64748b;
+	}
+
+	.editor-tab-badge {
+		display: inline-grid;
+		place-items: center;
+		min-width: 1.35rem;
+		height: 1.35rem;
+		padding: 0 0.3rem;
+		border-radius: 999px;
+		background: #cbd5e1;
+		color: #334155;
+		font-size: 0.72rem;
+		font-weight: 800;
+		line-height: 1;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.editor-tab[aria-selected='true'] .editor-tab-badge {
+		background: #1a2744;
+		color: #fff;
+	}
+
+	.editor-tab-root {
+		min-width: 0;
+		margin-top: -1px;
+	}
+
+	.editor-shell .editor-tab-root {
+		border: 1px solid #d8dee8;
+		border-radius: 0 12px 12px 12px;
+		background: #fff;
+		padding: 1.15rem 1.15rem 0.5rem;
+		box-shadow: 0 8px 24px rgba(26, 39, 68, 0.04);
+	}
+
+	.editor-tab-panel[hidden] {
+		display: none !important;
+	}
+
+	.editor-guests-shell {
+		padding: 0.15rem 0 1rem;
+	}
+
+	@media (max-width: 960px) {
+		.editor-layout {
+			grid-template-columns: 1fr;
+		}
+
+		.editor-sidebar {
+			position: static;
+			order: -1;
+		}
+
+		.editor-toolbar-sticky {
+			position: static;
+			margin-top: 0;
+		}
+
+		.content-add-options {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.editor-tab-bar {
+			flex-direction: column;
+			gap: 0.4rem;
+		}
+
+		.editor-tab {
+			width: 100%;
+			min-width: 0;
+			border-radius: 10px;
+		}
+
+		.editor-tab[aria-selected='true'] {
+			border-radius: 10px;
+			border-bottom-color: #d8dee8;
+			transform: none;
+			box-shadow: 0 2px 10px rgba(26, 39, 68, 0.06);
+		}
+
+		.editor-shell .editor-tab-root {
+			border-radius: 12px;
+			margin-top: 0.35rem;
+		}
+
+		.toolbar-actions {
+			width: 100%;
+		}
+
+		.toolbar-actions .btn-ghost,
+		.toolbar-actions .btn-primary {
+			flex: 1;
+			text-align: center;
+		}
+
+		#btn-preview {
+			flex: 0 0 100%;
+		}
+	}
+</style>

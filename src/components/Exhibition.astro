@@ -7,44 +7,54 @@ const {title, organization, location, organizationUrl} = Astro.props;
 
 <style>
     .exhibition {
-        border-left: 1px solid var(--text-color);
-        padding: 0 1rem;
+        border-left: 2px solid rgba(0, 200, 150, 0.35);
+        padding: 0.1rem 0 0.1rem 1rem;
+        margin-bottom: 1.1rem;
         display: flex;
         flex-direction: column;
         gap: 0.2rem;
         align-items: flex-start;
         justify-content: flex-start;
         flex-wrap: wrap;
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-size: 0.82rem;
+        transition: border-color 0.15s ease;
+    }
+
+    .exhibition:hover {
+        border-left-color: #00c896;
     }
 
     .exhibition--top {
         display: flex;
         width: 100%;
-        gap: 1rem;
+        min-width: 0;
+        gap: 0.4rem 1rem;
         flex-wrap: wrap;
     }
 
     .exhibition--title {
-        font-weight: bold;
-        white-space: nowrap;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        color: #e4e4e4;
+        min-width: 0;
+        overflow-wrap: break-word;
     }
 
     .exhibition--organization {
+        color: #9a9da4;
+        min-width: 0;
+        overflow-wrap: break-word;
+    }
 
+    .exhibition--organization a {
+        color: inherit;
     }
 
     .exhibition--location {
-        font-style: italic;
-    }
-
-    @media (max-width: 762px) {
-        .exhibition {
-            flex-direction: row;
-        }
-
-        .exhibition--top {
-            flex-direction: column;
-        }
+        color: #9a9da4;
+        opacity: 0.75;
+        font-style: normal;
     }
 </style>
 <div class="exhibition">

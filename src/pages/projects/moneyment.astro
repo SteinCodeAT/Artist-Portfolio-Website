@@ -1,9 +1,7 @@
 ---
 import ProjectPage from '../../layouts/ProjectPage.astro';
 
-const images = await Astro.glob(`../../img/moneyment/*`).then(files => {
-    return files.map(file => file.default);
-});
+const images = Object.values(import.meta.glob('../../img/moneyment/*', { eager: true })).map((file) => file.default);
 
 
 const project = {

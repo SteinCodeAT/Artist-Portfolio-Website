@@ -1,0 +1,134 @@
+---
+import { issueFormToken } from '@steincms/cms/forms/form-token';
+import { PUBLIC_TURNSTILE_SITEKEY } from 'astro:env/client';
+
+interface Props {
+	eventId: string;
+	submitLabel?: string;
+	class?: string;
+	submitClass?: string;
+}
+
+const { eventId, submitLabel = 'Anmelden', class: className, submitClass } = Astro.props;
+const { token } = issueFormToken(eventId);
+const formClass = ['registration-form', className].filter(Boolean).join(' ');
+const buttonClass = ['register-submit', submitClass].filter(Boolean).join(' ');
+---
+
+<form class={formClass} data-registration-form method="post" action="/api/register-event">
+	<input type="hidden" name="eventId" value={eventId} />
+	<input type="hidden" name="_sibop" value={token} />
+	<slot />
+	{
+		PUBLIC_TURNSTILE_SITEKEY && (
+			<div class="cf-turnstile" data-sitekey={PUBLIC_TURNSTILE_SITEKEY} />
+		)
+	}
+	<button type="submit" class={buttonClass}>{submitLabel}</button>
+	<p class="register-status" data-registration-status role="status" aria-live="polite"></p>
+</form>
+
+{
+	PUBLIC_TURNSTILE_SITEKEY && (
+		<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer />
+	)
+}
+
+<script>
+	import { initRegistrationForms } from './registration-form-client.ts';
+
+	initRegistrationForms();
+</script>
+<style>
+	.registration-form {
+		display: flex;
+		flex-direction: column;
+		gap: 0.95rem;
+		font-family: var(--registration-font, inherit);
+		color: var(--registration-color, inherit);
+	}
+
+	.registration-form :global(.register-field) {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		font-size: 0.95rem;
+	}
+
+	.registration-form :global(.register-custom) {
+		border: 0;
+		margin: 0;
+		padding: 0;
+		min-width: 0;
+	}
+
+	.registration-form :global(.register-custom legend) {
+		padding: 0;
+		margin: 0 0 0.4rem;
+	}
+
+	.registration-form :global(.register-choice) {
+		display: flex;
+		align-items: center;
+		gap: 0.45rem;
+		margin: 0.2rem 0;
+	}
+
+	.registration-form :global(.register-counts) {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 0.75rem;
+	}
+
+	.registration-form :global(.register-counts:has(.register-field:nth-child(2))) {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.registration-form :global(.register-field input) {
+		padding: 0.75rem 0.9rem;
+		border: 1px solid var(--registration-input-border, currentColor);
+		background: var(--registration-input-bg, transparent);
+		font-family: var(--registration-font, inherit);
+		font-size: 1.05rem;
+		color: var(--registration-color, inherit);
+	}
+
+	.registration-form :global(.register-field input:focus) {
+		outline: 2px solid var(--registration-focus, currentColor);
+		outline-offset: 1px;
+	}
+
+	.registration-form :global(.register-field input[type='radio']),
+	.registration-form :global(.register-field input[type='checkbox']) {
+		width: 1.05rem;
+		height: 1.05rem;
+		padding: 0;
+		border: 0;
+		background: none;
+		accent-color: var(--registration-accent, currentColor);
+	}
+
+	.register-submit {
+		align-self: flex-start;
+		padding: 0.85rem 1.55rem;
+		border: 0;
+		background: var(--registration-submit-bg, currentColor);
+		font-family: var(--registration-font, inherit);
+		font-size: 1.05rem;
+		color: var(--registration-submit-color, Canvas);
+		cursor: pointer;
+	}
+
+	.register-submit:hover {
+		background: var(
+			--registration-submit-hover,
+			color-mix(in srgb, var(--registration-submit-bg, currentColor) 85%, black)
+		);
+	}
+
+	.register-status {
+		margin: 0;
+		min-height: 1.4em;
+		color: var(--registration-status-color, inherit);
+	}
+</style>
