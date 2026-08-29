@@ -1,0 +1,1 @@
+import"./copyright-year-updater.B61ea6fi.js";

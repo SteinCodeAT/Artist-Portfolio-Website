@@ -1,0 +1,1 @@
+var e=new Date;document.querySelectorAll(`.copyright-year`).forEach(t=>{t!==null&&(t.innerHTML=e.getFullYear().toString())});
