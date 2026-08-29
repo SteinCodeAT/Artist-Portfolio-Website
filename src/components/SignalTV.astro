@@ -1,0 +1,100 @@
+---
+// Signal TV — the interactive project-browser hero for the homepage.
+// Markup/CSS/JS ported from a standalone prototype (see conversation history);
+// the CSS's position:fixed overlays became position:absolute inside
+// .banner-section (100vh) here, since this now lives inside a normal
+// scrollable page instead of owning the whole viewport.
+import '../styles/signal-tv.css';
+---
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Roboto:wght@400&display=swap" rel="stylesheet">
+
+<svg width="0" height="0" style="position:absolute">
+  <filter id="rChan" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/></filter>
+  <filter id="bChan" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"/></filter>
+</svg>
+
+<div class="tv" id="tv">
+  <div class="bg-layers">
+    <div class="nebula n1"></div>
+    <div class="nebula n2"></div>
+    <div class="nebula n3"></div>
+    <canvas id="stars"></canvas>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="bg-photo" id="bgPhoto"></div>
+    <div class="bg-photo ghost-r" id="bgPhotoR"></div>
+    <div class="bg-photo ghost-b" id="bgPhotoB"></div>
+    <div class="tree-veil"></div>
+    <div class="tree-parallax" id="treeParallax">
+      <img class="tree-glow b" id="glowB" src="" alt="" aria-hidden="true">
+      <img class="tree-glow a" id="glowA" src="" alt="" aria-hidden="true">
+      <img class="tree-img base" id="stageImg" src="" alt="">
+      <div class="tree-tint" id="treeTint"></div>
+      <img class="ghost r-chan" id="ghostR" src="" alt="" aria-hidden="true">
+      <img class="ghost b-chan" id="ghostB" src="" alt="" aria-hidden="true">
+    </div>
+    <div class="tear" id="tear1"></div>
+    <div class="tear" id="tear2"></div>
+  </div>
+
+  <div class="tracking-wave"></div>
+  <div class="scanlines"></div>
+  <div class="aperture"></div>
+  <div class="grain"></div>
+  <div class="vignette"></div>
+  <div class="vlines"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="tv-power-flicker"></div>
+  <div class="crt-bezel"></div>
+  <div class="crt-glass"></div>
+  <div class="power-led"></div>
+  <div class="static-flash" id="staticFlash"></div>
+  <div class="tune-out" id="tuneOut"></div>
+
+  <div class="frame">
+    <header class="nav">
+      <div class="brand-block">
+        <div class="artist-name led-text" id="artistName">Çağdaş Çeçen</div>
+        <div class="led-logo led-text" id="ledLogo">MEDIA : ARTS</div>
+      </div>
+      <nav class="top-nav">
+        <a href="#about-me-section">About</a>
+      </nav>
+    </header>
+
+    <div class="list-wrap" id="listWrap">
+      <ol class="project-list" id="projectList"></ol>
+    </div>
+    <div class="scroll-hint">SCROLL TO CHANGE CHANNEL</div>
+
+    <div class="desc" id="desc">
+      <h2 id="descTitle"></h2>
+      <div class="meta" id="descMeta"></div>
+      <p id="descBody"></p>
+      <a class="see-more" id="seeMore" href="/projects/ghostbox">&gt;&gt; TUNE IN — SEE MORE</a>
+    </div>
+
+    <div class="stats-panel">
+      <div class="stats-title"><span>Active Log</span><span class="dot"></span></div>
+      <canvas id="scope" width="200" height="40"></canvas>
+      <div class="stat"><span class="stat-label">Channel</span><span class="stat-value" id="statChannel">01 / 10</span></div>
+      <div class="stat"><span class="stat-label">Signal</span><span class="stat-value" id="statSignal">98%</span></div>
+      <div class="stat"><span class="stat-label">Freq</span><span class="stat-value" id="statFreq">— Hz</span></div>
+      <div class="stat"><span class="stat-label">Coherence</span><span class="stat-value" id="statCoherence">0.71 φ</span></div>
+      <div class="stat"><span class="stat-label">Entropy Δ</span><span class="stat-value" id="statEntropy">2.3e³</span></div>
+      <div class="stat-rule"></div>
+      <div class="stat"><span class="stat-label">Lat / Lon</span><span class="stat-value">48.21°N 16.37°E</span></div>
+      <div class="stat"><span class="stat-label">Rec</span><span class="stat-value" id="timecode">00:00:00:00</span></div>
+      <div class="stat-rule"></div>
+      <button class="audio-btn" id="audioToggle">▶ SIGNAL</button>
+      <canvas id="bars" width="160" height="30"></canvas>
+    </div>
+  </div>
+</div>
+
+<audio id="audioEl" loop preload="auto"></audio>
+
+<script src="../scripts/signal-tv.js"></script>

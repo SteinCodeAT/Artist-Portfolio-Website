@@ -1,0 +1,81 @@
+---
+import {
+	MAX_NUMBER_ANSWER,
+	MAX_TEXT_ANSWER,
+	type RegistrationField as RegistrationFieldDef,
+} from '@steincms/cms/events/registration-form';
+
+interface Props {
+	field: RegistrationFieldDef;
+	class?: string;
+}
+
+const { field, class: className } = Astro.props;
+const fieldClass = ['register-field', 'register-custom', className].filter(Boolean).join(' ');
+---
+
+<fieldset class={fieldClass} data-reg-field={field.id} data-reg-type={field.type}>
+	<legend>
+		{field.label}
+		{field.required ? ' *' : ''}
+	</legend>
+	{
+		field.type === 'yesno' && (
+			<>
+				<label class="register-choice">
+					<input type="radio" name={`answer-${field.id}`} value="yes" required={field.required} />
+					Ja
+				</label>
+				<label class="register-choice">
+					<input type="radio" name={`answer-${field.id}`} value="no" />
+					Nein
+				</label>
+			</>
+		)
+	}
+	{
+		field.type === 'single' &&
+			(field.options ?? []).map((option) => (
+				<label class="register-choice">
+					<input
+						type="radio"
+						name={`answer-${field.id}`}
+						value={option.id}
+						required={field.required}
+					/>
+					{option.label}
+				</label>
+			))
+	}
+	{
+		field.type === 'multi' &&
+			(field.options ?? []).map((option) => (
+				<label class="register-choice">
+					<input type="checkbox" name={`answer-${field.id}`} value={option.id} />
+					{option.label}
+				</label>
+			))
+	}
+	{
+		field.type === 'number' && (
+			<input
+				type="number"
+				name={`answer-${field.id}`}
+				min="0"
+				max={MAX_NUMBER_ANSWER}
+				value="0"
+				required={field.required}
+			/>
+		)
+	}
+	{
+		field.type === 'text' && (
+			<input
+				type="text"
+				name={`answer-${field.id}`}
+				maxlength={MAX_TEXT_ANSWER}
+				required={field.required}
+			/>
+		)
+	}
+</fieldset>

@@ -1,0 +1,644 @@
+---
+import '../styles/admin-ui.css';
+import AdminIcon from '../icons/AdminIcon.astro';
+
+export interface CalendarDay {
+	date: string;
+	dayNumber: number;
+	weekdayShort: string;
+	isCurrentMonth: boolean;
+	isToday: boolean;
+}
+
+export interface CalendarEvent {
+	id: string;
+	title: string;
+	categoryLabel: string;
+	excerpt: string;
+	searchText: string;
+}
+
+interface Props {
+	monthLabel: string;
+	currentMonthValue: string;
+	prevMonthKey: string;
+	nextMonthKey: string;
+	editorBase: string;
+	newEventHref: string;
+	intro?: string;
+	weekdayLabels: string[];
+	weeks: CalendarDay[][];
+	eventsByDate: Record<string, CalendarEvent[]>;
+	maxEventsPerDay?: number;
+}
+
+const {
+	monthLabel,
+	currentMonthValue,
+	prevMonthKey,
+	nextMonthKey,
+	newEventHref,
+	intro = 'Überblick über Veranstaltungen. Tage mit Einträgen sind markiert — Bearbeiten und Löschen direkt am Termin.',
+	weekdayLabels,
+	weeks,
+	eventsByDate,
+	maxEventsPerDay = 2,
+	editorBase,
+} = Astro.props;
+---
+
+<header class="planner-toolbar">
+	<div class="toolbar-primary">
+		<div class="month-nav" aria-label="Monat wählen">
+			<a class="nav-btn" href={`?month=${prevMonthKey}`} aria-label="Vorheriger Monat">‹</a>
+			<span class="nav-dot" aria-hidden="true">·</span>
+			<label class="month-picker" title="Monat springen">
+				<span class="month-picker-icon" aria-hidden="true">
+					<AdminIcon name="calendar" width="16" height="16" />
+				</span>
+				<input
+					type="month"
+					class="month-picker-input"
+					value={currentMonthValue}
+					aria-label="Monat auswählen"
+				/>
+			</label>
+			<span class="nav-dot" aria-hidden="true">·</span>
+			<a class="nav-btn" href={`?month=${nextMonthKey}`} aria-label="Nächster Monat">›</a>
+		</div>
+		<h1 class="planner-month">{monthLabel}</h1>
+		
+	</div>
+
+	<div class="toolbar-actions">
+		<label class="search-field search-field--icon">
+			<span class="search-icon" aria-hidden="true">
+				<AdminIcon name="search" width="16" height="16" />
+			</span>
+			<input type="search" id="event-search" placeholder="Termine suchen…" autocomplete="off" />
+		</label>
+		<a class="btn-primary" href={newEventHref}>Neues Event</a>
+	</div>
+</header>
+
+<p class="planner-intro">{intro}</p>
+
+<section class="planner-calendar" aria-label="Monatskalender">
+	<div class="weekday-row" aria-hidden="true">
+		{weekdayLabels.map((label) => (
+			<span>{label}</span>
+		))}
+	</div>
+
+	{weeks.map((week) => (
+		<div class="week-row">
+			{week.map((day) => {
+				const dayEvents = eventsByDate[day.date] ?? [];
+				const visibleEvents = dayEvents.slice(0, maxEventsPerDay);
+				const hiddenCount = dayEvents.length - visibleEvents.length;
+
+				return (
+					<article
+						class:list={[
+							'calendar-day',
+							{ 'is-other-month': !day.isCurrentMonth },
+							{ 'is-today': day.isToday },
+							{ 'has-events': dayEvents.length > 0 },
+						]}
+						data-date={day.date}
+					>
+						<div class="day-head">
+							<span class="day-label">{day.weekdayShort}</span>
+							<div class="day-topline" aria-hidden="true"></div>
+							<p class="day-number">{day.dayNumber}</p>
+						</div>
+
+						<div class="day-events">
+							{visibleEvents.map((event) => (
+								<div
+									class="event-row"
+									data-event-id={event.id}
+									data-search-text={event.searchText}
+								>
+									<div class="event-body">
+										<strong>{event.title}</strong>
+										<span>{event.categoryLabel}</span>
+									</div>
+									<div class="event-actions" aria-label="Termin-Aktionen">
+										<a
+											class="action-btn edit-btn"
+											href={`${editorBase}?id=${event.id}&from=calendar`}
+											aria-label="Veranstaltung bearbeiten"
+											title="Bearbeiten"
+											onclick="event.stopPropagation()"
+										>
+											<AdminIcon name="edit" width="14" height="14" />
+										</a>
+										<button type="button" class="action-btn delete-btn" 
+										data-event-id={event.id} data-event-title={event.title} aria-label="Veranstaltung löschen" title="Löschen">
+											<AdminIcon name="trash" width="14" height="14" />
+										</button>
+									</div>
+								</div>
+							))}
+							{hiddenCount > 0 && <p class="event-more">+ {hiddenCount} weitere</p>}
+						</div>
+					</article>
+				);
+			})}
+		</div>
+	))}
+</section>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const monthPickerLabel = document.querySelector('.month-picker');
+		const monthPickerInput = monthPickerLabel?.querySelector('input');
+
+		monthPickerLabel?.addEventListener('click', (event) => {
+			event.preventDefault();
+			try {
+				monthPickerInput?.showPicker();
+			} catch {
+				monthPickerInput?.focus();
+			}
+		});
+	});
+
+	
+</script>
+
+<style>
+	.planner-toolbar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1.25rem;
+		margin-bottom: 0.5rem;
+		flex-wrap: wrap;
+		min-width: 0;
+	}
+
+	.toolbar-primary {
+		display: flex;
+		align-items: center;
+		gap: 1.25rem;
+		flex-wrap: wrap;
+	}
+
+	.planner-month {
+		margin: 0;
+		font-size: clamp(1.5rem, 2.5vw, 1.9rem);
+		font-weight: 700;
+		letter-spacing: -0.03em;
+	}
+
+	.month-nav {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.nav-btn {
+		display: inline-grid;
+		place-items: center;
+		width: 32px;
+		height: 32px;
+		border: 1px solid #e4e4e4;
+		border-radius: 8px;
+		background: #fff;
+		color: inherit;
+		text-decoration: none;
+		font-size: 1.15rem;
+		line-height: 1;
+		transition: border-color 0.15s, background 0.15s;
+	}
+
+	.nav-btn:hover {
+		border-color: #ccc;
+		background: #fafafa;
+	}
+
+	.nav-dot {
+		color: #ccc;
+		font-size: 1.1rem;
+		line-height: 1;
+		user-select: none;
+	}
+
+	.month-picker {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		border: 1px solid #e4e4e4;
+		border-radius: 8px;
+		background: #fff;
+		cursor: pointer;
+		color: #555;
+		transition: border-color 0.15s, background 0.15s;
+	}
+
+	.month-picker:hover {
+		border-color: #ccc;
+		background: #fafafa;
+	}
+
+	.month-picker-icon :global(svg) {
+		width: 16px;
+		height: 16px;
+		display: block;
+	}
+
+	.month-picker-input {
+		position: absolute;
+		inset: 0;
+		opacity: 0;
+		cursor: pointer;
+		width: 100%;
+		height: 100%;
+	}
+
+	.toolbar-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		flex: 0 1 auto;
+		justify-content: flex-end;
+		min-width: 0;
+	}
+
+	.planner-intro {
+		color: #888;
+		margin: 0 0 1.25rem;
+		font-size: 0.86rem;
+		line-height: 1.5;
+	}
+
+	.planner-calendar {
+		background: #fff;
+		border-radius: 14px;
+		padding: 1rem;
+		min-width: 0;
+		max-width: 100%;
+		overflow: hidden;
+	}
+
+	.weekday-row {
+		display: grid;
+		grid-template-columns: repeat(7, minmax(0, 1fr));
+		column-gap: 0.3rem;
+		margin-bottom: 0.85rem;
+		padding: 0 0.15rem;
+		min-width: 0;
+	}
+
+	.weekday-row span {
+		font-size: 0.72rem;
+		font-weight: 700;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		color: #b0b0b0;
+		background: #f3f4f6;
+	}
+
+	.week-row {
+		display: grid;
+		grid-template-columns: repeat(7, minmax(0, 1fr));
+		column-gap: 0.3rem;
+		margin-bottom: 1.25rem;
+		min-width: 0;
+	}
+
+	.week-row:last-child {
+		margin-bottom: 0;
+	}
+
+	.calendar-day {
+		min-width: 0;
+		min-height: 96px;
+		padding: 0.15rem 0.2rem 0.45rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		border-radius: 0;
+		transition: opacity 0.15s, background 0.15s;
+		cursor: pointer;
+		overflow: hidden;
+	}
+
+	.calendar-day:hover:not(.is-other-month) {
+		background: #f7f7f7;
+	}
+
+	.day-head {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+	}
+
+	.day-label {
+		font-size: 0.62rem;
+		font-weight: 600;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: #b8b8b8;
+	}
+
+	.day-topline {
+		height: 2px;
+		width: 100%;
+		background: #e0e0e0;
+		border-radius: 0;
+	}
+
+	.calendar-day.has-events:not(.is-today) {
+		padding: 0.25rem 0.25rem 0.45rem;
+		border-radius: 4px;
+	}
+
+	.calendar-day.has-events:not(.is-today) .day-topline {
+		background: #8fa3b8;
+		height: 2.5px;
+	}
+
+	.calendar-day.has-events:not(.is-today) .day-label {
+		color: #a8b4c0;
+	}
+
+	.calendar-day.has-events:not(.is-today) .day-number {
+		color: #5f7389;
+	}
+
+	.calendar-day.is-today {
+		background: #fff5ee;
+		padding: 0.35rem 0.25rem 0.55rem;
+		margin: 0;
+		border-radius: 2px;
+	}
+
+	.calendar-day.is-today .day-label,
+	.calendar-day.is-today .day-number {
+		color: #aa6907;
+	}
+
+	.calendar-day.is-today .day-topline {
+		background: #aa6907;
+		height: 3px;
+	}
+
+	.calendar-day.is-other-month {
+		opacity: 0.3;
+	}
+
+	.calendar-day.is-other-month .day-topline {
+		background: #ececec;
+	}
+
+	.calendar-day.is-other-month.has-events .day-topline {
+		background: #b8c4d0;
+	}
+
+	.calendar-day.is-other-month.has-events:not(.is-today) {
+		background: #f7f8f9;
+	}
+
+	.calendar-day.search-dim {
+		opacity: 0.2;
+	}
+
+	.calendar-day.search-hit:not(.is-today) {
+		background: #eceff3;
+	}
+
+	.calendar-day.search-hit.is-today {
+		background: #fff5ee;
+	}
+
+	.day-number {
+		margin: 0;
+		font-size: 1.35rem;
+		font-weight: 700;
+		line-height: 1;
+		letter-spacing: -0.03em;
+		color: #888;
+	}
+
+	.day-events {
+		display: flex;
+		flex-direction: column;
+		gap: 0.55rem;
+		flex: 1;
+	}
+
+	.event-row {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: start;
+		gap: 0.2rem;
+		padding: 0.1rem 0;
+		min-width: 0;
+		background: #f8f8f8;
+		border-radius: 4px;
+		
+	}
+
+	.event-row.is-hidden {
+		display: none;
+	}
+
+	.event-body {
+		min-width: 0;
+	}
+
+	.event-body strong {
+		display: block;
+		font-size: 0.72rem;
+		font-weight: 700;
+		line-height: 1.4;
+		margin-bottom: 0.12rem;
+		color: #111;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.event-body span {
+		display: block;
+		font-size: 0.75rem;
+		color: #9a9a9a;
+		line-height: 1.25;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.event-actions {
+		display: flex;
+		gap: 0.2rem;
+		flex-shrink: 0;
+		align-items: flex-start;
+	}
+
+	.action-btn {
+		display: inline-grid;
+		place-items: center;
+		width: 24px;
+		height: 24px;
+		min-width: 24px;
+		min-height: 24px;
+		border: 1px solid #e8e8e8;
+		border-radius: 6px;
+		background: #fff;
+		color: #777;
+		cursor: pointer;
+		padding: 0;
+		transition: background 0.12s, border-color 0.12s, color 0.12s;
+	}
+
+	.action-btn :global(svg) {
+		width: 14px;
+		height: 14px;
+		display: block;
+	}
+
+	.edit-btn {
+		color: #555;
+		text-decoration: none;
+	}
+
+	.edit-btn:hover,
+	.edit-btn:focus-visible {
+		background: #f3f3f3;
+		border-color: #ccc;
+		color: #111;
+		outline: none;
+	}
+
+	.delete-btn {
+		color: #c45c4a;
+		border-color: #f0ddd9;
+		background: #fffaf9;
+	}
+
+	.delete-btn:hover,
+	.delete-btn:focus-visible {
+		background: #fdecea;
+		border-color: #e8b4ab;
+		color: #a93226;
+		outline: none;
+	}
+
+	.event-more {
+		margin: 0;
+		font-size: 0.62rem;
+		color: #9a9a9a;
+		text-decoration: underline;
+		cursor: pointer;
+	}
+
+	@media (min-width: 1600px) {
+		.planner-calendar {
+			padding: 1.25rem 1.25rem 1.5rem;
+		}
+
+		.weekday-row,
+		.week-row {
+			column-gap: 0.5rem;
+		}
+
+		.weekday-row span {
+			letter-spacing: 0.28em;
+			font-size: 0.78rem;
+		}
+
+		.day-number {
+			font-size: 1.75rem;
+		}
+
+		.calendar-day {
+			min-height: 108px;
+			padding: 0.2rem 0.3rem 0.55rem;
+		}
+
+		.calendar-day.has-events:not(.is-today) {
+			padding: 0.35rem 0.4rem 0.55rem;
+		}
+
+		.calendar-day.is-today {
+			padding: 0.45rem 0.4rem 0.65rem;
+		}
+
+		.event-body strong {
+			font-size: 0.8rem;
+		}
+
+		.event-body span {
+			font-size: 0.85rem;
+		}
+
+		.action-btn {
+			width: 28px;
+			height: 28px;
+			min-width: 28px;
+			min-height: 28px;
+		}
+
+		.search-field {
+			max-width: 280px;
+		}
+	}
+
+	@media (max-width: 1100px) {
+		.toolbar-actions {
+			width: 100%;
+			max-width: none;
+		}
+
+		.search-field {
+			max-width: none;
+		}
+
+		.weekday-row {
+			display: none;
+		}
+
+		.week-row {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			row-gap: 0.75rem;
+		}
+
+		.calendar-day {
+			min-height: 96px;
+		}
+
+		.day-label {
+			display: block;
+		}
+
+		.action-btn {
+			width: 32px;
+			height: 32px;
+			min-width: 32px;
+			min-height: 32px;
+		}
+	}
+
+	@media (min-width: 1101px) {
+		.day-label {
+			display: none;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.week-row {
+			grid-template-columns: 1fr;
+		}
+
+		.calendar-day.is-today {
+			margin: 0;
+		}
+	}
+</style>

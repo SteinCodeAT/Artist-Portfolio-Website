@@ -4,9 +4,7 @@ import ProjectPage from '../../layouts/ProjectPage.astro';
 
 import {videoTypes} from '../../const.js'
 
-const images = await Astro.glob(`../../img/virtual-isolation/*`).then(files => {
-    return files.map(file => file.default);
-});
+const images = Object.values(import.meta.glob<{ default: ImageMetadata }>('../../img/virtual-isolation/*', { eager: true })).map((file) => file.default);
 
 
 const project = {

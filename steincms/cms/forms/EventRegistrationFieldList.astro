@@ -1,0 +1,42 @@
+---
+import type { RegistrationField as RegistrationFieldDef } from '@steincms/cms/events/registration-form';
+import EventRegistrationField from './EventRegistrationField.astro';
+
+interface Props {
+	fields: RegistrationFieldDef[];
+	guestsMax: number;
+	class?: string;
+	nameLabel?: string;
+	emailLabel?: string;
+	guestsLabel?: string;
+}
+
+const {
+	fields,
+	guestsMax,
+	class: className,
+	nameLabel = 'Name',
+	emailLabel = 'E-Mail',
+	guestsLabel = 'Anzahl Personen',
+} = Astro.props;
+const fieldClass = ['register-field', className].filter(Boolean).join(' ');
+---
+
+<label class={fieldClass}>
+	<span>{nameLabel}</span>
+	<input type="text" name="name" required maxlength="80" autocomplete="name" />
+</label>
+
+<label class={fieldClass}>
+	<span>{emailLabel}</span>
+	<input type="email" name="email" required autocomplete="email" />
+</label>
+
+<div class="register-counts">
+	<label class={fieldClass}>
+		<span>{guestsLabel}</span>
+		<input type="number" name="guests" min="1" max={guestsMax} value="1" required />
+	</label>
+</div>
+
+{fields.map((field) => <EventRegistrationField field={field} class={className} />)}

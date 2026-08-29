@@ -1,0 +1,41 @@
+---
+interface Props {
+	title: string;
+	subtitle?: string;
+	actionHref?: string;
+	actionLabel?: string;
+}
+
+const { title, subtitle, actionHref, actionLabel } = Astro.props;
+---
+
+<header class="admin-page-header">
+	<div>
+		<h1 class="admin-page-title">{title}</h1>
+		{subtitle && <p class="admin-page-subtitle">{subtitle}</p>}
+	</div>
+	{actionHref && actionLabel && (
+		<a class="btn-primary" href={actionHref}>{actionLabel}</a>
+	)}
+</header>
+
+<style>
+	.admin-page-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+		flex-wrap: wrap;
+		margin-bottom: 1.25rem;
+	}
+
+	.admin-page-title {
+		margin: 0;
+		font-size: clamp(1.5rem, 2.5vw, 1.9rem);
+	}
+
+	.admin-page-subtitle {
+		margin: 0.35rem 0 0;
+		color: #667085;
+	}
+</style>

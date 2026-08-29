@@ -1,0 +1,60 @@
+---
+interface Props {
+	greeting: string;
+	username: string | null;
+	subtitle: string;
+}
+
+const { greeting, username, subtitle } = Astro.props;
+---
+
+<header class="dash-header">
+	<div>
+		<p class="dash-greeting">{greeting}</p>
+		<h1 class="dash-title">{username ?? ''}</h1>
+		<p class="dash-subtitle">{subtitle}</p>
+	</div>
+</header>
+
+<div class="dash-grid">
+	<slot />
+</div>
+
+<style>
+	.dash-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 1.5rem;
+		flex-wrap: wrap;
+	}
+
+	.dash-greeting {
+		margin: 0 0 0.25rem;
+		font-size: 0.85rem;
+		color: #667085;
+		font-weight: 500;
+	}
+
+	.dash-title {
+		margin: 0;
+		font-size: clamp(1.5rem, 2.5vw, 1.85rem);
+		font-weight: 700;
+		letter-spacing: -0.03em;
+		color: #1a2744;
+	}
+
+	.dash-subtitle {
+		margin: 0.4rem 0 0;
+		color: #667085;
+		font-size: 0.92rem;
+		line-height: 1.45;
+	}
+
+	.dash-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+		gap: 1rem;
+	}
+</style>

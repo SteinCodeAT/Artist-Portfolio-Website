@@ -1,0 +1,69 @@
+---
+import type { FieldDef } from '@steincms/cms/schema';
+import { isFieldGroup, textFieldRows } from '@steincms/cms/schema';
+import SchemaFormField from './SchemaFormField.astro';
+
+interface Props {
+	field: FieldDef;
+	name: string;
+	value: unknown;
+}
+
+const { field, name, value } = Astro.props;
+
+function nestedRecord(raw: unknown): Record<string, unknown> {
+	if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+		return raw as Record<string, unknown>;
+	}
+	return {};
+}
+
+const label = field.label ?? field.name;
+const hidden =
+	field.kind === 'previewDraft' || field.kind === 'registrationForm' || field.kind === 'mediaUrlList';
+const rows = textFieldRows(field);
+const nestedValues = isFieldGroup(field) ? nestedRecord(value) : {};
+---
+
+{
+	hidden ? null : isFieldGroup(field) ? (
+		<fieldset class="schema-fieldset">
+			<legend>{label}</legend>
+			{
+				field.fields.map((nested) => (
+					<SchemaFormField
+						field={nested}
+						name={`${name}.${nested.name}`}
+						value={nestedValues[nested.name]}
+					/>
+				))
+			}
+		</fieldset>
+	) : field.kind === 'stringList' ? (
+		<label class="schema-field schema-field-wide">
+			<span>{label}</span>
+			<textarea name={name} rows={6} data-kind="stringList">{Array.isArray(value) ? value.join('\n') : ''}</textarea>
+		</label>
+	) : field.kind === 'number' || field.kind === 'positiveNumber' ? (
+		<label class="schema-field">
+			<span>{label}</span>
+			<input
+				type="number"
+				name={name}
+				data-kind={field.kind}
+				min={field.kind === 'positiveNumber' ? 0 : undefined}
+				value={typeof value === 'number' ? value : ''}
+			/>
+		</label>
+	) : rows > 1 ? (
+		<label class="schema-field schema-field-wide">
+			<span>{label}</span>
+			<textarea name={name} rows={rows} data-kind="text">{typeof value === 'string' ? value : ''}</textarea>
+		</label>
+	) : (
+		<label class="schema-field schema-field-wide">
+			<span>{label}</span>
+			<input type="text" name={name} data-kind="text" value={typeof value === 'string' ? value : ''} />
+		</label>
+	)
+}

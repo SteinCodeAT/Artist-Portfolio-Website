@@ -1,0 +1,146 @@
+---
+import type { FieldDef } from '@steincms/cms/schema';
+import { isContentBlockListField } from '@steincms/cms/schema';
+import SchemaFormField from './SchemaFormField.astro';
+
+interface Props {
+	fields: FieldDef[];
+	values: Record<string, unknown>;
+	formId?: string;
+}
+
+const { fields, values, formId = 'schema-form' } = Astro.props;
+
+const visibleFields = fields.filter(
+	(field) => field.admin.visible !== false && !isContentBlockListField(field),
+);
+---
+
+<form id={formId} class="schema-form">
+	{
+		visibleFields.map((field) => (
+			<SchemaFormField field={field} name={field.name} value={values[field.name]} />
+		))
+	}
+	<div class="schema-form-actions">
+		<button type="submit" class="btn-primary">Speichern</button>
+		<span class="schema-form-status" aria-live="polite"></span>
+	</div>
+</form>
+
+<style>
+	.schema-form {
+		display: grid;
+		gap: 1rem;
+		max-width: 48rem;
+	}
+
+	.schema-form :global(.schema-field),
+	.schema-form :global(.schema-fieldset) {
+		display: grid;
+		gap: 0.35rem;
+	}
+
+	.schema-form :global(.schema-field-wide) {
+		grid-column: 1 / -1;
+	}
+
+	.schema-form :global(.schema-field span),
+	.schema-form :global(.schema-fieldset legend) {
+		font-weight: 600;
+		font-size: 0.9rem;
+	}
+
+	.schema-form :global(.schema-field input),
+	.schema-form :global(.schema-field textarea),
+	.schema-form :global(.schema-fieldset textarea),
+	.schema-form :global(.schema-fieldset input) {
+		width: 100%;
+		padding: 0.55rem 0.65rem;
+		border: 1px solid #d5dbe3;
+		border-radius: 8px;
+		font: inherit;
+	}
+
+	.schema-form-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+</style>
+
+<script>
+	function readControlValue(element: HTMLInputElement | HTMLTextAreaElement): unknown {
+		const kind = element.dataset.kind;
+		if (
+			kind === 'number' ||
+			kind === 'positiveNumber' ||
+			(element instanceof HTMLInputElement && element.type === 'number')
+		) {
+			return element.value === '' ? 0 : Number(element.value);
+		}
+		if (kind === 'stringList') {
+			return element.value
+				.split('\n')
+				.map((line) => line.trim())
+				.filter(Boolean);
+		}
+		return element.value;
+	}
+
+	function setPath(data: Record<string, unknown>, path: string, value: unknown): void {
+		const parts = path.split('.');
+		let current = data;
+		for (let index = 0; index < parts.length - 1; index += 1) {
+			const key = parts[index];
+			const next = current[key];
+			if (typeof next !== 'object' || next === null || Array.isArray(next)) {
+				current[key] = {};
+			}
+			current = current[key] as Record<string, unknown>;
+		}
+		current[parts[parts.length - 1]] = value;
+	}
+
+	function readSchemaForm(form: HTMLFormElement): Record<string, unknown> {
+		const data: Record<string, unknown> = {};
+		for (const element of form.elements) {
+			if (!(element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)) {
+				continue;
+			}
+			if (!element.name) continue;
+			setPath(data, element.name, readControlValue(element));
+		}
+		return data;
+	}
+
+	const form = document.getElementById('schema-form') as HTMLFormElement | null;
+	const statusEl = document.querySelector('.schema-form-status');
+	const collectionId =
+		form?.closest('[data-schema-collection]')?.getAttribute('data-schema-collection') ??
+		document.body.dataset.schemaCollection;
+
+	form?.addEventListener('submit', async (event) => {
+		event.preventDefault();
+		if (!collectionId) return;
+		if (!form.checkValidity()) {
+			form.reportValidity();
+			return;
+		}
+		if (statusEl) statusEl.textContent = 'Speichert…';
+
+		const response = await fetch(`/api/content/${collectionId}`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			credentials: 'same-origin',
+			body: JSON.stringify(readSchemaForm(form)),
+		});
+
+		const payload = (await response.json().catch(() => ({}))) as { error?: string };
+		if (!response.ok) {
+			if (statusEl) statusEl.textContent = payload.error ?? 'Speichern fehlgeschlagen';
+			return;
+		}
+		if (statusEl) statusEl.textContent = 'Gespeichert';
+	});
+</script>

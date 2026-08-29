@@ -1,0 +1,110 @@
+---
+interface Props {
+	itemLabel: string;
+	searchPlaceholder?: string;
+	pageSize?: number;
+}
+
+const { itemLabel, searchPlaceholder = 'Suchen…', pageSize = 10 } = Astro.props;
+---
+
+<div class="admin-post-list">
+	<div class="posts-toolbar">
+		<label class="search-field">
+			<input
+				type="search"
+				id="posts-search"
+				placeholder={searchPlaceholder}
+				autocomplete="off"
+			/>
+		</label>
+		<p class="posts-count" id="posts-count" aria-live="polite"></p>
+	</div>
+
+	<ul
+		class="posts-list"
+		id="posts-list"
+		data-item-label={itemLabel}
+		data-page-size={pageSize}
+	>
+		<slot />
+	</ul>
+
+	<div class="posts-pagination" id="posts-pagination" aria-label="Seiten"></div>
+</div>
+
+<script>
+	import '../scripts/event-list.ts';
+</script>
+
+<style>
+	.posts-toolbar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 1rem;
+		flex-wrap: wrap;
+	}
+
+	.search-field input {
+		width: min(320px, 100%);
+	}
+
+	.posts-count {
+		margin: 0;
+		color: #667085;
+		font-size: 0.9rem;
+	}
+
+	.posts-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: grid;
+		gap: 0.85rem;
+	}
+
+	:global(.list-group-label) {
+		margin: 0.35rem 0 0;
+		padding: 0.15rem 0.1rem 0;
+		list-style: none;
+		font-size: 0.72rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: #8a93a3;
+	}
+
+	:global(.list-group-label[data-list-heading='archive']) {
+		margin-top: 1.15rem;
+		padding-top: 1.05rem;
+		border-top: 1px solid #eceff3;
+	}
+
+	:global(.list-group-label.is-hidden) {
+		display: none;
+	}
+
+	.posts-pagination {
+		display: flex;
+		gap: 0.35rem;
+		margin-top: 1rem;
+		flex-wrap: wrap;
+	}
+
+	:global(.posts-page-btn) {
+		min-width: 2rem;
+		height: 2rem;
+		border: 1px solid #e4e4e4;
+		border-radius: 8px;
+		background: #fff;
+		cursor: pointer;
+	}
+
+	:global(.posts-page-btn.is-active) {
+		background: #1a2744;
+		color: #fff;
+		border-color: #1a2744;
+	}
+</style>

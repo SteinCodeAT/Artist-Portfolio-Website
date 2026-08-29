@@ -1,0 +1,40 @@
+---
+import type { HTMLAttributes, SvgComponent } from 'astro/types';
+import Calendar from './calendar.svg';
+import ChevronDown from './chevron-down.svg';
+import Download from './download.svg';
+import Edit from './edit.svg';
+import Home from './home.svg';
+import Logout from './logout.svg';
+import Pages from './pages.svg';
+import Posts from './posts.svg';
+import Search from './search.svg';
+import Settings from './settings.svg';
+import Trash from './trash.svg';
+import Users from './users.svg';
+import { resolveAdminIconName, type AdminIconFileName, type AdminIconName } from './names';
+
+const icons = {
+	home: Home,
+	calendar: Calendar,
+	posts: Posts,
+	pages: Pages,
+	settings: Settings,
+	logout: Logout,
+	chevronDown: ChevronDown,
+	search: Search,
+	edit: Edit,
+	trash: Trash,
+	users: Users,
+	download: Download,
+} satisfies Record<AdminIconFileName, SvgComponent>;
+
+interface Props extends Omit<HTMLAttributes<'svg'>, 'name'> {
+	name: AdminIconName;
+}
+
+const { name, class: className, ...svgProps } = Astro.props;
+const Icon = icons[resolveAdminIconName(name)];
+---
+
+<Icon class={className} aria-hidden="true" {...svgProps} />

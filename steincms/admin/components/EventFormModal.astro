@@ -1,0 +1,158 @@
+---
+import '../styles/admin-ui.css';
+
+export interface CategoryOption {
+	value: string;
+	label: string;
+}
+
+interface Props {
+	categoryOptions: CategoryOption[];
+}
+
+const { categoryOptions } = Astro.props;
+---
+
+<dialog class="event-modal" id="event-modal">
+	<form class="modal-card" id="event-form">
+		<header class="modal-header">
+			<h2 id="modal-title">Neue Veranstaltung</h2>
+			<button type="button" class="modal-close" id="modal-close" aria-label="Schließen">×</button>
+		</header>
+
+		<input type="hidden" name="id" id="field-id" />
+
+		<div class="field admin-field">
+			<label for="field-title">Titel</label>
+			<input type="text" id="field-title" name="title" required placeholder="Veranstaltungstitel" />
+		</div>
+
+		<div class="field-row">
+			<div class="field admin-field">
+				<label for="field-date">Datum</label>
+				<input type="date" id="field-date" name="date" />
+			</div>
+			<div class="field admin-field">
+				<label for="field-category">Kategorie</label>
+				<select id="field-category" name="category" required>
+					{categoryOptions.map((option) => (
+						<option value={option.value}>{option.label}</option>
+					))}
+				</select>
+			</div>
+		</div>
+
+		<div class="field admin-field">
+			<label for="field-excerpt">Kurztext</label>
+			<textarea id="field-excerpt" name="excerpt" rows="2" placeholder="Teaser für die Übersicht"></textarea>
+		</div>
+
+		<div class="field admin-field">
+			<label for="field-body">Bericht</label>
+			<textarea id="field-body" name="body" rows="4" placeholder="Berichtstext (Absätze durch Leerzeile trennen)"></textarea>
+		</div>
+
+		<p class="form-error" id="form-error" hidden></p>
+
+		<footer class="modal-footer">
+			<button type="button" class="btn-ghost" id="modal-cancel">Abbrechen</button>
+			<button type="submit" class="btn-primary" id="modal-save">Speichern</button>
+		</footer>
+	</form>
+</dialog>
+
+<script>
+	import { initEventFormModal } from '../scripts/event-form-modal.ts';
+
+	initEventFormModal({ onSaved: () => window.location.reload() });
+</script>
+
+<style>
+	.event-modal {
+		border: none;
+		padding: 0;
+		background: transparent;
+		max-width: calc(100vw - 2rem);
+	}
+
+	.event-modal::backdrop {
+		background: rgba(15, 15, 15, 0.45);
+		backdrop-filter: blur(2px);
+	}
+
+	.modal-card {
+		width: min(480px, 100%);
+		margin: 0;
+		padding: 1.25rem;
+		border: none;
+		border-radius: 14px;
+		background: #fff;
+		box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+		display: grid;
+		gap: 0.85rem;
+	}
+
+	.modal-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.modal-header h2 {
+		margin: 0;
+		font-size: 1.15rem;
+		font-weight: 700;
+	}
+
+	.modal-close {
+		width: 32px;
+		height: 32px;
+		border: none;
+		border-radius: 8px;
+		background: #f5f5f5;
+		font-size: 1.25rem;
+		line-height: 1;
+		cursor: pointer;
+		color: #666;
+	}
+
+	.field {
+		display: grid;
+		gap: 0.3rem;
+	}
+
+	.field-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.75rem;
+	}
+
+	.field label {
+		font-size: 0.78rem;
+		font-weight: 600;
+		color: #555;
+	}
+
+	.form-error {
+		margin: 0;
+		padding: 0.55rem 0.75rem;
+		border-radius: 8px;
+		background: #fdecea;
+		color: #a93226;
+		font-size: 0.82rem;
+	}
+
+	.modal-footer {
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.5rem;
+		padding-top: 0.25rem;
+	}
+
+	@media (max-width: 640px) {
+		.field-row {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

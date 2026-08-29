@@ -1,12 +1,20 @@
 
 :root {
-  --main-bg: #141414;
-  --card-bg: #E4E4E4;
+  --main-bg: #030406;
+  --card-bg: #0b0d12;
 
-  --scrollbar-accent: #c4c4c4;
-  --scrollbar-accent-bg: #d8d8d8;
+  --pc-static: #e4e4e4;
+  --pc-static-dim: #9a9da4;
+  --pc-signal: #00c896;
+  --pc-amber: #ffb020;
+
+  --scrollbar-accent: #2a2f38;
+  --scrollbar-accent-bg: #0b0d12;
 
   --text-color: #E4E4E4;
+
+  --font-display: 'Rajdhani', 'Arial Narrow', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
   scrollbar-face-color: var(--scrollbar-accent-bg);
   scrollbar-base-color: var(--scrollbar-accent-bg);
@@ -25,21 +33,37 @@
 ::-webkit-scrollbar-corner { background-color: var(--scrollbar-accent-bg);}
 ::-webkit-resizer { background-color: var(--scrollbar-accent-bg);}
 
+/* .project-card combines width:95dvw with its own padding under the default
+   content-box model — border-box keeps that from overflowing the viewport. */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body{
-  background-color: #141414;
+  background-color: var(--main-bg);
+  color: var(--pc-static);
   height: fit-content;
 }
 
 a {
-  text-decoration: underline;
+  color: var(--pc-signal);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0, 200, 150, 0.35);
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
 
 p {
   margin-bottom: 0.5rem;
+  color: var(--pc-static-dim);
 }
 
 a:hover {
-  color: #3d3d3d
+  color: var(--pc-amber);
+  border-color: var(--pc-amber);
+}
+
+a:has(img) {
+  border-bottom: none;
 }
 
 a:has(img):hover {
@@ -48,7 +72,8 @@ a:has(img):hover {
 }
 
 h1 {
-  font-family: "Poppins";
+  font-family: var(--font-display);
+  color: var(--pc-static);
 }
 
 hr {
@@ -64,28 +89,65 @@ hr {
   margin: auto;
   width: 90vw;
   min-height: 92vh;
-  background-color: #E4E4E4;
-  border-radius: 7px;
+  background-color: var(--card-bg);
+  color: var(--pc-static);
+  border: 1px solid rgba(228, 228, 228, 0.08);
+  border-radius: 4px;
   margin-top: 3%;
   padding: 0 2rem;
   padding-top: 2rem;
+  overflow: hidden;
+}
+
+/* A faint, static scanline texture ties this page back to the rest of the
+   site without competing with the actual project imagery. */
+.project-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 2px, rgba(0, 0, 0, 0.25) 3px, rgba(0, 0, 0, 0) 4px);
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+  z-index: 1;
 }
 
 .horizontal-line-large {
-    border-top: 1rem solid #141414; /* Only show the top border */
+    border-top: 1rem solid var(--main-bg); /* Only show the top border */
 }
 
 .horizontal-line-small {
-   
-    border-top: 1px solid #141414; /* Only show the top border */
+    border-top: 1px solid rgba(228, 228, 228, 0.12);
     margin-top: 1rem;
 }
 .header-container {
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
     width: 100%; /* Match the width of the horizontal line */
     padding: 0 0.1rem; /* Adjust padding as necessary */
     margin-top: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pc-static-dim);
+    position: relative;
+    z-index: 2;
+}
+
+.home-link {
+  color: var(--pc-static);
+  border-bottom: 1px solid var(--pc-static-dim);
+}
+
+.home-link:hover {
+  color: var(--pc-signal);
+  border-color: var(--pc-signal);
+}
+
+.project-header-label {
+  color: var(--pc-signal);
 }
 
 /* project info and slider images */
@@ -97,16 +159,23 @@ hr {
   width: 100%;
   min-height: 60vh;
   height: 77vh;
+  position: relative;
+  z-index: 2;
 }
 
 .project-title {
   float: left;
   margin: 0.5rem 0.5rem 0.5rem 0;
   white-space: nowrap;
-  font-weight: bolder;
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
   font-size: 2.8rem;
+  color: var(--pc-static);
+  text-shadow: 0 0 22px rgba(0, 200, 150, 0.25);
   writing-mode: vertical-rl;
-  transform: rotate(180deg);        
+  transform: rotate(180deg);
 }
 
 .project-info:not(:has(.videos-container)) {
@@ -122,6 +191,9 @@ hr {
   list-style: none;
   margin-bottom: 1rem;
   padding-top: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
 }
 
 .additional-links-list li {
@@ -129,9 +201,15 @@ hr {
 }
 
 .additional-links-list a {
-  border-left: 1px solid black;
+  border-left: 2px solid rgba(0, 200, 150, 0.4);
+  border-bottom: none;
   margin: 0.5rem 0;
-  padding-left: 0.5rem;
+  padding-left: 0.6rem;
+  text-transform: uppercase;
+}
+
+.additional-links-list a:hover {
+  border-left-color: var(--pc-amber);
 }
 
 .videos-container {
@@ -153,7 +231,7 @@ hr {
   margin: 0 0 2vh 0;
   width: 100%;
   background: black;
-  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4); 
+  box-shadow: 0 0 0 1px rgba(228, 228, 228, 0.1);
 }
 
 .project-info .videos-container iframe {
@@ -165,9 +243,11 @@ hr {
     grid-template-columns: repeat(2, 1fr); /* 3 columns */
     gap: 1vh;
     height: 75vh;
-    overflow: hidden;    
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
   }
-  
+
   .image-wrapper {
     display: flex;
     flex-direction: column;
@@ -177,13 +257,13 @@ hr {
   .image-wrapper img {
     cursor: pointer;
   }
-  
+
   /* Different animation durations for varying speeds */
 .image-wrapper:has(img) {
   --animation-duration: 25s;
   animation: scrollImages var(--animation-duration) linear infinite;
   }
-  
+
   .image-wrapper:last-of-type:has(img) {
     --animation-duration: 30s;
   }
@@ -192,41 +272,43 @@ hr {
     .image-wrapper:has(img) {
       --animation-duration: 55s;
       }
-      
+
       .image-wrapper:last-of-type:has(img) {
         --animation-duration: 50s;
       }
-    
+
   }
-  
+
   /* Keyframes for each column */
   @keyframes scrollImages {
     0% { transform: translateY(0); }
     100% { transform: translateY(-50%); }
   }
-  
- 
+
+
   /* Ensure images fill their cells and maintain aspect ratio */
   .image-container .project-image {
     width: 100%;
     height: 24vh;
     object-fit: cover; /* Cover the area of the cell without stretching */
-    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4); 
+    box-shadow: 0 0 0 1px rgba(228, 228, 228, 0.08);
+    filter: saturate(0.95) contrast(1.05);
   }
 
   .image-container .project-image:hover {
-    filter: brightness(120%);
+    filter: saturate(1.1) contrast(1.05) brightness(112%);
   }
-  
-  
+
+
 /*left side - project description */
 .project-info {
     height: 75vh;
     display: flex;
     flex-direction: column;
     position: relative;
+    z-index: 2;
   }
-  
+
   .copyright-label-mobile {
     display: none;
   }
@@ -253,7 +335,7 @@ hr {
     .project-header-label {
       text-align: center;
     }
-    
+
     .header-container {
       flex-direction: column;
       gap: 0.5rem;
@@ -296,16 +378,6 @@ hr {
   }
 
   /* Modal */
-  /* Button to open modal */
-.modal-button {
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: #ffffff;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
 /* Modal styles */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -321,12 +393,13 @@ hr {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.8);
   align-items: center;
   justify-content: center;
   display: none;
   opacity: 0; /* Initial state of the modal is fully transparent */
   animation: fadeIn 0.5s ease forwards;
+  z-index: 20;
 }
 
 /* Show modal when checkbox is checked */
@@ -347,15 +420,20 @@ hr {
   width: 95vw;
   height: 95vh;
   position: relative;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(3, 4, 6, 0.94);
+  border: 1px solid rgba(228, 228, 228, 0.1);
 }
 
 
 /* Close button */
 .modal--close {
   gap: 0.5rem;
-  font-size: 1.3rem;
-  border-radius: 0.25rem; 
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 0.25rem;
+  border-bottom: none;
 }
 
 .modal--image-wrapper {
@@ -386,21 +464,23 @@ hr {
 }
 
 .modal--navigation button {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(228, 228, 228, 0.06);
   padding: 0.25rem 1rem;
-  transition: background 0.2s ease-in-out;
-  color: var(--card-bg);
+  transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
+  color: var(--pc-static);
+  border-bottom: none;
 }
 
 .modal--navigation button:hover {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 200, 150, 0.22);
+  color: var(--pc-signal);
 }
 
 .modal--next-previous-buttons {
   display: flex;
   gap: 1rem;
   align-items: center;
-  color: var(--card-bg);
+  color: var(--pc-static);
   padding: 0.25rem 1rem;
 }
 
