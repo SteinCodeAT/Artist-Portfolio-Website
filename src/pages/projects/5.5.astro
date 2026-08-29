@@ -4,7 +4,7 @@ import ProjectPage from '../../layouts/ProjectPage.astro';
 
 import {videoTypes} from '../../const.js'
 
-const images = Object.values(import.meta.glob('../../img/ghostbox/*', { eager: true })).map((file) => file.default);
+const images = Object.values(import.meta.glob<{ default: ImageMetadata }>('../../img/ghostbox/*', { eager: true })).map((file) => file.default);
 
 const project = {
     title: "5.5",

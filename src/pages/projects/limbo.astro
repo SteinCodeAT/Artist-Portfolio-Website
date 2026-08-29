@@ -2,7 +2,7 @@
 import ProjectPage from '../../layouts/ProjectPage.astro';
 
 
-const images = Object.values(import.meta.glob('../../img/limbo/*', { eager: true })).map((file) => file.default);
+const images = Object.values(import.meta.glob<{ default: ImageMetadata }>('../../img/limbo/*', { eager: true })).map((file) => file.default);
 
 const project = {
     title: "Limbo",

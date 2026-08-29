@@ -2,7 +2,7 @@
 import ProjectPage from '../../layouts/ProjectPage.astro';
 import {videoTypes} from '../../const.js'
 
-const images = Object.values(import.meta.glob('../../img/lumiscape/*', { eager: true })).map((file) => file.default);
+const images = Object.values(import.meta.glob<{ default: ImageMetadata }>('../../img/lumiscape/*', { eager: true })).map((file) => file.default);
 
 import LumiscapeGif from '../../videos/lumiscape-gif.mp4'
 

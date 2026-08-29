@@ -1,7 +1,7 @@
 {
   "extends": "astro/tsconfigs/base",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"],
+  "exclude": ["dist", "steincms", "src/content.schema.ts", "drizzle.config.ts"],
   "compilerOptions": {
     "strictNullChecks": true,
     "allowJs": true,
