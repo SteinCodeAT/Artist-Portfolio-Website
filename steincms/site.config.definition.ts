@@ -64,4 +64,12 @@ export type SiteConfig = {
 		excludeCategories?: string[];
 		maxGuests?: number;
 	};
+	analytics?: {
+		enabled: boolean;
+		/** Pirsch site identification code — public, safe to ship client-side. */
+		identificationCode?: string;
+		/** Pirsch dashboard access-link URL, e.g. with &ui=hide&interval=30d&lang=de appended. */
+		dashboardEmbedUrl?: string;
+	};
+	
 };

@@ -81,4 +81,9 @@ export const siteConfigExample: SiteConfig = {
 	registrations: {
 		ticketPrefix: 'EVT',
 	},
+	analytics: {
+		enabled: true,
+		identificationCode: '1234567890',
+		dashboardEmbedUrl: 'https://pirsch.com/dashboard?site=1234567890',
+	},
 };
