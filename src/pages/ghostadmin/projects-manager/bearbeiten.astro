@@ -44,8 +44,15 @@ const currentYear = new Date().getFullYear();
 		</div>
 		<div class="toolbar-actions">
 			<span id="save-status" class="save-status"></span>
-			<button type="button" class="btn-ghost" id="btn-preview">Preview</button>
-			<button type="button" class="btn-ghost" id="btn-save-draft">Save Draft</button>
+			<button
+				type="button"
+				class="btn-ghost"
+				id="btn-preview"
+				data-preview-needs-save={isEdit ? 'false' : 'true'}
+				data-preview-draft={isEdit ? `${adminPaths.base}/projects-manager/vorschau?id=${post!.id}` : ''}
+				data-preview-public={post?.status === 'published' ? `/projects/${post.slug}` : undefined}
+			>Preview</button>
+			<button type="button" class="btn-ghost" id="btn-save-draft">{post?.status === 'published' ? 'Save' : 'Save Draft'}</button>
 			<button type="button" class="btn-primary" id="btn-publish">Publish</button>
 		</div>
 	</header>

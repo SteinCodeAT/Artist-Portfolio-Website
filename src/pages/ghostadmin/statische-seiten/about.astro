@@ -27,7 +27,15 @@ const values = readSingleton(cmsDatabase, 'about') ?? {};
 	navItems={adminNav}
 	{...adminLayoutText}
 >
-	<h1>About</h1>
+	<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+		<h1 style="margin:0;">About</h1>
+		<a class="btn-ghost btn-sm" href="/#about-me-section" target="_blank" rel="noopener">Preview on site &rarr;</a>
+	</div>
+	<p style="margin:0 0 1.5rem; padding:0.65rem 0.9rem; background:#f5f6f8; border-radius:8px; font-size:0.82rem; color:#667085;">
+		The public About section reads this content directly — no separate preview page needed. In <code>npm run dev</code>
+		it updates immediately after saving; on the live production site it needs a rebuild + redeploy to show, since this
+		is a static page.
+	</p>
 	<div data-schema-collection="about">
 		<SchemaForm fields={fields} values={values} submitLabel="Save" />
 	</div>

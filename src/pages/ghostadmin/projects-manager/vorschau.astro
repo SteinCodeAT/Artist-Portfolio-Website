@@ -30,8 +30,15 @@ const post = id && postsStore ? postsStore.findPostById(id) : null;
 		<p>Project not found — save it first.</p>
 	) : (
 		<article class="preview">
-			<a class="back-link" href={`${adminPaths.base}/projects-manager/bearbeiten?id=${post.id}`}>&larr; Back to editor</a>
+			<div class="preview-nav">
+				<a class="back-link" href={`${adminPaths.base}/projects-manager/bearbeiten?id=${post.id}`}>&larr; Back to editor</a>
+				<a class="back-link" href={`${adminPaths.base}/projects-manager`}>All Projects</a>
+			</div>
 			<p class="preview-badge" data-status={post.status}>{post.status === 'published' ? 'Published' : 'Draft preview'}</p>
+			<p class="preview-note">
+				This shows what's saved in the CMS right now — it's not the live public page's design
+				(that still needs its own dynamic route reading from here).
+			</p>
 			{post.mainImage && <img class="preview-cover" src={post.mainImage} alt="" />}
 			<h1>{post.title}</h1>
 			<p class="preview-desc">{post.description}</p>
@@ -57,12 +64,28 @@ const post = id && postsStore ? postsStore.findPostById(id) : null;
 </AdminAreaLayout>
 
 <style>
+	.preview-nav {
+		display: flex;
+		gap: 1rem;
+		margin-bottom: 1rem;
+	}
 	.back-link {
 		display: inline-block;
-		margin-bottom: 1rem;
 		color: #666;
 		text-decoration: none;
 		font-size: 0.85rem;
+	}
+	.back-link:hover {
+		color: #1a1a1a;
+	}
+	.preview-note {
+		margin: 0 0 1.5rem;
+		padding: 0.65rem 0.9rem;
+		background: #f5f6f8;
+		border-radius: 8px;
+		font-size: 0.82rem;
+		color: #667085;
+		line-height: 1.4;
 	}
 	.preview {
 		max-width: 48rem;
