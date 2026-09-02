@@ -1,0 +1,407 @@
+---
+import AdminIcon from '@steincms/admin/icons/AdminIcon.astro';
+import type { StaticPageEntry } from '@steincms/admin/nav';
+import type { ActivityLogEntry } from '@steincms/cms/activity-log';
+
+type ProjectRow = {
+	id: string;
+	title: string;
+	year: string | null;
+	status: 'draft' | 'published';
+};
+
+interface Props {
+	username: string | null;
+	subtitle: string;
+	projectsHref: string;
+	newProjectHref: string;
+	pagesHref: string;
+	publishedCount: number;
+	draftCount: number;
+	pageCount: number;
+	recentProjects: ProjectRow[];
+	pages: StaticPageEntry[];
+	recent: ActivityLogEntry[];
+}
+
+const {
+	username,
+	subtitle,
+	projectsHref,
+	newProjectHref,
+	pagesHref,
+	publishedCount,
+	draftCount,
+	pageCount,
+	recentProjects,
+	pages,
+	recent,
+} = Astro.props;
+
+function formatWhen(iso: string | null | undefined): string {
+	if (!iso) return '—';
+	return new Date(iso).toLocaleString('en-GB', {
+		day: 'numeric',
+		month: 'short',
+		year: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit',
+	});
+}
+---
+
+<div class="home">
+	<header class="dash-top">
+		<div>
+			<p class="dash-greeting">Welcome back</p>
+			<h1 class="dash-title">{username ?? ''}</h1>
+			<p class="dash-subtitle">{subtitle}</p>
+		</div>
+		<div class="dash-actions">
+			<a class="btn-primary" href={newProjectHref}>+ New Project</a>
+			<a class="btn-ghost" href={projectsHref}>All Projects</a>
+		</div>
+	</header>
+
+	<dl class="dash-stats">
+		<div>
+			<dt>Published</dt>
+			<dd>{publishedCount} project{publishedCount === 1 ? '' : 's'}</dd>
+		</div>
+		<div>
+			<dt>Drafts</dt>
+			<dd>{draftCount === 0 ? 'none open' : `${draftCount} open`}</dd>
+		</div>
+		<div>
+			<dt>Pages</dt>
+			<dd>{pageCount} site page{pageCount === 1 ? '' : 's'}</dd>
+		</div>
+		<div>
+			<dt>Activity</dt>
+			<dd>{recent.length === 0 ? 'no edits yet' : `${recent.length} recent`}</dd>
+		</div>
+	</dl>
+
+	<div class="dash-layout">
+		<div class="dash-col">
+			<section class="dash-panel">
+				<p class="dash-kicker">Content</p>
+				<div class="dash-panel-head">
+					<div>
+						<h2>Projects</h2>
+						<p class="dash-panel-sub">Artwork pages on the public site</p>
+					</div>
+					<a class="dash-panel-link" href={projectsHref}>List →</a>
+				</div>
+				{recentProjects.length === 0 ? (
+					<p class="dash-empty">No projects yet.</p>
+				) : (
+					<ul class="dash-rows">
+						{recentProjects.map((post) => (
+							<li>
+								<div>
+									<p class="dash-row-title">{post.title}</p>
+									<p class="dash-row-meta">
+										{post.year || 'no year'} · {post.status === 'published' ? 'Published' : 'Draft'}
+									</p>
+								</div>
+								<div class="dash-row-actions">
+									<span class:list={['dash-badge', post.status === 'published' && 'dash-badge--ok']}>
+										{post.status === 'published' ? 'Live' : 'Draft'}
+									</span>
+									<a href={`${projectsHref}/bearbeiten?id=${post.id}`}>Edit</a>
+								</div>
+							</li>
+						))}
+					</ul>
+				)}
+			</section>
+
+			<section class="dash-panel">
+				<p class="dash-kicker">Pages</p>
+				<div class="dash-panel-head">
+					<div>
+						<h2>Site pages</h2>
+						<p class="dash-panel-sub">Static content — independent of individual projects</p>
+					</div>
+					<a class="dash-panel-link" href={pagesHref}>List →</a>
+				</div>
+				<ul class="dash-page-list">
+					{pages.map((page) => (
+						<li class="dash-page-item">
+							<span class="dash-page-icon" aria-hidden="true">
+								<AdminIcon name="pages" class="dash-page-icon-svg" />
+							</span>
+							<div>
+								<p class="dash-row-title">{page.label}</p>
+								<p class="dash-row-meta">Public about / intro copy</p>
+							</div>
+							<a href={page.href}>Edit page</a>
+						</li>
+					))}
+				</ul>
+			</section>
+		</div>
+
+		<section class="dash-panel">
+			<p class="dash-kicker">Activity</p>
+			<h2>Recent changes</h2>
+			{recent.length === 0 ? (
+				<p class="dash-empty">
+					No log entries yet. As soon as someone saves in the CMS, it shows up here — with name and time.
+				</p>
+			) : (
+				<ul class="dash-activity">
+					{recent.map((entry) => (
+						<li>
+							<p class="dash-row-title">
+								{entry.href ? <a href={entry.href}>{entry.title}</a> : entry.title}
+							</p>
+							<p class="dash-row-meta">
+								{entry.displayName} · {entry.action} · {formatWhen(entry.at)}
+							</p>
+						</li>
+					))}
+				</ul>
+			)}
+		</section>
+	</div>
+</div>
+
+<style>
+	.home {
+		min-width: 0;
+	}
+
+	.dash-top {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+		flex-wrap: wrap;
+		margin-bottom: 1.25rem;
+	}
+
+	.dash-greeting {
+		margin: 0 0 0.25rem;
+		font-size: 0.85rem;
+		color: #667085;
+		font-weight: 500;
+	}
+
+	.dash-title {
+		margin: 0;
+		font-size: clamp(1.5rem, 2.5vw, 1.85rem);
+		font-weight: 700;
+		letter-spacing: -0.03em;
+		color: #1a2744;
+	}
+
+	.dash-subtitle {
+		margin: 0.4rem 0 0;
+		color: #667085;
+		font-size: 0.92rem;
+		line-height: 1.45;
+	}
+
+	.dash-actions {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.dash-stats {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+		gap: 1rem 1.5rem;
+		margin: 0 0 1.5rem;
+	}
+
+	.dash-stats dt {
+		margin: 0 0 0.2rem;
+		font-size: 0.68rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: #98a2b3;
+	}
+
+	.dash-stats dd {
+		margin: 0;
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: #1a2744;
+	}
+
+	.dash-layout {
+		display: grid;
+		grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+		gap: 1.15rem;
+		align-items: start;
+	}
+
+	.dash-col {
+		display: grid;
+		gap: 1.15rem;
+	}
+
+	.dash-panel {
+		padding: 1.15rem 1.25rem 1.05rem;
+		border: 1px solid #eef0f3;
+		border-radius: 14px;
+		background: #fff;
+	}
+
+	.dash-kicker {
+		margin: 0 0 0.35rem;
+		font-size: 0.68rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: #98a2b3;
+	}
+
+	.dash-panel h2 {
+		margin: 0;
+		font-size: 1.05rem;
+		font-weight: 700;
+		color: #1a2744;
+	}
+
+	.dash-panel-head {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 1rem;
+		margin-bottom: 0.85rem;
+	}
+
+	.dash-panel-sub {
+		margin: 0.25rem 0 0;
+		font-size: 0.82rem;
+		color: #667085;
+	}
+
+	.dash-panel-link,
+	.dash-row-actions a,
+	.dash-page-item a,
+	.dash-activity a {
+		font-size: 0.82rem;
+		font-weight: 600;
+		color: #1a2744;
+		text-decoration: none;
+		white-space: nowrap;
+	}
+
+	.dash-panel-link:hover,
+	.dash-row-actions a:hover,
+	.dash-page-item a:hover,
+	.dash-activity a:hover {
+		text-decoration: underline;
+	}
+
+	.dash-empty {
+		margin: 0.5rem 0 0;
+		font-size: 0.88rem;
+		line-height: 1.5;
+		color: #667085;
+	}
+
+	.dash-rows,
+	.dash-activity,
+	.dash-page-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.55rem;
+	}
+
+	.dash-rows li,
+	.dash-activity li {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.7rem 0;
+		border-top: 1px solid #f2f4f7;
+	}
+
+	.dash-rows li:first-child,
+	.dash-activity li:first-child {
+		border-top: none;
+		padding-top: 0.15rem;
+	}
+
+	.dash-row-title {
+		margin: 0;
+		font-size: 0.92rem;
+		font-weight: 600;
+		color: #1a2744;
+	}
+
+	.dash-row-meta {
+		margin: 0.15rem 0 0;
+		font-size: 0.78rem;
+		color: #667085;
+	}
+
+	.dash-row-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		flex-shrink: 0;
+	}
+
+	.dash-badge {
+		display: inline-block;
+		padding: 0.15rem 0.45rem;
+		border: 1px solid #f79009;
+		border-radius: 999px;
+		font-size: 0.68rem;
+		font-weight: 600;
+		color: #b54708;
+	}
+
+	.dash-badge--ok {
+		border-color: #abefc6;
+		color: #067647;
+	}
+
+	.dash-page-item {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.85rem 0.95rem;
+		border: 1px solid #e9d7fe;
+		border-radius: 12px;
+		background: linear-gradient(90deg, #f9f5ff 0%, #fff 70%);
+	}
+
+	.dash-page-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2rem;
+		height: 2rem;
+		border-radius: 8px;
+		background: #f4ebff;
+		color: #6941c6;
+		flex-shrink: 0;
+	}
+
+	:global(svg.dash-page-icon-svg) {
+		width: 16px;
+		height: 16px;
+	}
+
+	.dash-page-item a {
+		margin-left: auto;
+	}
+
+	@media (max-width: 900px) {
+		.dash-layout {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

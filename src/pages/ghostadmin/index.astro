@@ -2,19 +2,29 @@
 export const prerender = false;
 
 import AdminAreaLayout from '@steincms/admin/layouts/AdminAreaLayout.astro';
-import DashboardHeader from '@steincms/admin/components/DashboardHeader.astro';
-import DashboardCard from '@steincms/admin/components/DashboardCard.astro';
-
+import { listStaticPageEntries } from '@steincms/admin/nav';
 import { getAuthenticatedUsername } from '@steincms/auth/admin-auth';
+import DashboardHome from '../../components/admin/DashboardHome.astro';
 import { siteConfig } from '../../site.config';
+import { contentSchema } from '../../content.schema';
 import { adminNav, adminPaths, adminLayoutText } from '../../admin-nav';
 import { cms } from '../../cms';
 
 const username = await getAuthenticatedUsername(Astro.request);
 const posts = cms.postsStore?.loadPosts() ?? [];
-const publishedCount = posts.filter((post) => post.status === 'published').length;
-const draftCount = posts.length - publishedCount;
+const published = posts.filter((post) => post.status === 'published');
+const drafts = posts.filter((post) => post.status === 'draft');
+const pages = listStaticPageEntries(contentSchema, adminPaths);
 const recent = cms.activityLog.readRecent(8);
+const recentProjects = [...posts]
+	.sort((a, b) => (b.updatedAt ?? '').localeCompare(a.updatedAt ?? ''))
+	.slice(0, 5)
+	.map((post) => ({
+		id: post.id,
+		title: post.title,
+		year: post.year,
+		status: post.status,
+	}));
 ---
 
 <AdminAreaLayout
@@ -28,80 +38,17 @@ const recent = cms.activityLog.readRecent(8);
 	navItems={adminNav}
 	{...adminLayoutText}
 >
-	<DashboardHeader greeting="Welcome back" username={username} subtitle={siteConfig.admin.title}>
-		<DashboardCard
-			href={`${adminPaths.base}/projects-manager`}
-			title="Projects"
-			description="Add, edit, and publish your project pages."
-			icon="posts"
-			stat={`${publishedCount} published · ${draftCount} draft`}
-		/>
-		<DashboardCard
-			href={adminPaths.staticPages}
-			title="Site Pages"
-			description="Homepage intro and the About section text."
-			icon="pages"
-		/>
-	</DashboardHeader>
-
-	<section class="recent-activity">
-		<h2 class="recent-activity-title">Recent activity</h2>
-		{recent.length === 0 ? (
-			<p class="recent-activity-empty">No edits yet.</p>
-		) : (
-			<ul class="recent-activity-list">
-				{recent.map((entry) => (
-					<li>
-						<span class="recent-activity-meta">
-							{new Date(entry.at).toLocaleString('en-GB')}
-						</span>
-						<strong>{entry.displayName}</strong>
-						{entry.action} — {entry.title}
-					</li>
-				))}
-			</ul>
-		)}
-	</section>
+	<DashboardHome
+		username={username}
+		subtitle={siteConfig.admin.title}
+		projectsHref={`${adminPaths.base}/projects-manager`}
+		newProjectHref={`${adminPaths.base}/projects-manager/bearbeiten`}
+		pagesHref={adminPaths.staticPages}
+		publishedCount={published.length}
+		draftCount={drafts.length}
+		pageCount={pages.length}
+		recentProjects={recentProjects}
+		pages={pages}
+		recent={recent}
+	/>
 </AdminAreaLayout>
-
-<style>
-	.recent-activity {
-		margin-top: 2rem;
-	}
-
-	.recent-activity-title {
-		margin: 0 0 0.85rem;
-		font-size: 1.05rem;
-		font-weight: 700;
-		color: #1a2744;
-	}
-
-	.recent-activity-empty,
-	.recent-activity-list {
-		margin: 0;
-		font-size: 0.88rem;
-		line-height: 1.5;
-		color: #667085;
-	}
-
-	.recent-activity-list {
-		list-style: none;
-		padding: 0;
-		display: grid;
-		gap: 0.65rem;
-	}
-
-	.recent-activity-list li {
-		padding: 0.75rem 0.9rem;
-		border: 1px solid #eef0f3;
-		border-radius: 10px;
-		background: #fff;
-	}
-
-	.recent-activity-meta {
-		display: block;
-		margin-bottom: 0.2rem;
-		font-size: 0.75rem;
-		color: #98a2b3;
-	}
-</style>
