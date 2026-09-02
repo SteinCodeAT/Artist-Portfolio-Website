@@ -240,7 +240,7 @@ function initBlogPostFormEditor() {
 
   initMainImageField();
 
-  const { postId: initialPostId, initialBlocks, blogPublicPath, postsListPath, postsPreviewPath } =
+  const { postId: initialPostId, initialBlocks, postsPreviewPath } =
     readEditorConfig(root);
 
   // Updated after first save so preview + PUT work on brand-new posts.
@@ -356,27 +356,20 @@ function initBlogPostFormEditor() {
     root!.dataset.postId = data.post.id;
 
     const previewBtn = document.getElementById('btn-preview') as HTMLButtonElement | null;
-    // if preview button exists, set the draft url and clear the public url
     if (previewBtn) {
       previewBtn.dataset.previewDraft = `${postsPreviewPath}?id=${data.post.id}`;
       previewBtn.dataset.previewNeedsSave = 'false';
-      
-      // clear public url when saving draft
-      if (data.post.status === 'published') {
-        previewBtn.dataset.previewPublic = `${blogPublicPath}/${data.post.slug}`;
-      } else {
-        delete previewBtn.dataset.previewPublic;
-      }
-    }
-
-    // if preview button exists, set the preview needs save to false
-    if (previewBtn) {
-      previewBtn.dataset.previewDraft = `${postsPreviewPath}?id=${data.post.id}`;
-      previewBtn.dataset.previewNeedsSave = 'false';
+      // NOT linking to `${blogPublicPath}/${slug}` here — that only resolves
+      // for the handful of legacy-imported projects that still have a
+      // hand-written page under src/pages/projects/*.astro. A project
+      // created through the CMS has no public page at all yet (that needs
+      // a dynamic [slug].astro reading from the CMS, not built yet), so
+      // every preview goes through the admin preview page, which always
+      // exists regardless of publish status.
     }
 
     if (redirectAfterSave) {
-      window.location.href = postsListPath;
+      window.location.href = `${postsPreviewPath}?id=${data.post.id}`;
     }
 
     return data.post;
@@ -431,11 +424,16 @@ function initBlogPostFormEditor() {
     lastSavedSnapshot = captureSnapshot();
   }
   document.getElementById('btn-save-draft')?.addEventListener('click', () => {
-    void savePost('draft', { redirectAfterSave: false });
+    // "Save Draft" must not silently unpublish an already-published post —
+    // it means "save my edits", not "take this offline". Only force draft
+    // status for a post that isn't published yet.
+    const currentStatus = document.getElementById('post-status-display')?.dataset.status;
+    const targetStatus = currentStatus === 'published' ? 'published' : 'draft';
+    void savePost(targetStatus, { redirectAfterSave: true });
   });
 
   document.getElementById('btn-publish')?.addEventListener('click', () => {
-    void savePost('published', { redirectAfterSave: false });
+    void savePost('published', { redirectAfterSave: true });
   });
 }
 
