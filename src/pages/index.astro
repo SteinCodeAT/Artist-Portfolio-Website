@@ -10,7 +10,7 @@ import { readSingleton } from '@steincms/db/singletons-store';
 
 import '../styles/index.css';
 
-const description = `
+const fallbackDescription = `
 Media Art focusing on the relationship between
 human movement, space and uncertainty and developing
 new ways of interaction between humans and spaces.
@@ -22,14 +22,21 @@ new ways of interaction between humans and spaces.
 // content if the singleton was never saved (fresh install, no About content yet).
 type AboutContent = {
 	bio?: string;
+	tagline?: string;
 	photo?: string | null;
 	instagramUrl?: string;
 	instagramHandle?: string;
 	email?: string;
+	phone?: string;
 	exhibitions?: string[];
+	awards?: string[];
+	curatorial?: string[];
+	activities?: string[];
+	education?: string[];
 };
 const about = readSingleton(cmsDatabase, 'about') as AboutContent | null;
 const photoSrc = about?.photo || CcProfileImage.src;
+const description = about?.tagline || fallbackDescription;
 ---
 
 <Layout title="Çağdaş Çeçen - Media Artist" description={description}>
@@ -47,10 +54,16 @@ const photoSrc = about?.photo || CcProfileImage.src;
 		<ArtistCV
 			photoSrc={photoSrc}
 			bio={about?.bio}
+			tagline={about?.tagline}
 			instagramUrl={about?.instagramUrl}
 			instagramHandle={about?.instagramHandle}
 			email={about?.email}
+			phone={about?.phone}
 			exhibitions={about?.exhibitions ?? []}
+			awards={about?.awards ?? []}
+			curatorial={about?.curatorial ?? []}
+			activities={about?.activities ?? []}
+			education={about?.education ?? []}
 		/>
 
 	</main>

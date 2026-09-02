@@ -8,47 +8,69 @@ import Exhibition from './Exhibition.astro';
 interface Props {
 	photoSrc: string;
 	bio?: string;
+	tagline?: string;
 	instagramUrl?: string;
 	instagramHandle?: string;
 	email?: string;
-	/** Raw "Year | Title | Organization | Location | URL" lines from the CMS. */
+	phone?: string;
+	/** Raw "Year | Title | Organization | Location | URL" lines from the CMS — same convention for every CV section below. */
 	exhibitions?: string[];
+	awards?: string[];
+	curatorial?: string[];
+	activities?: string[];
+	education?: string[];
 }
 
 const {
 	photoSrc,
 	bio = '',
+	tagline,
 	instagramUrl,
 	instagramHandle,
 	email,
+	phone,
 	exhibitions = [],
+	awards = [],
+	curatorial = [],
+	activities = [],
+	education = [],
 } = Astro.props as Props;
 
 // Multiple paragraphs in the bio come through as literal "\n" from the CMS
 // textarea — split into real <p> tags rather than relying on CSS white-space.
 const bioParagraphs = bio.split('\n').map((p) => p.trim()).filter(Boolean);
 
-function parseExhibitionLine(line: string) {
+function parseCvLine(line: string) {
 	const [year, title, organization, location, url] = line.split('|').map((part) => part.trim());
 	return { year, title, organization, location, organizationUrl: url || undefined };
 }
 
-const parsedExhibitions = exhibitions
-	.map(parseExhibitionLine)
-	.filter((entry) => entry.year && entry.title);
+type CvEntry = ReturnType<typeof parseCvLine>;
 
-// Groups consecutive same-year entries — the artist controls chronological
-// order by how lines are arranged in the CMS field, same as the old hardcoded markup did.
-type ExhibitionEntry = ReturnType<typeof parseExhibitionLine>;
-const exhibitionsByYear: Array<{ year: string; entries: ExhibitionEntry[] }> = [];
-for (const entry of parsedExhibitions) {
-	const last = exhibitionsByYear[exhibitionsByYear.length - 1];
-	if (last && last.year === entry.year) {
-		last.entries.push(entry);
-	} else {
-		exhibitionsByYear.push({ year: entry.year, entries: [entry] });
+// Groups consecutive same-year (or same-range, e.g. "2018 to 2023") entries —
+// the artist controls chronological order by how lines are arranged in the
+// CMS field, same as the old hardcoded markup did.
+function groupByYear(lines: string[]): Array<{ year: string; entries: CvEntry[] }> {
+	const parsed = lines.map(parseCvLine).filter((entry) => entry.year && entry.title);
+	const grouped: Array<{ year: string; entries: CvEntry[] }> = [];
+	for (const entry of parsed) {
+		const last = grouped[grouped.length - 1];
+		if (last && last.year === entry.year) {
+			last.entries.push(entry);
+		} else {
+			grouped.push({ year: entry.year, entries: [entry] });
+		}
 	}
+	return grouped;
 }
+
+const cvSections = [
+	{ heading: 'Exhibitions', groups: groupByYear(exhibitions) },
+	{ heading: 'Awards', groups: groupByYear(awards) },
+	{ heading: 'Curatorial', groups: groupByYear(curatorial) },
+	{ heading: 'Activities', groups: groupByYear(activities) },
+	{ heading: 'Education', groups: groupByYear(education) },
+].filter((section) => section.groups.length > 0);
 ---
 
 <section id="about-me-section" class="cv-section">
@@ -89,29 +111,41 @@ for (const entry of parsedExhibitions) {
 					<span class="mobile-only">E-Mail</span>
 				</a>
 			)}
+			{phone && (
+				<a href={`tel:${phone.replace(/\s+/g, '')}`}>
+					<Icon name="mdi:phone" /> <span class="desktop-only">{phone}</span>
+					<span class="mobile-only">Phone</span>
+				</a>
+			)}
 		</div>
 	</div>
 
 	<div class="cv-text-col">
 		<div class="cv-eyebrow">Vienna — Media Art</div>
 		<h2 class="cv-heading">About</h2>
+		{tagline && <p class="cv-tagline">{tagline}</p>}
 		{bioParagraphs.map((paragraph) => <p class="cv-bio">{paragraph}</p>)}
 
-		<div class="cv-timeline">
-			{exhibitionsByYear.map(({ year, entries }) => (
-				<>
-					<h3>{year}</h3>
-					{entries.map((entry) => (
-						<Exhibition
-							title={entry.title}
-							organization={entry.organization}
-							organizationUrl={entry.organizationUrl}
-							location={entry.location}
-						/>
+		{cvSections.map((section) => (
+			<div class="cv-section-block">
+				<h3 class="cv-section-heading">{section.heading}</h3>
+				<div class="cv-timeline">
+					{section.groups.map(({ year, entries }) => (
+						<>
+							<h4>{year}</h4>
+							{entries.map((entry) => (
+								<Exhibition
+									title={entry.title}
+									organization={entry.organization}
+									organizationUrl={entry.organizationUrl}
+									location={entry.location}
+								/>
+							))}
+						</>
 					))}
-				</>
-			))}
-		</div>
+				</div>
+			</div>
+		))}
 	</div>
 </section>
 
@@ -315,24 +349,54 @@ for (const entry of parsedExhibitions) {
 		color: var(--cv-static);
 	}
 
+	.cv-tagline {
+		max-width: 60ch;
+		font-family: 'JetBrains Mono', ui-monospace, monospace;
+		font-size: 0.95rem;
+		line-height: 1.6;
+		color: var(--cv-signal);
+		margin: 0 0 1.5rem;
+	}
+
 	.cv-bio {
 		max-width: 65ch;
 		font-size: 1.1rem;
 		line-height: 1.7;
 		color: var(--cv-static-dim);
-		margin: 0 0 3rem;
+		margin: 0 0 1.25rem;
+	}
+	.cv-bio:last-of-type {
+		margin-bottom: 3rem;
 	}
 
-	.cv-timeline h3 {
+	.cv-section-block {
+		margin-top: 3rem;
+	}
+	.cv-section-block:first-of-type {
+		margin-top: 0;
+	}
+
+	.cv-section-heading {
+		font-family: 'Rajdhani', 'Arial Narrow', sans-serif;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		font-size: 1.15rem;
+		color: var(--cv-static);
+		margin: 0 0 0.5rem;
+	}
+
+	.cv-timeline h4 {
 		font-family: 'JetBrains Mono', ui-monospace, monospace;
 		font-size: 0.85rem;
 		letter-spacing: 0.16em;
+		font-weight: 400;
 		color: var(--cv-signal);
 		border-top: 1px solid rgba(228, 228, 228, 0.14);
 		padding-top: 0.75rem;
 		margin: 2rem 0 0.75rem;
 	}
-	.cv-timeline h3:first-child {
+	.cv-timeline h4:first-child {
 		margin-top: 0;
 		border-top: none;
 		padding-top: 0;

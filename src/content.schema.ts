@@ -57,14 +57,21 @@ export type ProjectRecord = z.infer<typeof projectRecord.schema>;
 const aboutRecord = defineRecord({
 	fields: {
 		bio: textField({ required: true, rows: 10, label: 'Bio' }),
+		tagline: textField({ optional: true, rows: 2, label: 'Tagline' }),
 		//photo: mediaUrlField({ nullable: true, label: 'Portrait Photo' }),
 		instagramUrl: textField({ optional: true, label: 'Instagram URL' }),
 		instagramHandle: textField({ optional: true, label: 'Instagram Handle' }),
 		email: textField({ optional: true, label: 'Contact Email' }),
-		// One exhibition per line: "Year | Title | Organization | Location | URL"
-		// (URL optional, trailing). Parsed in ArtistCV.astro. A plain textarea
-		// beats a real repeater field here — no new schema plumbing needed for v1.
+		phone: textField({ optional: true, label: 'Phone' }),
+		// One entry per line, same "Year | Title | Organization | Location | URL"
+		// convention (URL optional, trailing) for every CV section below —
+		// one parser/renderer (ArtistCV.astro) reused for all five instead of
+		// a bespoke field shape per section.
 		exhibitions: stringListField({ label: 'Exhibitions (Year | Title | Organization | Location | URL)' }),
+		awards: stringListField({ optional: true, label: 'Awards (Year | Title | Organization | Detail | URL)' }),
+		curatorial: stringListField({ optional: true, label: 'Curatorial (Year | Title | Organization | Location | URL)' }),
+		activities: stringListField({ optional: true, label: 'Activities (Years | Title | Organization)' }),
+		education: stringListField({ optional: true, label: 'Education (Years | Title | Organization)' }),
 	},
 });
 
