@@ -12,6 +12,7 @@ export const ADMIN_ICON_NAMES = [
 	'trash',
 	'users',
 	'download',
+	'chart-line',
 ] as const;
 
 export type AdminIconName = (typeof ADMIN_ICON_NAMES)[number];

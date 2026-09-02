@@ -8,4 +8,6 @@ export type AdminNavItem = {
 	href: string;
 	title?: string;
 	icon: AdminNavIcon;
+	/** Small chip after the label — e.g. "PRO" for an unpurchased feature. */
+	badge?: string;
 };

@@ -1,3 +1,4 @@
+// puporse: build the admin navigation menu based on the site config and the content schema
 import type { AdminNavItem } from './types/admin-nav';
 import type { ContentSchemaRegistry } from '@steincms/cms/schema';
 import {
@@ -9,11 +10,17 @@ import {
 export type AdminNavSiteConfig = {
 	admin: { path: string };
 	features?: { events?: boolean; blog?: boolean };
+	analytics?: {
+		enabled: boolean;
+		identificationCode?: string;
+		dashboardEmbedUrl?: string;
+	};
 };
 
 export type AdminPaths = {
 	base: string;
 	dashboard: string;
+	analytics: string;
 	login: string;
 	calendar: string;
 	posts: string;
@@ -51,6 +58,7 @@ export function buildAdminPaths(
 	return {
 		base: adminPath,
 		dashboard: adminPath,
+		analytics: `${adminPath}/statistiken`,
 		login: `${adminPath}/login`,
 		calendar: `${adminPath}/${calendarSegment}`,
 		posts: `${adminPath}/${listSegment}`,
@@ -77,11 +85,13 @@ export function listStaticPageEntries(
 export type AdminNavLabels = {
 	home?: { label: string; title: string };
 	staticPages?: { label: string; title: string };
+	analytics?: { label: string; title: string };
 };
 
 const DEFAULT_NAV_LABELS: Required<AdminNavLabels> = {
 	home: { label: 'Start', title: 'Dashboard' },
 	staticPages: { label: 'Seiten', title: 'Statische Seiten' },
+	analytics: { label: 'Visitor Stats', title: 'Visitor Stats' },
 };
 
 export function buildAdminNav(
@@ -92,7 +102,7 @@ export function buildAdminNav(
 ): AdminNavItem[] {
 	const home = labels.home ?? DEFAULT_NAV_LABELS.home;
 	const staticPages = labels.staticPages ?? DEFAULT_NAV_LABELS.staticPages;
-
+	const analytics = labels.analytics ?? DEFAULT_NAV_LABELS.analytics;
 	const items: AdminNavItem[] = [
 		{
 			id: 'home',
@@ -145,6 +155,16 @@ export function buildAdminNav(
 		});
 	}
 
+	// Always shown, even when not purchased/enabled — the page itself renders
+	// an upsell instead of the real dashboard in that case.
+	items.push({
+		id: 'analytics',
+		label: analytics.label,
+		href: paths.analytics,
+		title: analytics.title,
+		icon: 'chart-line',
+		...(siteConfig.analytics?.enabled ? {} : { badge: 'PRO' }),
+	});
 	return items;
 }
 

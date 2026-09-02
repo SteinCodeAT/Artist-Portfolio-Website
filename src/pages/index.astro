@@ -5,14 +5,31 @@ import SignalTV from '../components/SignalTV.astro'
 import ArtistCV from '../components/ArtistCV.astro'
 
 import CcProfileImage from '../img/cc-public.png'
+import { cmsDatabase } from '../db/cms-database';
+import { readSingleton } from '@steincms/db/singletons-store';
 
 import '../styles/index.css';
 
 const description = `
-Media Art focusing on the relationship between 
-human movement, space and uncertainty and developing 
+Media Art focusing on the relationship between
+human movement, space and uncertainty and developing
 new ways of interaction between humans and spaces.
 `
+
+// Read at BUILD time — this page is static (no prerender=false), so the CMS
+// data gets baked into the HTML on the next `npm run build`, same as any
+// other static-site CMS integration. Falls back to the original hardcoded
+// content if the singleton was never saved (fresh install, no About content yet).
+type AboutContent = {
+	bio?: string;
+	photo?: string | null;
+	instagramUrl?: string;
+	instagramHandle?: string;
+	email?: string;
+	exhibitions?: string[];
+};
+const about = readSingleton(cmsDatabase, 'about') as AboutContent | null;
+const photoSrc = about?.photo || CcProfileImage.src;
 ---
 
 <Layout title="Çağdaş Çeçen - Media Artist" description={description}>
@@ -27,7 +44,14 @@ new ways of interaction between humans and spaces.
 		</section>
 
 
-		<ArtistCV photo={CcProfileImage} />
+		<ArtistCV
+			photoSrc={photoSrc}
+			bio={about?.bio}
+			instagramUrl={about?.instagramUrl}
+			instagramHandle={about?.instagramHandle}
+			email={about?.email}
+			exhibitions={about?.exhibitions ?? []}
+		/>
 
 	</main>
 

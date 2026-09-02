@@ -57,7 +57,7 @@ export type ProjectRecord = z.infer<typeof projectRecord.schema>;
 const aboutRecord = defineRecord({
 	fields: {
 		bio: textField({ required: true, rows: 10, label: 'Bio' }),
-		photo: mediaUrlField({ nullable: true, label: 'Portrait Photo' }),
+		//photo: mediaUrlField({ nullable: true, label: 'Portrait Photo' }),
 		instagramUrl: textField({ optional: true, label: 'Instagram URL' }),
 		instagramHandle: textField({ optional: true, label: 'Instagram Handle' }),
 		email: textField({ optional: true, label: 'Contact Email' }),

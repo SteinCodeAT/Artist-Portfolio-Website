@@ -3,10 +3,52 @@
 // (sticky, so it stays in view) and a scrollable CV — bio + full exhibition
 // history — on the right, styled to match the Signal TV hero.
 import { Icon } from 'astro-icon/components';
-import { Image } from 'astro:assets';
 import Exhibition from './Exhibition.astro';
 
-const { photo } = Astro.props;
+interface Props {
+	photoSrc: string;
+	bio?: string;
+	instagramUrl?: string;
+	instagramHandle?: string;
+	email?: string;
+	/** Raw "Year | Title | Organization | Location | URL" lines from the CMS. */
+	exhibitions?: string[];
+}
+
+const {
+	photoSrc,
+	bio = '',
+	instagramUrl,
+	instagramHandle,
+	email,
+	exhibitions = [],
+} = Astro.props as Props;
+
+// Multiple paragraphs in the bio come through as literal "\n" from the CMS
+// textarea — split into real <p> tags rather than relying on CSS white-space.
+const bioParagraphs = bio.split('\n').map((p) => p.trim()).filter(Boolean);
+
+function parseExhibitionLine(line: string) {
+	const [year, title, organization, location, url] = line.split('|').map((part) => part.trim());
+	return { year, title, organization, location, organizationUrl: url || undefined };
+}
+
+const parsedExhibitions = exhibitions
+	.map(parseExhibitionLine)
+	.filter((entry) => entry.year && entry.title);
+
+// Groups consecutive same-year entries — the artist controls chronological
+// order by how lines are arranged in the CMS field, same as the old hardcoded markup did.
+type ExhibitionEntry = ReturnType<typeof parseExhibitionLine>;
+const exhibitionsByYear: Array<{ year: string; entries: ExhibitionEntry[] }> = [];
+for (const entry of parsedExhibitions) {
+	const last = exhibitionsByYear[exhibitionsByYear.length - 1];
+	if (last && last.year === entry.year) {
+		last.entries.push(entry);
+	} else {
+		exhibitionsByYear.push({ year: entry.year, entries: [entry] });
+	}
+}
 ---
 
 <section id="about-me-section" class="cv-section">
@@ -25,9 +67,9 @@ const { photo } = Astro.props;
 
 	<div class="cv-photo-col">
 		<div class="cv-photo-frame">
-			<Image class="cv-photo cv-photo--base" src={photo} alt="Çağdaş Çeçen" width={800} height={1067} />
-			<img class="cv-photo cv-photo--ghost cv-photo--r" src={photo.src} alt="" aria-hidden="true" />
-			<img class="cv-photo cv-photo--ghost cv-photo--b" src={photo.src} alt="" aria-hidden="true" />
+			<img class="cv-photo cv-photo--base" src={photoSrc} alt="Çağdaş Çeçen" width="800" height="1067" />
+			<img class="cv-photo cv-photo--ghost cv-photo--r" src={photoSrc} alt="" aria-hidden="true" />
+			<img class="cv-photo cv-photo--ghost cv-photo--b" src={photoSrc} alt="" aria-hidden="true" />
 			<div class="cv-photo-noise"></div>
 			<div class="cv-photo-scanlines"></div>
 			<div class="cv-photo-tracking"></div>
@@ -35,137 +77,40 @@ const { photo } = Astro.props;
 		</div>
 
 		<div class="cv-social">
-			<a href="https://www.instagram.com/nihilprophet/">
-				<Icon name="mdi:instagram" /> <span class="desktop-only">@nihilprophet</span>
-				<span class="mobile-only">Instagram</span>
-			</a>
-			<a href="mailto:nihilprophet@gmail.com">
-				<Icon name="mdi:email" /> <span class="desktop-only">nihilprophet@gmail.com</span>
-				<span class="mobile-only">E-Mail</span>
-			</a>
+			{instagramUrl && (
+				<a href={instagramUrl}>
+					<Icon name="mdi:instagram" /> <span class="desktop-only">{instagramHandle || 'Instagram'}</span>
+					<span class="mobile-only">Instagram</span>
+				</a>
+			)}
+			{email && (
+				<a href={`mailto:${email}`}>
+					<Icon name="mdi:email" /> <span class="desktop-only">{email}</span>
+					<span class="mobile-only">E-Mail</span>
+				</a>
+			)}
 		</div>
 	</div>
 
 	<div class="cv-text-col">
 		<div class="cv-eyebrow">Vienna — Media Art</div>
 		<h2 class="cv-heading">About</h2>
-		<p class="cv-bio">
-			Çağdaş Çeçen is a Vienna based media artist. He studied Media Art :
-			Digital Art at University of Applied Arts Vienna and Physics at University of Vienna.
-			Currently, his artistic practices focuses in the relationship between
-			human movement, space and uncertainty. Since 2018 he is developing
-			new ways of interaction between human and space by using synesthetic
-			nature of Quantum Physics not just symbolic or inspirational way
-			but as an active element in his artworks. He strongly believes that
-			democratization of Quantum Physics will open new artistic ways
-			to reexplore our surroundings and improving our synesthetic sensation.
-			His projects have been already presented in several countries:
-			Austria, Italy, Poland, Greece, Bosnia and Herzegovina.
-		</p>
+		{bioParagraphs.map((paragraph) => <p class="cv-bio">{paragraph}</p>)}
 
 		<div class="cv-timeline">
-			<h3>2022</h3>
-			<Exhibition
-				title="TRAUMATRAUMA"
-				organization="feat. B.A.D."
-				organizationUrl="https://www.bad-art.org/"
-				location="Vienna - Austria"
-			/>
-			<Exhibition
-				title="Distance Fog"
-				organization="feat. B.A.D. Wienstation"
-				location="Vienna - Austria"
-			/>
-			<Exhibition
-				title="The Cellular Fidelity"
-				organization="Alte Schieberkammer"
-				location="Vienna - Austria"
-			/>
-
-			<h3>2021</h3>
-			<Exhibition
-				title="Transform-Arte 2021"
-				organization="Participating artist"
-				location="Eisenstadt - Austria"
-			/>
-			<Exhibition
-				title="Angewandte Festival 2021"
-				organization="Paricipating artist"
-				location="Vienna - Austria"
-			/>
-
-			<h3>2019</h3>
-			<Exhibition
-				title="“KAIROS” Recall of Earth Part 2"
-				organization="Collective exhibition"
-				location="Thessalonikki - Greece"
-			/>
-			<Exhibition
-				title="“Spannung!”-Medienwerkstatt"
-				organization="Collective exhibition"
-				location="Vienna - Austria"
-			/>
-			<Exhibition
-				title="Fabrikraum #01"
-				organization="Collective exhibition"
-				location="Vienna - Austria"
-			/>
-			<Exhibition
-				title="“5.5” Mixed media installation"
-				organization="La Biennale di Venezia, Biennale Sessions"
-				location="Venice - Italy"
-			/>
-			<Exhibition
-				title="Offene Ateliers in Margareten"
-				organization="Künstlerhaus, Participating artist"
-				location="Vienna - Austria"
-			/>
-			<Exhibition
-				title="Reflecting Records"
-				organization="Collective exhibition"
-				location="Vienna - Austria"
-			/>
-
-			<h3>2018</h3>
-			<Exhibition
-				title="A community of individuals"
-				organization="SOHO Festival, Collective exhibition"
-				location="Vienna - Austria"
-			/>
-
-			<h3>2017</h3>
-			<Exhibition
-				title="DIGITAL WORKFLOW"
-				organization="Collective exhibition"
-				location="Vienna - Austria"
-			/>
-			<Exhibition
-				title="UNTAPPED SUR-PLUS"
-				organization="Künstlerhaus, Collective exhibition"
-				location="Vienna - Austria"
-			/>
-			<Exhibition
-				title="Disintegrate"
-				organization="Stop-Motion PSA movie for “Ministerium für ein lebenswertes Österreich”, “Danube Projekt”- Der Haus der Europäischen Union"
-				location="Vienna - Austria"
-			/>
-
-			<h3>2016</h3>
-			<Exhibition
-				title="Infected Structures"
-				organization="Collective exhibition"
-				location="Sokolowsko - Poland"
-			/>
-			<Exhibition
-				title="Smells Like Sh.t"
-				organization="Video Documenary “TV916”"
-				location="Trebinje - Bosnia and Herzegovina"
-			/>
-			<Exhibition
-				title="....Sowohl als auch....."
-				organization="Performance"
-				location="Vienna - Austria"
-			/>
+			{exhibitionsByYear.map(({ year, entries }) => (
+				<>
+					<h3>{year}</h3>
+					{entries.map((entry) => (
+						<Exhibition
+							title={entry.title}
+							organization={entry.organization}
+							organizationUrl={entry.organizationUrl}
+							location={entry.location}
+						/>
+					))}
+				</>
+			))}
 		</div>
 	</div>
 </section>

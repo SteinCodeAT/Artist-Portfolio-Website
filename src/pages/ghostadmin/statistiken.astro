@@ -1,0 +1,290 @@
+---
+export const prerender = false;
+
+/**
+ * Visitor analytics (Pirsch). Three states, driven by siteConfig.analytics
+ * (see site.config.ts): not purchased -> upsell; purchased but not
+ * configured yet -> setup note; fully configured -> the real embedded dashboard.
+ */
+import AdminAreaLayout from '@steincms/admin/layouts/AdminAreaLayout.astro';
+import AdminIcon from '@steincms/admin/icons/AdminIcon.astro';
+import DashboardPreview from '@steincms/admin/components/img/dashboard-light.svg';
+import { siteConfig } from '../../site.config';
+import { adminNav, adminLayoutText } from '../../admin-nav';
+
+const analytics = siteConfig.analytics;
+const isEnabled = Boolean(analytics?.enabled);
+const identificationCode = analytics?.identificationCode?.trim();
+const dashboardEmbedUrlBase = analytics?.dashboardEmbedUrl?.trim();
+const isConfigured = isEnabled && Boolean(identificationCode) && Boolean(dashboardEmbedUrlBase);
+
+function withDefaultParams(url: string): string {
+	const target = new URL(url);
+	target.searchParams.set('ui', target.searchParams.get('ui') ?? 'hide');
+	target.searchParams.set('interval', target.searchParams.get('interval') ?? '30d');
+	target.searchParams.set('lang', target.searchParams.get('lang') ?? 'en');
+	return target.toString();
+}
+
+const dashboardSrc = isConfigured ? withDefaultParams(dashboardEmbedUrlBase!) : null;
+
+const benefits = [
+	'Real-time visitor counts at a glance',
+	'Sources, devices & most-visited pages',
+	'Cookie-free & GDPR-compliant — no cookie banner needed',
+	'30-day trends, right here in the CMS',
+];
+---
+
+<AdminAreaLayout
+	title={`Visitors — ${siteConfig.admin.title}`}
+	activeSection="analytics"
+	adminPath={siteConfig.admin.path}
+	adminTitle={siteConfig.admin.title}
+	siteName={siteConfig.name}
+	siteShortName={siteConfig.shortName}
+	adminLogoSrc={siteConfig.admin.logo}
+	navItems={adminNav}
+	{...adminLayoutText}
+>
+	<header class="stats-header">
+		<h1>Visitors</h1>
+		<p class="stats-subtitle">Views and sources for your website. Only visible to you.</p>
+	</header>
+
+	{
+		isConfigured ? (
+			<iframe
+				src={dashboardSrc}
+				title="Visitor Statistics"
+				width="100%"
+				height="800"
+				style="border: 0; border-radius: 12px; background: #fff;"
+			/>
+		) : isEnabled ? (
+			<div class="setup-note">
+				<AdminIcon name="chart-line" class="setup-note-icon" />
+				<div>
+					<p class="setup-note-title">Access details still missing</p>
+					<p>
+						Visitor analytics is enabled for this site, but
+						<code>identificationCode</code> and/or <code>dashboardEmbedUrl</code> aren't set in{' '}
+						<code>site.config.ts</code> yet.
+					</p>
+				</div>
+			</div>
+		) : (
+			<section class="upsell">
+				<div class="upsell-hero">
+					<div class="upsell-icon-badge">
+						<AdminIcon name="chart-line" class="upsell-icon" />
+					</div>
+					<h2>Who's visiting your website?</h2>
+					<p>
+						See in real time how many people visit your site, where they come from, and which
+						content resonates most — right here in the CMS, with no cookie banner.
+					</p>
+				</div>
+
+				<div class="upsell-preview" aria-hidden="true">
+					<DashboardPreview class="upsell-preview-img" />
+					<div class="upsell-preview-fade"></div>
+				</div>
+
+				<ul class="upsell-benefits">
+					{benefits.map((benefit) => (
+						<li>
+							<span class="upsell-check" aria-hidden="true">✓</span>
+							{benefit}
+						</li>
+					))}
+				</ul>
+
+				<p class="upsell-cta">Get in touch to unlock this feature.</p>
+			</section>
+		)
+	}
+</AdminAreaLayout>
+
+<style>
+	.stats-header {
+		margin-bottom: 1.5rem;
+	}
+
+	.stats-header h1 {
+		margin: 0 0 0.35rem;
+		font-size: 1.5rem;
+		color: #1a2744;
+	}
+
+	.stats-subtitle {
+		margin: 0;
+		color: #667085;
+		font-size: 0.92rem;
+	}
+
+	.setup-note {
+		display: flex;
+		gap: 0.9rem;
+		align-items: flex-start;
+		background: #fff;
+		border: 1px solid #dde1e8;
+		border-radius: 12px;
+		padding: 1.25rem 1.4rem;
+		color: #475467;
+	}
+
+	.setup-note-icon {
+		width: 22px;
+		height: 22px;
+		flex-shrink: 0;
+		color: #aa6907;
+		margin-top: 0.15rem;
+	}
+
+	.setup-note-title {
+		margin: 0 0 0.3rem;
+		font-weight: 700;
+		color: #1a2744;
+	}
+
+	.setup-note code {
+		background: #f2f4f7;
+		border-radius: 4px;
+		padding: 0.1em 0.35em;
+		font-size: 0.88em;
+	}
+
+	/* ---- Upsell ---- */
+
+	.upsell {
+		background: #fff;
+		border: 1px solid #dde1e8;
+		border-radius: 16px;
+		padding: clamp(1.75rem, 4vw, 3rem);
+		max-width: 56rem;
+		box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+	}
+
+	.upsell-hero {
+		text-align: center;
+		margin-bottom: 2rem;
+	}
+
+	.upsell-icon-badge {
+		width: 64px;
+		height: 64px;
+		margin: 0 auto 1.1rem;
+		border-radius: 18px;
+		background: linear-gradient(135deg, #aa6907, #d99b2b);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 8px 20px rgba(170, 105, 7, 0.28);
+	}
+
+	.upsell-icon {
+		width: 30px;
+		height: 30px;
+		color: #fff;
+	}
+
+	.upsell-hero h2 {
+		margin: 0 0 0.6rem;
+		font-size: 1.35rem;
+		color: #1a2744;
+	}
+
+	.upsell-hero p {
+		margin: 0 auto;
+		max-width: 32rem;
+		color: #667085;
+		line-height: 1.55;
+	}
+
+	.upsell-preview {
+		position: relative;
+		margin: 0 auto 2rem;
+		border-radius: 12px;
+		overflow: hidden;
+		border: 1px solid #eef0f3;
+		box-shadow:
+			0 1px 2px rgba(15, 23, 42, 0.04),
+			0 16px 32px -12px rgba(15, 23, 42, 0.18);
+		animation: upsell-preview-in 0.5s ease-out backwards;
+	}
+
+	.upsell-preview-img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
+	/* Fades the bottom of the (cropped) preview into the card background
+	   instead of ending on a hard edge — a "peek", not a full screenshot. */
+	.upsell-preview-fade {
+		position: absolute;
+		inset: auto 0 0 0;
+		height: 14%;
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0), #fff);
+		pointer-events: none;
+	}
+
+	@keyframes upsell-preview-in {
+		from {
+			opacity: 0;
+			transform: translateY(0.75rem);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.upsell-preview {
+			animation: none;
+		}
+	}
+
+	.upsell-benefits {
+		list-style: none;
+		margin: 0 0 1.75rem;
+		padding: 0;
+		display: grid;
+		gap: 0.7rem;
+	}
+
+	.upsell-benefits li {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.65rem;
+		color: #344054;
+		font-size: 0.93rem;
+		line-height: 1.4;
+	}
+
+	.upsell-check {
+		flex-shrink: 0;
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		background: #fdf1de;
+		color: #aa6907;
+		font-size: 0.72rem;
+		font-weight: 800;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-top: 0.05rem;
+	}
+
+	.upsell-cta {
+		margin: 0;
+		padding-top: 1.4rem;
+		border-top: 1px solid #eef0f3;
+		text-align: center;
+		font-weight: 600;
+		color: #1a2744;
+	}
+</style>

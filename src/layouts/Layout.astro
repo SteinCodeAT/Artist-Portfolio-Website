@@ -10,6 +10,8 @@ import '../styles/global.css'
 const { title, description } = Astro.props;
 
 import CcProfileImage from '../img/cc-public.png'
+import { siteConfig } from '../site.config'
+const pirschCode = siteConfig.analytics?.enabled ? siteConfig.analytics.identificationCode : undefined;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 ---
@@ -25,6 +27,13 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 
 		<!--  -->
 		<link rel="canonical" href={canonicalURL} />
+
+		<!-- Pirsch Analytics -->
+		{pirschCode && (
+			<script is:inline defer src="https://api.pirsch.io/pa.js"
+			 id="pianjs" data-code={pirschCode}></script>
+		)}
+		
 
 		<!-- Theme related tags -->
 		<link rel="icon" href="/favicon.ico">

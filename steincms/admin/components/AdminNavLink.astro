@@ -23,6 +23,7 @@ const isActive = activeSection === item.id;
 		>
 			<AdminIcon name={item.icon} class="sidebar-icon" />
 			<span class="sidebar-label">{item.label}</span>
+			{item.badge && <span class="sidebar-badge">{item.badge}</span>}
 		</a>
 	) : (
 		<a
@@ -32,6 +33,7 @@ const isActive = activeSection === item.id;
 		>
 			<AdminIcon name={item.icon} class="mobile-nav-icon" />
 			{item.label}
+			{item.badge && <span class="mobile-nav-badge">{item.badge}</span>}
 		</a>
 	)
 }

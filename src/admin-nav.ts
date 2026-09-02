@@ -11,6 +11,7 @@ export const adminPaths = buildAdminPaths(siteConfig.admin.path, contentSchema);
 export const adminNav = buildAdminNav(cms.siteConfig, contentSchema, adminPaths, {
 	home: { label: 'Home', title: 'Dashboard' },
 	staticPages: { label: 'Pages', title: 'Site Pages' },
+	analytics: { label: 'Visitors', title: 'Visitor Statistics' },
 });
 
 // Shared English text for AdminAreaLayout's other hardcoded-German props.

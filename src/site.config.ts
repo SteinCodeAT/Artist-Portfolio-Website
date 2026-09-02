@@ -72,4 +72,9 @@ export const siteConfig: SiteConfig = {
 	cms: {
 		expectedSteinCMSVersion: '1.2.0', // must match steincms/manifest.json
 	},
+	analytics: {
+		enabled: false, // PRO upsell shown in the admin until this flips on
+		identificationCode: 'wLqWocE46EFuz1ikEPrKiRmjvVeCUsZC',
+		dashboardEmbedUrl: 'https://cagdascecencom.pirsch.io/?domain=cagdascecen.com&interval=today&access=b6n5PPGtH5c7nV3nBdvA&mode=light&ui=hide',
+	},
 };
