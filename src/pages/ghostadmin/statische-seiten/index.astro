@@ -1,0 +1,27 @@
+---
+export const prerender = false;
+
+import AdminAreaLayout from '@steincms/admin/layouts/AdminAreaLayout.astro';
+import StaticPagesList from '@steincms/admin/components/StaticPagesList.astro';
+import { listStaticPageEntries } from '@steincms/admin/nav';
+import { siteConfig } from '../../../site.config';
+import { contentSchema } from '../../../content.schema';
+import { adminNav, adminPaths, adminLayoutText } from '../../../admin-nav';
+
+const pages = listStaticPageEntries(contentSchema, adminPaths);
+---
+
+<AdminAreaLayout
+	title={`Site Pages — ${siteConfig.admin.title}`}
+	activeSection="static-pages"
+	adminPath={siteConfig.admin.path}
+	adminTitle={siteConfig.admin.title}
+	siteName={siteConfig.name}
+	siteShortName={siteConfig.shortName}
+	adminLogoSrc={siteConfig.admin.logo}
+	navItems={adminNav}
+	{...adminLayoutText}
+>
+	<h1>Site Pages</h1>
+	<StaticPagesList pages={pages} description="Edit the public page's content" />
+</AdminAreaLayout>

@@ -26,7 +26,7 @@ export function createUploadImageHandler(mediaConfig: MediaConfig): APIRoute {
 				return jsonResponse({ error: 'Ungültiger contentType' }, 400);
 			}
 
-			const buffers = [];
+			const buffers: Array<{ buffer: Buffer; mime: string }> = [];
 			for (const file of files) {
 				const mime = file.type || 'application/octet-stream';
 				const buffer = Buffer.from(await file.arrayBuffer());

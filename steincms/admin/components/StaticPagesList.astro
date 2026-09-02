@@ -5,9 +5,10 @@ import type { StaticPageEntry } from '../nav';
 
 interface Props {
 	pages: StaticPageEntry[];
+	description?: string;
 }
 
-const { pages } = Astro.props;
+const { pages, description = 'Inhalte der öffentlichen Seite bearbeiten' } = Astro.props;
 ---
 
 <DashboardCardList>
@@ -16,7 +17,7 @@ const { pages } = Astro.props;
 			<DashboardCard
 				href={page.href}
 				title={page.label}
-				description="Inhalte der öffentlichen Seite bearbeiten"
+				description={description}
 				icon="pages"
 			/>
 		))

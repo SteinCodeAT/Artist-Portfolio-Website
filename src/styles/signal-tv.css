@@ -281,6 +281,7 @@
     width: fit-content;
     overflow: hidden;
     pointer-events: auto;
+    touch-action: none; /* let JS own vertical drag here instead of the page scrolling */
     -webkit-mask-image: linear-gradient(to bottom, transparent, black 18%, black 82%, transparent);
     mask-image: linear-gradient(to bottom, transparent, black 18%, black 82%, transparent);
   }

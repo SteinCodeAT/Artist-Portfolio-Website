@@ -210,16 +210,18 @@ export function unauthorizedJsonResponse(): Response {
 export function safeInternRedirect(next: string | null | undefined, adminPath: string): string {
 	const loginPath = `${adminPath}/login`;
 	const dashboardPath = adminPath;
-	const calendarPath = `${adminPath}/veranstaltungen-manager`;
 	const internPrefix = `${adminPath}/`;
 
+	// Falls back to the dashboard, not a hardcoded events-calendar path — a
+	// project without an events collection (this one) has no page there, so
+	// that default 404'd on every login with no explicit `next`.
 	if (next === loginPath) {
-		return calendarPath;
+		return dashboardPath;
 	}
 	if (next === dashboardPath || (next && next.startsWith(internPrefix))) {
 		return next;
 	}
-	return calendarPath;
+	return dashboardPath;
 }
 
 export function loginPath(adminPath: string): string {

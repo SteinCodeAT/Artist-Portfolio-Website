@@ -74,17 +74,31 @@ export function listStaticPageEntries(
 		.sort((a, b) => a.label.localeCompare(b.label, 'de'));
 }
 
+export type AdminNavLabels = {
+	home?: { label: string; title: string };
+	staticPages?: { label: string; title: string };
+};
+
+const DEFAULT_NAV_LABELS: Required<AdminNavLabels> = {
+	home: { label: 'Start', title: 'Dashboard' },
+	staticPages: { label: 'Seiten', title: 'Statische Seiten' },
+};
+
 export function buildAdminNav(
 	siteConfig: AdminNavSiteConfig,
 	contentSchema: ContentSchemaRegistry,
 	paths: AdminPaths = buildAdminPaths(siteConfig.admin.path, contentSchema),
+	labels: AdminNavLabels = {},
 ): AdminNavItem[] {
+	const home = labels.home ?? DEFAULT_NAV_LABELS.home;
+	const staticPages = labels.staticPages ?? DEFAULT_NAV_LABELS.staticPages;
+
 	const items: AdminNavItem[] = [
 		{
 			id: 'home',
-			label: 'Start',
+			label: home.label,
 			href: paths.dashboard,
-			title: 'Dashboard',
+			title: home.title,
 			icon: 'home',
 		},
 	];
@@ -124,9 +138,9 @@ export function buildAdminNav(
 	if (listStaticPageEntries(contentSchema, paths).length > 0) {
 		items.push({
 			id: 'static-pages',
-			label: 'Seiten',
+			label: staticPages.label,
 			href: paths.staticPages,
-			title: 'Statische Seiten',
+			title: staticPages.title,
 			icon: 'pages',
 		});
 	}
@@ -161,7 +175,9 @@ export function resolveActiveSection(
 
 	const normalized = pathname.replace(/\/$/, '') || '/';
 	if (isStaticPagesPath(normalized, adminPaths)) {
-		return 'statische-seiten';
+		// Must match the nav item's own id (buildAdminNav pushes id: 'static-pages')
+		// for sidebar highlighting to actually apply.
+		return 'static-pages';
 	}
 
 	const match = nav

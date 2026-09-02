@@ -36,7 +36,7 @@ export async function handleMultiImageUpload(
 	entryId: string,
 	startSlot?: string,
 ): Promise<Array<{ url: string; thumbUrl: string }>> {
-	const results = [];
+	const results: Array<{ url: string; thumbUrl: string }> = [];
 	let slotIndex = startSlot ? Number.parseInt(startSlot, 10) : 1;
 
 	for (const file of files) {

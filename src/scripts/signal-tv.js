@@ -313,6 +313,29 @@ var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (next !== activeIndex) selectProject(next);
   }, { passive: false });
 
+  // Touch/pen devices never fire "wheel" — drag the list with Pointer Events
+  // instead, stepping one channel per row-height dragged.
+  var touchDrag = null;
+  listWrap.addEventListener('pointerdown', function (e) {
+    if (e.pointerType === 'mouse') return;
+    touchDrag = { id: e.pointerId, lastY: e.clientY };
+    listWrap.setPointerCapture(e.pointerId);
+  });
+  listWrap.addEventListener('pointermove', function (e) {
+    if (!touchDrag || e.pointerId !== touchDrag.id) return;
+    var delta = e.clientY - touchDrag.lastY;
+    if (Math.abs(delta) < ROW_H) return;
+    var dir = delta > 0 ? -1 : 1;
+    var next = Math.min(Math.max(activeIndex + dir, 0), projects.length - 1);
+    if (next !== activeIndex) selectProject(next);
+    touchDrag.lastY = e.clientY;
+  });
+  ['pointerup', 'pointercancel'].forEach(function (evt) {
+    listWrap.addEventListener(evt, function (e) {
+      if (touchDrag && e.pointerId === touchDrag.id) touchDrag = null;
+    });
+  });
+
   // ---- interactivity: the tree leans toward the cursor ----
   if (!reduceMotion) {
     window.addEventListener('pointermove', function (e) {

@@ -28,6 +28,10 @@ export function createPostsHandler(
 			const title = String(body.title ?? '').trim();
 			const description = String(body.description ?? '').trim();
 			const status = parseStatus(body.status) ?? 'draft';
+  			const year = body.year !== undefined ? String(body.year).trim() : undefined;
+			if (!year) {
+				return jsonResponse({ error: 'Jahr fehlt' }, 400);
+			}
 
 			if (!title) {
 				return jsonResponse({ error: 'Titel fehlt' }, 400);
@@ -73,6 +77,7 @@ export function createPostsHandler(
 				description,
 				blocks,
 				status,
+				year,
 				...(mainImage !== undefined ? { mainImage } : {}),
 				...(publishedAt !== undefined ? { publishedAt } : {}),
 			});
@@ -97,7 +102,10 @@ export function createPostsHandler(
 			const description =
 				body.description !== undefined ? String(body.description).trim() : undefined;
 			const status = parseStatus(body.status);
-
+			const year = body.year !== undefined ? String(body.year).trim() : undefined;
+			if (!year) {
+				return jsonResponse({ error: 'Jahr fehlt' }, 400);
+			}
 			if (!id) {
 				return jsonResponse({ error: 'ID fehlt' }, 400);
 			}
@@ -147,6 +155,7 @@ export function createPostsHandler(
 				...(description !== undefined ? { description } : {}),
 				...(blocks !== undefined ? { blocks } : {}),
 				...(status !== undefined ? { status } : {}),
+				...(year !== undefined ? { year } : {}),
 				...(mainImage !== undefined ? { mainImage } : {}),
 				...(publishedAt !== undefined ? { publishedAt } : {}),
 			});

@@ -1,0 +1,25 @@
+---
+export const prerender = false;
+
+import AdminLoginPage from '../../../steincms/admin/components/AdminLoginPage.astro';
+import { handleAdminLoginRoute } from '../../../steincms/admin/components/admin-login.server';
+import { siteConfig } from '../../site.config';
+
+const result = await handleAdminLoginRoute(Astro, {
+	siteConfig,
+	logoSrc: '/favicon.svg',
+	subtitle: 'Admin area for Çağdaş Çeçen — Media Artist.',
+	labels: {
+		usernameLabel: 'Username',
+		passwordLabel: 'Password',
+		submitLabel: 'Log In',
+		invalidCredentialsError: 'Invalid username or password.',
+		sessionExpiredError: 'Session expired — please log in again.',
+		tooManyAttemptsError: 'Too many attempts. Please try again in 15 minutes.',
+	},
+});
+if ('redirect' in result) return Astro.redirect(result.redirect);
+if ('forbidden' in result) return new Response('Forbidden', { status: 403 });
+---
+
+<AdminLoginPage {...result.view} />

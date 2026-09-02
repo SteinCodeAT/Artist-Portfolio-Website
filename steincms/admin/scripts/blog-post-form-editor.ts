@@ -16,6 +16,53 @@
 
 import { initContentSectionEditor, uploadImages } from './content-section-of-post-editor.ts';
 
+/** Reuses ConfirmDeleteModal.astro (#delete-event-modal) as a simple notice. */
+function showNotice(message: string, title = 'Notice'): Promise<void> {
+  const dialog = document.getElementById('delete-event-modal') as HTMLDialogElement | null;
+  const titleEl = document.getElementById('delete-event-title');
+  const messageEl = document.getElementById('delete-event-message');
+  const confirmBtn = document.getElementById('delete-event-confirm') as HTMLButtonElement | null;
+  const cancelBtn = document.getElementById('delete-event-cancel') as HTMLButtonElement | null;
+  const closeBtn = document.getElementById('delete-event-close') as HTMLButtonElement | null;
+
+  if (!dialog || !confirmBtn) {
+    window.alert(message);
+    return Promise.resolve();
+  }
+
+  const prevTitle = titleEl?.textContent ?? '';
+  const prevMessage = messageEl?.textContent ?? '';
+  const prevConfirm = confirmBtn.textContent ?? '';
+  const prevCancelHidden = cancelBtn?.hidden ?? false;
+
+  if (titleEl) titleEl.textContent = title;
+  if (messageEl) messageEl.textContent = message;
+  confirmBtn.textContent = 'OK';
+  if (cancelBtn) cancelBtn.hidden = true;
+
+  return new Promise((resolve) => {
+    let settled = false;
+    const done = () => {
+      if (settled) return;
+      settled = true;
+      confirmBtn.removeEventListener('click', done);
+      closeBtn?.removeEventListener('click', done);
+      dialog.removeEventListener('close', done);
+      if (titleEl) titleEl.textContent = prevTitle;
+      if (messageEl) messageEl.textContent = prevMessage;
+      confirmBtn.textContent = prevConfirm;
+      if (cancelBtn) cancelBtn.hidden = prevCancelHidden;
+      if (dialog.open) dialog.close();
+      resolve();
+    };
+
+    confirmBtn.addEventListener('click', done);
+    closeBtn?.addEventListener('click', done);
+    dialog.addEventListener('close', done);
+    dialog.showModal();
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Config from bearbeiten.astro HTML data attributes
 // ---------------------------------------------------------------------------
@@ -44,7 +91,6 @@ function readEditorConfig(root: HTMLElement) {
 // ---------------------------------------------------------------------------
 // Sidebar: title image (cover)
 // ---------------------------------------------------------------------------
-
 /** Cover image upload — separate from image sections inside the article body. */
 function initMainImageField() {
   const field = document.querySelector('.main-image-field') as HTMLElement | null;
@@ -82,15 +128,25 @@ function initMainImageField() {
     fileInput.value = '';
     if (!file) return;
 
+    const postId = document.getElementById('content-sections-root')?.dataset.postId || null;
+    if (!postId) {
+      await showNotice('Please save the project first, then upload a cover image.');
+      return;
+    }
+
     uploadBtn.textContent = 'Wird hochgeladen…';
     uploadBtn.setAttribute('disabled', 'true');
-
     try {
-      const [result] = await uploadImages([file]);
+      const [result] = await uploadImages([file], {
+        contentType: 'posts',
+        entryId: postId,
+        slot: 'cover.webp',
+      });
+      
       hiddenInput.value = result.url;
       renderPreview();
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Upload fehlgeschlagen');
+      await showNotice(error instanceof Error ? error.message : 'Upload failed');
     } finally {
       uploadBtn.textContent = 'Bild wählen';
       uploadBtn.removeAttribute('disabled');
@@ -136,6 +192,7 @@ type SavedPost = {
   id: string;
   slug: string;
   status: 'draft' | 'published';
+  year: string | null;
   createdAt: string;
   updatedAt: string;
   publishedAt: string | null;
@@ -201,8 +258,10 @@ function initBlogPostFormEditor() {
       (document.getElementById('post-description') as HTMLTextAreaElement | null)?.value?.trim() ?? '';
     const mainImage =
       (document.getElementById('post-main-image') as HTMLInputElement | null)?.value?.trim() ?? '';
+    const year =
+      (document.getElementById('post-year') as HTMLInputElement | null)?.value?.trim() ?? '';
     const blocks = sectionEditor.getBlocks();
-    return JSON.stringify({ title, description, mainImage, blocks });
+    return JSON.stringify({ title, description, mainImage, year, blocks });
   }
 
   function markDirtyIfChanged() {
@@ -235,13 +294,20 @@ function initBlogPostFormEditor() {
     });
 
     if (!title) {
-      alert('Bitte geben Sie einen Titel ein.');
+      await showNotice('Please enter a title.');
+      return null;
+    }
+
+    const year =
+      (document.getElementById('post-year') as HTMLInputElement | null)?.value?.trim() ?? '';
+    if (!year) {
+      await showNotice('Please enter the year the work was created.');
       return null;
     }
 
     for (const block of blocks) {
       if (block.type === 'image' && block.url && !block.alt.trim()) {
-        alert('Bitte Alt-Text für alle Bilder ausfüllen.');
+        await showNotice('Please add alt text for every image.');
         return null;
       }
     }
@@ -253,6 +319,7 @@ function initBlogPostFormEditor() {
       mainImage: mainImage || null,
       blocks,
       status,
+      year,
     };
 
     if (publishedAt !== undefined) {
@@ -275,7 +342,7 @@ function initBlogPostFormEditor() {
     };
 
     if (!response.ok || !data.post) {
-      alert(data.error ?? 'Speichern fehlgeschlagen');
+      await showNotice(data.error ?? 'Save failed');
       setSaveStatus('dirty');
       return null;
     }
@@ -321,7 +388,7 @@ function initBlogPostFormEditor() {
     const isPublished = btn?.dataset.previewPublic?.trim();
     const url = isPublished || btn?.dataset.previewDraft?.trim();
     if (url) window.open(url, '_blank', 'noopener');
-    else alert('Bitte zuerst speichern.');
+    else void showNotice('Please save the project first.');
   }
 
   function initPreviewButton() {
@@ -349,6 +416,7 @@ function initBlogPostFormEditor() {
   /* Listen for form input changes and update dirty state. */
   document.getElementById('post-title')?.addEventListener('input', markDirtyIfChanged);
   document.getElementById('post-description')?.addEventListener('input', markDirtyIfChanged);
+  document.getElementById('post-year')?.addEventListener('input', markDirtyIfChanged);
   document.getElementById('post-main-image')?.addEventListener('change', markDirtyIfChanged);
   
   // Sections: mark dirty on a timer after Quill edits - simples approach 

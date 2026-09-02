@@ -8,6 +8,29 @@
     src: url("/fonts/Poppins/Poppins-Regular.woff2");
 }
 
+
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url("/fonts/JetBrains_Mono/static/JetBrainsMono-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "JetBrains Mono";
+    src: url("/fonts/JetBrains_Mono/static/JetBrainsMono-Medium.ttf") format("truetype");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "JetBrains Mono";
+    src: url("/fonts/JetBrains_Mono/static/JetBrainsMono-Bold.ttf") format("truetype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  
 :root {
     --main-bg: #000000;
     --card-border-radius: 0.75rem;

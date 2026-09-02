@@ -29,3 +29,17 @@ RawMedia/
 # yaml files
 *.yaml
 *.yml
+
+# CMS runtime SQLite db + write-locks (NOT src/db/migrations — those are committed)
+data/
+
+# Raw CMS dumps — Sharp writes .webp on upload. Keep originals out of git.
+public/media/**/*.jpg
+public/media/**/*.jpeg
+public/media/**/*.png
+public/media/**/*.gif
+public/media/**/*.JPG
+public/media/**/*.JPEG
+public/media/**/*.PNG
+public/media/**/*.GIF
+public/media/**/*.webp.bak

@@ -1,0 +1,498 @@
+---
+// src/pages/ghostadmin/projects-manager/bearbeiten.astro
+export const prerender = false;
+
+import AdminAreaLayout from '@steincms/admin/layouts/AdminAreaLayout.astro';
+import ContentSectionStyles from '@steincms/admin/components/ContentSectionStyles.astro';
+import ConfirmDeleteModal from '@steincms/admin/components/ConfirmDeleteModal.astro';
+import { cms } from '../../../cms';
+import { siteConfig } from '../../../site.config';
+import { adminNav, adminPaths, adminLayoutText } from '../../../admin-nav';
+
+const { postsStore } = cms;
+const id = Astro.url.searchParams.get('id');
+const post = id && postsStore ? postsStore.findPostById(id) : null;
+const isEdit = Boolean(post);
+
+const currentYear = new Date().getFullYear();
+---
+
+<AdminAreaLayout
+	title={`${isEdit ? 'Edit' : 'New'} Project — ${siteConfig.admin.title}`}
+	activeSection="blog"
+	adminPath={siteConfig.admin.path}
+	adminTitle={siteConfig.admin.title}
+	siteName={siteConfig.name}
+	siteShortName={siteConfig.shortName}
+	adminLogoSrc={siteConfig.admin.logo}
+	navItems={adminNav}
+	{...adminLayoutText}
+	wideContent
+>
+	<ContentSectionStyles />
+
+	<header class="editor-toolbar">
+		<div class="editor-toolbar-left">
+			<a class="back-link" href={`${adminPaths.base}/projects-manager`}>&larr; All Projects</a>
+			<input
+				id="post-title"
+				type="text"
+				class="editor-title-input"
+				placeholder="Project title"
+				value={post?.title ?? ''}
+			/>
+		</div>
+		<div class="toolbar-actions">
+			<span id="save-status" class="save-status"></span>
+			<button type="button" class="btn-ghost" id="btn-preview">Preview</button>
+			<button type="button" class="btn-ghost" id="btn-save-draft">Save Draft</button>
+			<button type="button" class="btn-primary" id="btn-publish">Publish</button>
+		</div>
+	</header>
+
+	<div
+		id="content-sections-root"
+		data-post-id={post?.id ?? ''}
+		data-admin-path={adminPaths.base}
+		data-blog-public-path="/projects"
+		data-posts-list-path={`${adminPaths.base}/projects-manager`}
+		data-posts-preview-path={`${adminPaths.base}/projects-manager/vorschau`}
+		data-initial-blocks={JSON.stringify(post?.blocks ?? [])}
+		data-upload-content-type="posts"
+		class="editor-layout"
+	>
+		<div class="editor-main">
+			<section class="editor-panel">
+				<label class="field">
+					<span class="field-label-inline">Description (short blurb)</span>
+					<small class="field-hint">Used as the Signal TV channel text, the project intro, and the SEO description.</small>
+					<textarea id="post-description" rows="3">{post?.description ?? ''}</textarea>
+				</label>
+			</section>
+
+			<section class="editor-panel blocks-section">
+				<div class="blocks-toolbar">
+					<h2 class="panel-title">Body</h2>
+					<p class="panel-subtitle">The write-up shown on the project's page.</p>
+				</div>
+				<!-- Section blocks render into here entirely via JS — leave empty. -->
+				<div data-section-list></div>
+				<div class="content-add-picker">
+					<p class="content-add-heading">Add a section</p>
+					<div class="content-add-options">
+						<button type="button" class="content-add-option" data-add-text>
+							<span class="content-add-icon">&para;</span>
+							<span class="content-add-text"><strong>Text</strong><small>A paragraph</small></span>
+						</button>
+						<button type="button" class="content-add-option" data-add-image>
+							<span class="content-add-icon content-add-icon-image">&#128247;</span>
+							<span class="content-add-text"><strong>Image</strong><small>One photo with caption</small></span>
+						</button>
+						<button type="button" class="content-add-option" data-add-gallery>
+							<span class="content-add-icon content-add-icon-gallery">&#9638;</span>
+							<span class="content-add-text"><strong>Gallery</strong><small>Multiple photos</small></span>
+						</button>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<aside class="editor-sidebar">
+			<div class="editor-sidebar-shell">
+				<section class="editor-sidebar-card main-image-field" data-fallback-cover="">
+					<h3 class="sidebar-card-title">Cover Image</h3>
+					<div class="main-image-preview-wrap">
+						<div class="main-image-preview" id="main-image-preview"></div>
+					</div>
+					<input type="hidden" id="post-main-image" value={post?.mainImage ?? ''} />
+					<input type="file" id="main-image-file" accept="image/*" hidden />
+					<div class="main-image-actions">
+						<button type="button" id="btn-main-image-upload" class="btn-ghost btn-sm">Choose Image</button>
+						<button type="button" id="btn-main-image-remove" class="btn-ghost btn-sm" hidden>Remove</button>
+					</div>
+				</section>
+
+				<section class="editor-sidebar-card">
+					<h3 class="sidebar-card-title">Status</h3>
+					<p class="status-display" id="post-status-display" data-status={post?.status ?? 'draft'}>
+						{post?.status === 'published' ? '● Published' : '○ Draft'}
+					</p>
+					<label class="field">
+						<span class="field-label-inline">Year</span>
+						<input type="text" id="post-year" value={post?.year ?? ''} placeholder={currentYear.toString()}/>
+					</label>
+					<label class="field">
+						<span class="field-label-inline">Publish Date</span>
+						<input
+							type="datetime-local"
+							id="post-published-at"
+							value={post?.publishedAt ? post.publishedAt.slice(0, 16) : ''}
+						/>
+					</label>
+				</section>
+
+				<section class="editor-sidebar-card" id="post-meta-list" hidden={!isEdit}>
+					<h3 class="sidebar-card-title">History</h3>
+					<p class="meta-row">Created <span id="post-meta-created">{post ? new Date(post.createdAt).toLocaleString('en-GB') : ''}</span></p>
+					<p class="meta-row">Updated <span id="post-meta-updated">{post ? new Date(post.updatedAt).toLocaleString('en-GB') : ''}</span></p>
+					<p class="meta-row" id="post-meta-published-row" hidden={!post?.publishedAt}>
+						Published <span id="post-meta-published">{post?.publishedAt ? new Date(post.publishedAt).toLocaleString('en-GB') : ''}</span>
+					</p>
+				</section>
+				<p class="sidebar-new-hint" id="post-new-hint" hidden={isEdit}>Not saved yet — save a draft to unlock cover/gallery image uploads.</p>
+			</div>
+		</aside>
+	</div>
+	<ConfirmDeleteModal />
+</AdminAreaLayout>
+
+<script>
+	import '@steincms/admin/scripts/blog-post-form-editor.ts';
+</script>
+
+<style>
+	.editor-toolbar {
+		position: sticky;
+		top: 0;
+		z-index: 20;
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 1rem;
+		flex-wrap: wrap;
+		background: #f5f6f8;
+		padding: 0.5rem 0 1rem;
+		margin: -0.5rem 0 1.25rem;
+		border-bottom: 1px solid #dde1e8;
+	}
+
+	.editor-toolbar-left {
+		flex: 1;
+		min-width: min(100%, 280px);
+	}
+
+	.back-link {
+		display: inline-block;
+		margin-bottom: 0.35rem;
+		color: #666;
+		text-decoration: none;
+		font-size: 0.85rem;
+	}
+
+	.back-link:hover {
+		color: #1a1a1a;
+	}
+
+	.editor-title-input {
+		display: block;
+		width: 100%;
+		max-width: 560px;
+		padding: 0.35rem 0;
+		border: none;
+		background: transparent;
+		font: inherit;
+		font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		color: #1a1a1a;
+	}
+
+	.editor-title-input::placeholder {
+		color: #9aa3af;
+		font-weight: 600;
+	}
+
+	.editor-title-input:focus {
+		outline: none;
+		box-shadow: inset 0 -2px 0 #00c896;
+	}
+
+	.toolbar-actions {
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+
+	.save-status {
+		font-size: 0.82rem;
+		color: #667085;
+	}
+
+	.save-status.is-dirty {
+		color: #b54708;
+	}
+
+	.save-status.is-saved {
+		color: #027a48;
+	}
+
+	.editor-layout {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 320px;
+		gap: 1.5rem;
+		align-items: start;
+	}
+
+	.editor-main {
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	.editor-panel {
+		background: #fff;
+		border: 1px solid #e8e8e8;
+		border-radius: 12px;
+		padding: 1.25rem;
+		box-shadow: 0 1px 3px rgba(16, 24, 40, 0.04);
+	}
+
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+	}
+
+	.field-label-inline {
+		font-size: 0.88rem;
+		font-weight: 700;
+		color: #1a2744;
+	}
+
+	.field-hint {
+		font-size: 0.82rem;
+		color: #667085;
+		line-height: 1.4;
+	}
+
+	.field textarea,
+	.field input {
+		padding: 0.6rem 0.75rem;
+		border: 1.5px solid #d6dce8;
+		border-radius: 8px;
+		font: inherit;
+		font-size: 0.95rem;
+		resize: vertical;
+	}
+
+	.field textarea:focus,
+	.field input:focus {
+		outline: none;
+		border-color: #00c896;
+		box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.12);
+	}
+
+	.panel-title {
+		margin: 0;
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: #1a2744;
+	}
+
+	.panel-subtitle {
+		margin: 0.35rem 0 0;
+		font-size: 0.9rem;
+		color: #667085;
+	}
+
+	.blocks-toolbar {
+		margin-bottom: 1rem;
+	}
+
+	.content-add-picker {
+		margin-top: 1.25rem;
+		padding: 1rem;
+		border: 1px dashed #c9cdd4;
+		border-radius: 12px;
+		background: #fafbfc;
+	}
+
+	.content-add-heading {
+		margin: 0 0 0.75rem;
+		font-size: 0.95rem;
+		font-weight: 700;
+		color: #1a2744;
+	}
+
+	.content-add-options {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 0.65rem;
+	}
+
+	.content-add-option {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.6rem;
+		padding: 0.85rem;
+		border: 1px solid #e4e7ec;
+		border-radius: 10px;
+		background: #fff;
+		cursor: pointer;
+		text-align: left;
+		font: inherit;
+		transition: border-color 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	.content-add-option:hover {
+		border-color: #00c896;
+		box-shadow: 0 2px 8px rgba(0, 200, 150, 0.1);
+	}
+
+	.content-add-icon {
+		flex-shrink: 0;
+		width: 2rem;
+		height: 2rem;
+		display: grid;
+		place-items: center;
+		border-radius: 8px;
+		background: #eef2f6;
+		font-size: 1rem;
+	}
+
+	.content-add-icon-image {
+		background: #f5efe6;
+	}
+
+	.content-add-icon-gallery {
+		background: #f0f0f0;
+	}
+
+	.content-add-text {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+	}
+
+	.content-add-text strong {
+		font-size: 0.95rem;
+		color: #1a1a1a;
+	}
+
+	.content-add-text small {
+		font-size: 0.8rem;
+		color: #667085;
+	}
+
+	.editor-sidebar {
+		position: sticky;
+		top: 5.5rem;
+	}
+
+	.editor-sidebar-shell {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.editor-sidebar-card {
+		background: #fff;
+		border: 1px solid #e4e7ec;
+		border-radius: 12px;
+		padding: 1.1rem 1.15rem;
+		box-shadow: 0 1px 4px rgba(16, 24, 40, 0.04);
+	}
+
+	.sidebar-card-title {
+		margin: 0 0 0.75rem;
+		font-size: 0.82rem;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: #667085;
+	}
+
+	.main-image-preview-wrap {
+		margin-bottom: 0.75rem;
+	}
+
+	.main-image-preview {
+		aspect-ratio: 1 / 1;
+		width: 100%;
+		border: 2px solid #00c896;
+		border-radius: 8px;
+		overflow: hidden;
+		background: #f5f6f8;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+	}
+
+	.main-image-preview :global(.main-image-preview-img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	.main-image-preview :global(.main-image-preview-img--fallback) {
+		object-fit: contain;
+	}
+
+	.main-image-preview :global(.main-image-preview-empty) {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+		margin: 0;
+		font-size: 0.82rem;
+		color: #98a2b3;
+		text-align: center;
+		padding: 1rem;
+	}
+
+	.main-image-actions {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.status-display {
+		margin: 0 0 0.85rem;
+		font-size: 0.95rem;
+		font-weight: 700;
+		color: #1a2744;
+	}
+
+	.status-display[data-status='published'] {
+		color: #027a48;
+	}
+
+	.meta-row {
+		display: flex;
+		justify-content: space-between;
+		gap: 0.5rem;
+		margin: 0 0 0.4rem;
+		font-size: 0.85rem;
+		color: #667085;
+	}
+
+	.meta-row span {
+		color: #1a2744;
+		font-weight: 600;
+	}
+
+	.sidebar-new-hint {
+		margin: 0;
+		padding: 0.85rem 1rem;
+		font-size: 0.85rem;
+		line-height: 1.4;
+		color: #8a7349;
+		background: #fffbf2;
+		border: 1px solid #e8dfce;
+		border-radius: 10px;
+	}
+
+	@media (max-width: 960px) {
+		.editor-layout {
+			grid-template-columns: 1fr;
+		}
+		.editor-sidebar {
+			position: static;
+			order: -1;
+		}
+		.editor-toolbar {
+			position: static;
+		}
+	}
+</style>

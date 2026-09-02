@@ -57,6 +57,7 @@ export type PostRecord = {
 	description: string;
 	mainImage?: string | null;
 	blocks: ContentBlock[];
+	year: string | null;
 	status: PostStatus;
 	publishedAt: string | null;
 	createdAt: string;
@@ -69,6 +70,7 @@ export type CreatePostInput = {
 	description: string;
 	mainImage?: string | null;
 	blocks: ContentBlock[];
+	year: string | null;
 	status?: PostStatus;
 	publishedAt?: string | null;
 };
@@ -78,6 +80,7 @@ export type UpdatePostInput = {
 	description?: string;
 	mainImage?: string | null;
 	blocks?: ContentBlock[];
+	year?: string | null;
 	status?: PostStatus;
 	publishedAt?: string | null;
 };
@@ -290,6 +293,7 @@ export function createPostsStore(config: PostsStoreConfig, storage: RecordListSt
 				...(input.mainImage ? { mainImage: input.mainImage } : {}),
 				blocks: input.blocks,
 				status,
+				year: input.year?.trim() || null,
 				publishedAt:
 					status === 'published'
 						? resolvePublishedAt(null, 'published', input.publishedAt)
@@ -335,6 +339,7 @@ export function createPostsStore(config: PostsStoreConfig, storage: RecordListSt
 				blocks: patch.blocks ?? current.blocks,
 				status: nextStatus,
 				slug: nextSlug,
+				year: patch.year !== undefined ? (patch.year?.trim() || null) : (current.year ?? null),
 				publishedAt: resolvePublishedAt(
 					current.publishedAt,
 					nextStatus,

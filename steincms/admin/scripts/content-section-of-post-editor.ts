@@ -17,9 +17,7 @@ import {
   createEmptyGrid,
   isTableEmpty,
 } from '@steincms/cms/blocks/table-block';
-import type { BlockData } from '@steincms/cms/blocks/editor-block';
-
-export type {
+import type {
   BlockData,
   GalleryBlockData,
   GalleryImageData,
@@ -27,6 +25,18 @@ export type {
   TableBlockData,
   TextBlockData,
 } from '@steincms/cms/blocks/editor-block';
+
+// `export type { X } from '...'` re-exports X for OTHER files but does not
+// bind X locally — this file uses these types itself below, so they need the
+// `import type` above too, not just the re-export.
+export type {
+  BlockData,
+  GalleryBlockData,
+  GalleryImageData,
+  ImageBlockData,
+  TableBlockData,
+  TextBlockData,
+};
 
 type UploadResult = {
   url: string;

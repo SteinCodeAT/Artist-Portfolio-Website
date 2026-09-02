@@ -1,0 +1,59 @@
+---
+// src/pages/ghostadmin/projects-manager/index.astro
+export const prerender = false;
+
+import AdminAreaLayout from '@steincms/admin/layouts/AdminAreaLayout.astro';
+import AdminPostList from '@steincms/admin/components/AdminPostList.astro';
+import AdminListCard from '@steincms/admin/components/AdminListCard.astro';
+import { cms } from '../../../cms';
+import { siteConfig } from '../../../site.config';
+import { adminNav, adminPaths, adminLayoutText } from '../../../admin-nav';
+
+const { postsStore } = cms;
+
+function yearSortKey(year: string | null | undefined): number {
+	if (!year) return 0;
+	if (/upcoming/i.test(year)) return 9999;
+	const years = year.match(/\d{4}/g);
+	return years ? Math.max(...years.map(Number)) : 0;
+}
+
+const posts = postsStore
+	? postsStore.loadPosts().sort((a, b) => yearSortKey(b.year) - yearSortKey(a.year))
+	: [];
+---
+
+<AdminAreaLayout
+	title={`Projects — ${siteConfig.admin.title}`}
+	activeSection="blog"
+	adminPath={siteConfig.admin.path}
+	adminTitle={siteConfig.admin.title}
+	siteName={siteConfig.name}
+	siteShortName={siteConfig.shortName}
+	adminLogoSrc={siteConfig.admin.logo}
+	navItems={adminNav}
+	{...adminLayoutText}
+>
+	<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+		<h1 style="margin:0;">Projects</h1>
+		<a class="btn-ghost btn-sm" href={`${adminPaths.base}/projects-manager/bearbeiten`}>
+			+ New Project
+		</a>
+	</div>
+
+	<AdminPostList itemLabel="project" searchPlaceholder="Search projects…">
+		{posts.map((post) => (
+			<AdminListCard
+				id={post.id}
+				title={post.title}
+				excerpt={post.description}
+				meta={`${post.status === 'published' ? 'Published' : 'Draft'} · ${post.year || 'no year set'}`}
+				coverSrc={post.mainImage || '/favicon.svg'}
+				editHref={`${adminPaths.base}/projects-manager/bearbeiten?id=${post.id}`}
+				viewHref={post.status === 'published' ? `/projects/${post.slug}` : undefined}
+				viewLabel="View"
+				editLabel="Edit"
+			/>
+		))}
+	</AdminPostList>
+</AdminAreaLayout>

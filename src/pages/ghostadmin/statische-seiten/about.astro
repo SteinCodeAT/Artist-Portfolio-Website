@@ -1,0 +1,34 @@
+---
+// src/pages/ghostadmin/statische-seiten/about.astro
+export const prerender = false;
+
+import AdminAreaLayout from '@steincms/admin/layouts/AdminAreaLayout.astro';
+import SchemaForm from '@steincms/admin/components/SchemaForm.astro';
+import { getCollectionRecord, getRecordFields } from '@steincms/cms/schema';
+import { readSingleton } from '@steincms/db/singletons-store';
+import { siteConfig } from '../../../site.config';
+import { contentSchema } from '../../../content.schema';
+import { cmsDatabase } from '../../../db/cms-database';
+import { adminNav, adminLayoutText } from '../../../admin-nav';
+
+const record = getCollectionRecord(contentSchema.about)!;
+const fields = getRecordFields(record);
+const values = readSingleton(cmsDatabase, 'about') ?? {};
+---
+
+<AdminAreaLayout
+	title={`About — ${siteConfig.admin.title}`}
+	activeSection="static-pages"
+	adminPath={siteConfig.admin.path}
+	adminTitle={siteConfig.admin.title}
+	siteName={siteConfig.name}
+	siteShortName={siteConfig.shortName}
+	adminLogoSrc={siteConfig.admin.logo}
+	navItems={adminNav}
+	{...adminLayoutText}
+>
+	<h1>About</h1>
+	<div data-schema-collection="about">
+		<SchemaForm fields={fields} values={values} submitLabel="Save" />
+	</div>
+</AdminAreaLayout>

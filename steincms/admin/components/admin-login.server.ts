@@ -29,6 +29,9 @@ export type AdminLoginPageProps = {
 	usernameLabel?: string;
 	passwordLabel?: string;
 	submitLabel?: string;
+	invalidCredentialsError?: string;
+	sessionExpiredError?: string;
+	tooManyAttemptsError?: string;
 };
 
 export type AdminLoginSiteConfig = {
@@ -90,10 +93,28 @@ function setSecurityHeaders(astro: AstroGlobal): void {
 	astro.response.headers.set('Referrer-Policy', 'no-referrer');
 }
 
+type AdminLoginLabelOverrides = Partial<
+	Pick<
+		AdminLoginPageProps,
+		| 'usernameLabel'
+		| 'passwordLabel'
+		| 'submitLabel'
+		| 'invalidCredentialsError'
+		| 'sessionExpiredError'
+		| 'tooManyAttemptsError'
+	>
+>;
+
 function buildViewProps(
 	siteConfig: AdminLoginSiteConfig,
 	logoSrc: string,
-	opts: { next: string; csrfToken: string; error?: string | null; subtitle?: string },
+	opts: {
+		next: string;
+		csrfToken: string;
+		error?: string | null;
+		subtitle?: string;
+		labels?: AdminLoginLabelOverrides;
+	},
 ): AdminLoginPageProps {
 	return {
 		lang: siteConfig.lang,
@@ -108,6 +129,7 @@ function buildViewProps(
 		csrfToken: opts.csrfToken,
 		csrfFieldName: LOGIN_CSRF_FIELD,
 		error: opts.error ?? null,
+		...opts.labels,
 	};
 }
 
@@ -122,9 +144,14 @@ function adminBaitFilled(data: FormData): boolean {
 
 export async function handleAdminLoginRoute(
 	astro: AstroGlobal,
-	opts: { siteConfig: AdminLoginSiteConfig; logoSrc: string; subtitle?: string },
+	opts: {
+		siteConfig: AdminLoginSiteConfig;
+		logoSrc: string;
+		subtitle?: string;
+		labels?: AdminLoginLabelOverrides;
+	},
 ): Promise<AdminLoginRouteResult> {
-	const { siteConfig, logoSrc, subtitle } = opts;
+	const { siteConfig, logoSrc, subtitle, labels } = opts;
 	const adminPath = siteConfig.admin.path;
 
 	let error: string | null = astro.url.searchParams.get('error');
@@ -168,6 +195,6 @@ export async function handleAdminLoginRoute(
 	const csrfToken = createLoginCsrfToken();
 	setSecurityHeaders(astro);
 	return {
-		view: buildViewProps(siteConfig, logoSrc, { next, csrfToken, error, subtitle }),
+		view: buildViewProps(siteConfig, logoSrc, { next, csrfToken, error, subtitle, labels }),
 	};
 }

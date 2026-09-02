@@ -3,161 +3,89 @@
  * After changes: npm run db:sync-schema && npm run db:generate && npm run db:migrate
  */
 import { z } from 'zod';
-import type { EventRecordBase } from '@steincms/cms/events/events-store';
 import {
 	contentBlockList,
-	dateField,
 	defineListCollection,
 	defineRecord,
 	defineSingleton,
 	enumField,
-	fieldGroup,
 	idField,
 	isoTimestampField,
 	mediaUrlField,
-	mediaUrlList,
-	numberField,
-	positiveNumberField,
-	previewDraftField,
-	registrationFormField,
 	slugField,
 	stringListField,
 	textField,
 	type ContentSchemaRegistry,
 } from '@steincms/cms/schema';
 
-const guanxiEventRecord = defineRecord({
+// ---- projects (reuses the posts collection type — see site.config.ts note) --
+//
+// Field set here is intentionally exactly what steincms/cms/posts/posts-store.ts
+// and posts-store.database.ts already read/write (id, slug, title, description,
+// mainImage, blocks, status, publishedAt, createdAt, updatedAt) — zero adapter
+// code needed for this to work end to end. Extra project-specific fields (year,
+// medium, hue, a video embed URL, display order) are a deliberate follow-up:
+// each one needs a matching line added in both of those hand-written files
+// (see steincms/DATABASE.md, "Day-to-day … If the new field must appear in
+// admin read/write").
+const projectRecord = defineRecord({
 	fields: {
 		id: idField(),
 		slug: slugField(),
-		title: textField({ required: true, label: 'Titel' }),
-		date: dateField({ nullable: true, label: 'Datum' }),
-		location: textField({ nullable: true, optional: true, label: 'Ort' }),
-		url: textField({ label: 'URL' }),
-		year: numberField({ nullable: true, label: 'Jahr' }),
-		category: textField({ label: 'Kategorie' }),
-		excerpt: textField({ label: 'Auszug', rows: 3 }),
-		cover: mediaUrlField({ nullable: true, label: 'Titelbild' }),
-		photoCount: numberField({ label: 'Fotos' }),
-		previewDraft: previewDraftField(),
+		title: textField({ required: true, label: 'Title' }),
+		// Short blurb — used as the Signal TV channel description, the
+		// subpage intro, and the SEO description meta tag.
+		description: textField({ required: true, rows: 3, label: 'Description' }),
+		mainImage: mediaUrlField({ nullable: true, label: 'Cover Image' }),
 		blocks: contentBlockList({
-			types: ['text', 'image', 'table'],
-			label: 'Artikelinhalt',
-			group: 'content',
-			optional: true,
-		}),
-		gallery: mediaUrlList({
-			label: 'Veranstaltungsbilder',
-			group: 'media',
-		}),
-		registrationForm: registrationFormField({
-			label: 'Anmeldung',
-			group: 'registration',
-		}),
-	},
-});
-
-const postRecord = defineRecord({
-	fields: {
-		id: idField(),
-		slug: slugField(),
-		title: textField({ required: true, label: 'Titel' }),
-		description: textField({ label: 'Beschreibung', rows: 3 }),
-		blocks: contentBlockList({
-			types: ['text', 'image', 'gallery', 'table'],
-			label: 'Artikelinhalt',
+			types: ['text', 'image', 'gallery'],
+			label: 'Body',
 			group: 'content',
 		}),
+		year: textField({ optional: true, label: 'Year' }),
 		status: enumField(['draft', 'published'], { label: 'Status' }),
-		publishedAt: isoTimestampField({ nullable: true, label: 'Veröffentlicht am' }),
-		createdAt: isoTimestampField({ label: 'Erstellt am' }),
-		updatedAt: isoTimestampField({ label: 'Aktualisiert am' }),
+		publishedAt: isoTimestampField({ nullable: true, label: 'Published At' }),
+		createdAt: isoTimestampField({ label: 'Created At' }),
+		updatedAt: isoTimestampField({ label: 'Updated At' }),
 	},
 });
 
-const membershipRecord = defineRecord({
+export type ProjectRecord = z.infer<typeof projectRecord.schema>;
+
+// ---- about (singleton) -------------------------------------------------------
+
+const aboutRecord = defineRecord({
 	fields: {
-		year: positiveNumberField({ int: true, label: 'Jahr' }),
-		fee: fieldGroup({
-			label: 'Beitrag',
-			fields: {
-				amount: positiveNumberField({ int: true, label: 'Betrag' }),
-				currency: textField({ label: 'Währung' }),
-			},
-		}),
-		iban: textField({ required: true, label: 'IBAN' }),
-		recipient: textField({ required: true, label: 'Empfänger' }),
-		benefits: stringListField({ minItems: 1, itemMin: 1, label: 'Vorteile' }),
-		hero: fieldGroup({
-			label: 'Hero',
-			fields: {
-				lead: textField({ required: true, label: 'Einleitung', rows: 3 }),
-			},
-		}),
-		invite: fieldGroup({
-			label: 'Einladung',
-			fields: {
-				text: textField({ required: true, label: 'Text', rows: 3 }),
-				aside: textField({ required: true, label: 'Hinweis', rows: 3 }),
-			},
-		}),
-		transfer: fieldGroup({
-			label: 'Überweisung',
-			fields: {
-				note: textField({ required: true, label: 'Hinweis', rows: 3 }),
-			},
-		}),
-		thanks: textField({ required: true, label: 'Danksagung', rows: 3 }),
+		bio: textField({ required: true, rows: 10, label: 'Bio' }),
+		photo: mediaUrlField({ nullable: true, label: 'Portrait Photo' }),
+		instagramUrl: textField({ optional: true, label: 'Instagram URL' }),
+		instagramHandle: textField({ optional: true, label: 'Instagram Handle' }),
+		email: textField({ optional: true, label: 'Contact Email' }),
+		// One exhibition per line: "Year | Title | Organization | Location | URL"
+		// (URL optional, trailing). Parsed in ArtistCV.astro. A plain textarea
+		// beats a real repeater field here — no new schema plumbing needed for v1.
+		exhibitions: stringListField({ label: 'Exhibitions (Year | Title | Organization | Location | URL)' }),
 	},
 });
 
-// Generate the types based on the content schema
-export type GuanxiEvent = EventRecordBase;
-export type PostRecord = z.infer<typeof postRecord.schema>;
-export type MembershipContent = z.infer<typeof membershipRecord.schema>;
-
-export const membershipSchema = membershipRecord.schema;
+export type AboutContent = z.infer<typeof aboutRecord.schema>;
 
 export const contentSchema = {
-	events: defineListCollection({
-		// One-time JSON→DB import source only (npm run db:import-json / cms:migrate / cms:status).
-		// The live app reads/writes SQLite, never this file.
-		jsonImportPath: 'src/content/events/event-data.local.json',
-		record: guanxiEventRecord,
-		media: 'events',
-		admin: {
-			editor: 'event',
-			routes: { list: 'beitraege-manager', calendar: 'veranstaltungen-manager' },
-		},
-	}),
+	// Registry key MUST stay "posts" — steincms/cms/posts/posts-store.database.ts
+	// hard-codes requireTable(database, 'posts') to find its SQLite table, so
+	// db:sync-schema has to generate a table literally named "posts". The
+	// admin.label below is what the artist actually sees ("Projects").
 	posts: defineListCollection({
-		jsonImportPath: 'src/content/posts/post-data.local.json',
-		record: postRecord,
-		media: 'posts',
-		admin: { editor: 'post-blocks' },
-	}),
-	membership: defineSingleton({
-		jsonImportPath: 'src/content/pages/membership.local.json',
-		record: membershipRecord,
+		record: projectRecord,
+		media: 'projects',
 		admin: {
-			editor: 'custom',
-			label: 'Mitgliedschaft',
-			route: 'statische-seiten/mitgliedschaft',
+			editor: 'post-blocks',
+			label: 'Projects',
+			route: 'projects-manager',
 		},
 	}),
-
-	/* Optional (TypeScript only, not required): when you add HomepageContent to content.schema.ts, you can widen the type: 
-	example:
-	homepage: defineSingleton({
-		jsonImportPath: 'src/content/pages/homepage.local.json',
-		record: homepageRecord,
-		admin: {
-			editor: 'custom',
-			label: 'Startseite',
-			route: 'statische-seiten/startseite',
-		},
+	about: defineSingleton({
+		record: aboutRecord,
+		admin: { editor: 'custom', label: 'About', route: 'statische-seiten/about' },
 	}),
-	*/
 } satisfies ContentSchemaRegistry;
-
-export const membershipCollection = contentSchema.membership;

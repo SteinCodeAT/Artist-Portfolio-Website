@@ -44,7 +44,10 @@ export function blockArraySchema(types: ContentBlockType[]): z.ZodTypeAny {
 		return z.array(schemas[0]);
 	}
 
-	return z.array(
-		z.discriminatedUnion('type', schemas as [z.ZodTypeAny, z.ZodTypeAny, ...z.ZodTypeAny[]]),
-	);
+	// `schemas` is provably >=2 members with a literal `type` discriminator at
+	// runtime (that's the whole point of BLOCK_SCHEMA_BY_TYPE), but the zod
+	// version installed here types discriminatedUnion's tuple parameter with
+	// an internal branded type TS can't reconstruct through a plain array —
+	// `any` here doesn't change any runtime behavior, only silences that gap.
+	return z.array(z.discriminatedUnion('type', schemas as any));
 }

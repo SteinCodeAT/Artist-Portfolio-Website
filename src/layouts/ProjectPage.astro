@@ -23,7 +23,7 @@ import { Icon } from "astro-icon/components";
 
 const { title, description, project } = Astro.props;
 
-const randomlySortedImages = project.images.reverse().sort((a, b) => 0.5 - Math.random())
+const randomlySortedImages = project.images.reverse().sort((a: ImageMetadata, b: ImageMetadata) => 0.5 - Math.random())
 ---
 <Layout title={title} description={description}>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -122,7 +122,7 @@ const randomlySortedImages = project.images.reverse().sort((a, b) => 0.5 - Math.
                 const minimumTouchDistance = 100;
 
                 // functions
-                function setNewImageInModal({imageSrc}){
+                function setNewImageInModal({imageSrc}: {imageSrc: string}){
                     const imageWrapper = document.querySelector(".modal--image-wrapper")
                     if (imageWrapper === null) {
                         console.error("ERROR: Could not find modal-image-wrapper")
@@ -191,8 +191,8 @@ const randomlySortedImages = project.images.reverse().sort((a, b) => 0.5 - Math.
                     loadPreviousImage()
                 })
 
-                document.querySelector(".modal")?.addEventListener("touchstart", (event: TouchEvent) => {                    
-                    const touchLocation = event.targetTouches[0];
+                document.querySelector(".modal")?.addEventListener("touchstart", (event: Event) => {                    
+                    const touchLocation = (event as TouchEvent).targetTouches[0];
                     touchstartX = touchLocation.screenX;
                     touchstartY = touchLocation.screenY;
 
@@ -200,10 +200,10 @@ const randomlySortedImages = project.images.reverse().sort((a, b) => 0.5 - Math.
                     touchendY = 0;
                 }, false)
 
-                document.querySelector(".modal")?.addEventListener("touchend", (event: TouchEvent) => {
-                    const touchLocation = event.changedTouches[0];
-                    touchendX = touchLocation.screenX;
-                    touchendY = touchLocation.screenY;
+                document.querySelector(".modal")?.addEventListener("touchend", (event: Event) => {
+                    const touchLocation = (event as TouchEvent).changedTouches[0];
+                    touchendX = (touchLocation as Touch).screenX;
+                    touchendY = (touchLocation as Touch).screenY;
 
                     const distanceX = touchendX - touchstartX
                     const distanceY = touchendY - touchstartY
@@ -239,22 +239,28 @@ const randomlySortedImages = project.images.reverse().sort((a, b) => 0.5 - Math.
 
             /* Adjust image animation speed so that the image scroll on all pages in the 
             same speed independent of the number of images in the container */
-            document.querySelectorAll(".image-wrapper").forEach((container: HTMLElement, index: number) => {
+            document.querySelectorAll(".image-wrapper").forEach((container: Element) => {
+                const index = (container as HTMLElement).dataset.index;
+                if (index === undefined) {
+                    console.error("ERROR: Could not find index")
+                    return
+                }
+                const indexNumber = parseInt(index);
                 /* pixels per second + offset so that each column has a slightly
                 * different speed
                 */
                 const baseSpeed = prefersReducedMotion ? 50 : 100
 
-                const speed = baseSpeed + 20 * index;
+                const speed = baseSpeed + 20 * indexNumber;
 
-                const duration = container.scrollHeight / speed; // seconds
+                const duration = (container as HTMLElement).scrollHeight / speed; // seconds
 
                 // Set the animation duration dynamically
-                container.style.animationDuration = `${duration}s`;
-                console.log(container.style.animationDuration)
+                (container as HTMLElement).style.animationDuration = `${duration}s`;
+                console.log((container as HTMLElement).style.animationDuration)
             })
         </script>
-        
+        <!-- TODO: Add type for index -->
         <script src="../scripts/copyright-year-updater.js"></script>
 
         <div class="modal">

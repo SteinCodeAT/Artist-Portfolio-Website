@@ -15,6 +15,12 @@ interface Props {
   adminLogoSrc: string;
   navItems: AdminNavItem[];
   wideContent?: boolean;
+  lang?: string;
+  settingsLabel?: string;
+  logoutLabel?: string;
+  loggedInAsLabel?: string;
+  navAriaLabel?: string;
+  mainAriaLabel?: string;
 }
 const {
   title = 'Termine Manager',
@@ -26,6 +32,12 @@ const {
   adminLogoSrc,
   navItems,
   wideContent = false,
+  lang = 'de',
+  settingsLabel = 'Einstellungen',
+  logoutLabel = 'Abmelden',
+  loggedInAsLabel = 'Angemeldet als',
+  navAriaLabel = 'Planner Navigation',
+  mainAriaLabel = 'Planner Main Content',
 } = Astro.props;
 const username = getAuthenticatedUsername(Astro.request);
 
@@ -54,7 +66,7 @@ Example:
 ---
 
 <!doctype html>
-<html lang="de">
+<html lang={lang}>
     <head>
         <meta charset="UTF-8" />
         <meta name="robots" content="noindex, nofollow" />
@@ -504,7 +516,7 @@ Example:
     </head>
     <body>
         <div class="planner-app">
-            <aside class="planner-sidebar" aria-label="Planner Navigation">
+            <aside class="planner-sidebar" aria-label={navAriaLabel}>
                 <div class="sidebar-top">
                     <a href={adminPath} class="sidebar-logo" title="Dashboard" aria-label="Dashboard">
                         <img src={adminLogoSrc} alt="Logo" class="sidebar-logo-img" />
@@ -520,11 +532,11 @@ Example:
                     <button
                         type="button"
                         class="sidebar-btn"
-                        title="Einstellungen"
+                        title={settingsLabel}
                         disabled
                     >
                         <AdminIcon name="settings" class="sidebar-icon" />
-                        <span class="sidebar-label">Einstellungen</span>
+                        <span class="sidebar-label">{settingsLabel}</span>
                     </button>
                     </nav>
                 </div>
@@ -534,18 +546,18 @@ Example:
                         <button
                             type="submit"
                             class="sidebar-btn"
-                            title="Abmelden"
-                            aria-label="Abmelden"
+                            title={logoutLabel}
+                            aria-label={logoutLabel}
                         >
                             <AdminIcon name="logout" class="sidebar-icon" />
-                            <span class="sidebar-label">Abmelden</span>
+                            <span class="sidebar-label">{logoutLabel}</span>
                         </button>
                     </form>
                     <div class="sidebar-footer">{siteShortName}</div>
                 </div>
             </aside>
 
-            <main class="planner-main" aria-label="Planner Main Content">
+            <main class="planner-main" aria-label={mainAriaLabel}>
                 {username && (
                     <div class="planner-topbar">
                         <div class="planner-user-menu" data-user-menu>
@@ -558,7 +570,7 @@ Example:
                                 data-user-menu-trigger
                             >
                                 <span class="planner-user-dot" aria-hidden="true"></span>
-                                <span>Angemeldet als</span>
+                                <span>{loggedInAsLabel}</span>
                                 <span class="planner-user-name">{username}</span>
                                 <AdminIcon name="chevronDown" class="planner-user-chevron" />
                             </button>
@@ -570,7 +582,7 @@ Example:
                             >
                                 <form action="/api/logout" method="POST" class="planner-user-logout-form">
                                     <button type="submit" class="planner-user-logout-btn" role="menuitem">
-                                        Abmelden
+                                        {logoutLabel}
                                         <AdminIcon name="logout" class="planner-user-logout-icon" />
                                     </button>
                                 </form>
@@ -583,14 +595,14 @@ Example:
                 </div>
             </main>
 
-            <nav class="planner-mobile-nav" aria-label="Planner Navigation">
+            <nav class="planner-mobile-nav" aria-label={navAriaLabel}>
                 {navItems.map((item) => (
                     <AdminNavLink item={item} activeSection={activeSection} variant="mobile" />
                 ))}
 
-                <button type="button" class="mobile-nav-tab" title="Einstellungen" disabled>
+                <button type="button" class="mobile-nav-tab" title={settingsLabel} disabled>
                     <AdminIcon name="settings" class="mobile-nav-icon" />
-                    Einstellungen
+                    {settingsLabel}
                 </button>
 
             </nav>

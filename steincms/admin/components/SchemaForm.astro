@@ -7,9 +7,10 @@ interface Props {
 	fields: FieldDef[];
 	values: Record<string, unknown>;
 	formId?: string;
+	submitLabel?: string;
 }
 
-const { fields, values, formId = 'schema-form' } = Astro.props;
+const { fields, values, formId = 'schema-form', submitLabel = 'Speichern' } = Astro.props;
 
 const visibleFields = fields.filter(
 	(field) => field.admin.visible !== false && !isContentBlockListField(field),
@@ -23,7 +24,7 @@ const visibleFields = fields.filter(
 		))
 	}
 	<div class="schema-form-actions">
-		<button type="submit" class="btn-primary">Speichern</button>
+		<button type="submit" class="btn-primary">{submitLabel}</button>
 		<span class="schema-form-status" aria-live="polite"></span>
 	</div>
 </form>
