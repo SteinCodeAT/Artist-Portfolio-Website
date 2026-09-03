@@ -1,0 +1,33 @@
+[Unit]
+Description=Cagdas Cecen website
+After=network.target
+
+[Service]
+Type=simple
+User=cagdascecen
+WorkingDirectory=/home/cagdascecen/app
+EnvironmentFile=/home/cagdascecen/app/.env
+ExecStart=/home/cagdascecen/app/bin/start_server.sh
+StandardOutput=append:/home/cagdascecen/logs/cagdascecen_app.std.log
+StandardError=append:/home/cagdascecen/logs/cagdascecen_app.error.log
+
+Restart=on-failure
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/cagdascecen/app/src/content/events
+ReadWritePaths=/home/cagdascecen/app/src/content/posts
+ReadWritePaths=/home/cagdascecen/app/src/content/pages
+ReadWritePaths=/home/cagdascecen/app/data/
+ReadWritePaths=/var/www/cagdascecen.com/media/
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+# AF_NETLINK is required for Node.js os.networkInterfaces() at startup.
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+RestrictNamespaces=true
+
+[Install]
+WantedBy=multi-user.target

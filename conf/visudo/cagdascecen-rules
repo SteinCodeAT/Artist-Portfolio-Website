@@ -1,0 +1,5 @@
+cagdascecen ALL=NOPASSWD: /usr/bin/systemctl stop cagdascecen_app.service
+cagdascecen ALL=NOPASSWD: /usr/bin/systemctl start cagdascecen_app.service
+cagdascecen ALL=NOPASSWD: /usr/bin/systemctl restart cagdascecen_app.service
+cagdascecen ALL=NOPASSWD: /usr/bin/systemctl is-active cagdascecen_app.service
+cagdascecen ALL=NOPASSWD: /usr/bin/systemctl status cagdascecen_app.service
