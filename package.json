@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",
+    "@astrojs/node": "^11.1.5",
     "@astrojs/sitemap": "^3.7.3",
     "@iconify-json/mdi": "^1.1.64",
     "@libsql/client": "^0.17.4",

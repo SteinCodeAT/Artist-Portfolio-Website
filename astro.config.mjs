@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
+import node from '@astrojs/node';
 import icon from "astro-icon";
 import sitemap from '@astrojs/sitemap'
 import compressor from "astro-compressor";
@@ -12,6 +13,7 @@ import { contentSchema } from './src/content.schema';
 export default defineConfig({
   site: 'https://cagdascecen.com',
   base: '',
+  adapter: node({ mode: 'standalone' }),
   integrations: [
     sitemap(),
     icon(),
