@@ -30,6 +30,10 @@ export default defineConfig({
     // dev/build signal instead: Astro sets it to 'production' for
     // build/preview and leaves it as 'development' for `astro dev`.
     checkOrigin: process.env.NODE_ENV === 'production',
+    // Required for checkOrigin behind nginx TLS termination. Without this,
+    // Astro ignores X-Forwarded-Proto and sees http://www… while the
+    // browser Origin is https://www… — which 403s the login POST.
+    allowedDomains: [{ hostname: 'www.cagdascecen.com', protocol: 'https' }],
   },
   vite: {
     resolve: {
