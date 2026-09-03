@@ -6,7 +6,7 @@ export const siteConfig: SiteConfig = {
 	tagline: 'Media Artist — Vienna',
 	description:
 		'Media Art focusing on the relationship between human movement, space and uncertainty and developing new ways of interaction between humans and spaces.',
-	baseUrl: 'https://cagdascecen.com',
+	baseUrl: 'https://www.cagdascecen.com',
 	lang: 'en',
 
 	organization: {
