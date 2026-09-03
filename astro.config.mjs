@@ -11,7 +11,7 @@ import { contentSchema } from './src/content.schema';
 
 // astro.config.mjs
 export default defineConfig({
-  site: 'https://cagdascecen.com',
+  site: 'https://www.cagdascecen.com',
   base: '',
   adapter: node({ mode: 'standalone' }),
   integrations: [
