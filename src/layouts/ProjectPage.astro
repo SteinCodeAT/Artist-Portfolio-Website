@@ -1,8 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro"
 
-import { Image } from 'astro:assets';
-
 import {videoTypes} from '../const.js'
 
 import EmbeddedMp4Gif from '../components/media/Mp4Gif.astro'
@@ -23,7 +21,9 @@ import { Icon } from "astro-icon/components";
 
 const { title, description, project } = Astro.props;
 
-const randomlySortedImages = project.images.reverse().sort((a: ImageMetadata, b: ImageMetadata) => 0.5 - Math.random())
+// project.images are plain URL strings (CMS-uploaded, already web-sized) —
+// not astro:assets ImageMetadata, so this renders as plain <img>, not <Image>.
+const randomlySortedImages = project.images.slice().reverse().sort(() => 0.5 - Math.random())
 ---
 <Layout title={title} description={description}>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -85,21 +85,21 @@ const randomlySortedImages = project.images.reverse().sort((a: ImageMetadata, b:
             
                 <div class="image-container">
                     <div class="image-wrapper columns-1">
-                        {project.images.map((image: ImageMetadata) =>
-                            <Image src={image} alt={`Project Image`} class="project-image" />
+                        {project.images.map((image: string) =>
+                            <img src={image} alt={`Project Image`} class="project-image" />
                         )}
-                        {project.images.map((image: ImageMetadata) =>
-                            <Image src={image} alt={`Project Image`} class="project-image duplicate" />
+                        {project.images.map((image: string) =>
+                            <img src={image} alt={`Project Image`} class="project-image duplicate" />
                         )}
-                    </div>  
-                    
+                    </div>
+
                     <div class="image-wrapper columns-2">
                         <!-- Check if there are videos -->
-                        {randomlySortedImages.slice(0).reverse().map((image: ImageMetadata) =>
-                            <Image src={image} alt={`Project Image`} class="project-image duplicate" />
+                        {randomlySortedImages.slice(0).reverse().map((image: string) =>
+                            <img src={image} alt={`Project Image`} class="project-image duplicate" />
                         )}
-                        {randomlySortedImages.slice(0).reverse().map((image: ImageMetadata) =>
-                            <Image src={image} alt={`Project Image`} class="project-image duplicate" />
+                        {randomlySortedImages.slice(0).reverse().map((image: string) =>
+                            <img src={image} alt={`Project Image`} class="project-image duplicate" />
                         )}
                     </div>
 

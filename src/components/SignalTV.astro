@@ -4,7 +4,58 @@
 // the CSS's position:fixed overlays became position:absolute inside
 // .banner-section (100vh) here, since this now lives inside a normal
 // scrollable page instead of owning the whole viewport.
+//
+// The channel list is generated here (build time — this page is static) from
+// whatever's published in the CMS, instead of a hardcoded array. hue/synth
+// params for the original 10 projects are the exact hand-tuned values from
+// before this was CMS-driven; any project added later through the CMS gets
+// a deterministic hue (hashed from its slug) and one shared ambient synth
+// preset — those two are intentionally not CMS fields (see content.schema.ts).
+// Each channel's background is whatever "Cover Image" is set on that project
+// in the admin — changing it there changes the hero background too.
 import '../styles/signal-tv.css';
+import { cms } from '../cms';
+
+const LEGACY_CHANNEL_STYLE: Record<string, { hue: number; synth?: Record<string, number | string> }> = {
+	ghostbox: { hue: 0 },
+	'cellular-fidelity': { hue: 150, synth: { mode: 'drone', oscType: 'sine', baseFreq: 170, lfoRate: 0.28, lfoDepth: 45, filterFreq: 850, noiseAmount: 0.05, noiseFilterFreq: 2200, level: 0.05 } },
+	'quantum-synesthesia': { hue: 262, synth: { mode: 'drone', oscType: 'sine', baseFreq: 640, lfoRate: 0.14, lfoDepth: 30, filterFreq: 3200, noiseAmount: 0.02, noiseFilterFreq: 4000, level: 0.04 } },
+	'virtual-isolation': { hue: 205, synth: { mode: 'pulse', oscType: 'sine', baseFreq: 220, freqJitter: 0, dur: 0.35, interval: 1400 } },
+	moneyment: { hue: 88, synth: { mode: 'pulse', oscType: 'square', baseFreq: 1200, freqJitter: 400, dur: 0.08, interval: 420 } },
+	limbo: { hue: 322, synth: { mode: 'drone', oscType: 'sawtooth', baseFreq: 55, lfoRate: 0.07, lfoDepth: 12, filterFreq: 260, noiseAmount: 0.035, noiseFilterFreq: 400, level: 0.045 } },
+	'5.5': { hue: 218, synth: { mode: 'drone', oscType: 'sawtooth', baseFreq: 120, lfoRate: 6.5, lfoDepth: 4, filterFreq: 650, noiseAmount: 0.025, noiseFilterFreq: 1200, level: 0.04 } },
+	'behind-the-box': { hue: 28, synth: { mode: 'drone', oscType: 'square', baseFreq: 210, lfoRate: 0.05, lfoDepth: 2, filterFreq: 480, noiseAmount: 0.015, noiseFilterFreq: 800, level: 0.035 } },
+	'two-faces': { hue: 284, synth: { mode: 'drone', oscType: 'sine', baseFreq: 130, lfoRate: 0.09, lfoDepth: 6, filterFreq: 620, noiseAmount: 0.05, noiseFilterFreq: 500, level: 0.045 } },
+	lumiscape: { hue: 58, synth: { mode: 'pulse', oscType: 'sine', baseFreq: 900, freqJitter: 500, dur: 0.6, interval: 1100 } },
+};
+
+const DEFAULT_SYNTH = { mode: 'drone', oscType: 'sine', baseFreq: 300, lfoRate: 0.15, lfoDepth: 20, filterFreq: 1200, noiseAmount: 0.03, noiseFilterFreq: 2000, level: 0.04 };
+
+function hueFromSlug(slug: string): number {
+	let h = 0;
+	for (let i = 0; i < slug.length; i++) h = (h * 31 + slug.charCodeAt(i)) >>> 0;
+	return h % 360;
+}
+
+const publishedProjects = cms.postsStore
+	? cms.postsStore.loadPublishedPosts()
+	: [];
+
+const projects = publishedProjects.map((post, i) => {
+	const legacy = LEGACY_CHANNEL_STYLE[post.slug];
+	return {
+		num: String(i + 1).padStart(2, '0'),
+		title: post.title,
+		slug: post.slug,
+		year: post.year ?? '',
+		desc: post.description,
+		hue: legacy?.hue ?? hueFromSlug(post.slug),
+		bg: post.mainImage || null,
+		hasAudio: true,
+		native: post.slug === 'ghostbox',
+		...(post.slug === 'ghostbox' ? {} : { synth: legacy?.synth ?? DEFAULT_SYNTH }),
+	};
+});
 ---
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -80,7 +131,7 @@ import '../styles/signal-tv.css';
     <div class="stats-panel">
       <div class="stats-title"><span>Active Log</span><span class="dot"></span></div>
       <canvas id="scope" width="200" height="40"></canvas>
-      <div class="stat"><span class="stat-label">Channel</span><span class="stat-value" id="statChannel">01 / 10</span></div>
+      <div class="stat"><span class="stat-label">Channel</span><span class="stat-value" id="statChannel">01 / {projects.length}</span></div>
       <div class="stat"><span class="stat-label">Signal</span><span class="stat-value" id="statSignal">98%</span></div>
       <div class="stat"><span class="stat-label">Freq</span><span class="stat-value" id="statFreq">— Hz</span></div>
       <div class="stat"><span class="stat-label">Coherence</span><span class="stat-value" id="statCoherence">0.71 φ</span></div>
@@ -97,4 +148,5 @@ import '../styles/signal-tv.css';
 
 <audio id="audioEl" loop preload="auto"></audio>
 
+<script type="application/json" id="projectsData" is:inline set:html={JSON.stringify(projects)} />
 <script src="../scripts/signal-tv.js"></script>

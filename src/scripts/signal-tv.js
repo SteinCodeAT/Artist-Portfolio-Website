@@ -6,30 +6,14 @@
 // format } object rather than a plain URL string — so every image import
 // here needs its .src pulled out. The .mp3 import is unaffected (audio isn't
 // an extension Astro's image integration claims) and is already a string.
+// Per-project background images used to be individual imports here — they're
+// CMS-driven now (SignalTV.astro embeds the whole channel list, background
+// URLs included, as JSON — see #projectsData below), so only the shared tree
+// artwork and the one real audio file (Ghostbox) stay as build-time imports.
 import treeMeta from '../img/Tree.png';
 import ghostboxAudioUrl from '../audio/ghostbox-audio.mp3';
-import ghostboxImgMeta from '../img/ghostbox/ghostbox2.png';
-import cellularImgMeta from '../img/cellular-fidelity/cellular10.jpg';
-import quantumImgMeta from '../img/quantum-synesthesisia/quantum-synesthesisia-3.jpeg';
-import virtualImgMeta from '../img/virtual-isolation/virtual1.png';
-import moneymentImgMeta from '../img/moneyment/moneyment.png';
-import limboImgMeta from '../img/limbo/limbo2.jpg';
-import fiveFiveImgMeta from '../img/5.5/5_1.png';
-import behindBoxImgMeta from '../img/behind-the-box/behind_the_box.png';
-import twoFacesImgMeta from '../img/two-faces/two-faces8.jpg';
-import lumiscapeImgMeta from '../img/lumiscape/lumiscape-2.jpg';
 
 var treeUrl = treeMeta.src;
-var ghostboxImgUrl = ghostboxImgMeta.src;
-var cellularImgUrl = cellularImgMeta.src;
-var quantumImgUrl = quantumImgMeta.src;
-var virtualImgUrl = virtualImgMeta.src;
-var moneymentImgUrl = moneymentImgMeta.src;
-var limboImgUrl = limboImgMeta.src;
-var fiveFiveImgUrl = fiveFiveImgMeta.src;
-var behindBoxImgUrl = behindBoxImgMeta.src;
-var twoFacesImgUrl = twoFacesImgMeta.src;
-var lumiscapeImgUrl = lumiscapeImgMeta.src;
 
 var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var tv = document.getElementById('tv');
@@ -139,48 +123,11 @@ var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     glitchRandomLetters();
   })();
 
-  // ---- project data (real projects, recolored tree per channel) ----
-  var projects = [
-    { num: '01', title: 'Ghostbox', slug: 'ghostbox', year: '2020 – 2021', medium: 'Interactive Sound Installation', hue: 0, native: true,
-      desc: 'A dark space filled with ten constantly-powered, audio-modulated laser modules — physically identical, but each carrying different audio. Visitors wearing light-sensitive devices on both wrists make the lasers audible through their own movement, investigating the Observer Effect until the synthesized nature of the space reveals itself.',
-      hasAudio: true, bg: ghostboxImgUrl },
-    { num: '02', title: 'The Cellular Fidelity', slug: 'cellular-fidelity', year: '2022', medium: 'Interactive Sound Installation', hue: 150,
-      desc: 'A three-dimensional aquarium that breaks its own boundaries with light and sound. Audio is encoded into lasers projected through microscopic aquatic environments — field recordings from 30 groups of marine microbes bending, humming, and distorting with a visitor’s movement.',
-      bg: cellularImgUrl,
-      synth: { mode: 'drone', oscType: 'sine', baseFreq: 170, lfoRate: 0.28, lfoDepth: 45, filterFreq: 850, noiseAmount: 0.05, noiseFilterFreq: 2200, level: 0.05 } },
-    { num: '03', title: 'Quantum Synesthesia', slug: 'quantum-synesthesia', year: 'Upcoming', medium: 'Interactive Installation', hue: 262,
-      desc: 'Explores the hypothetical concept of quantum synesthesia, where individuals experience a merging of senses tied to quantum phenomena. Beyond scientific exploration, it stands as a metaphor: the unseen forces shaping the universe, expressed as a symphony through an interactive experience.',
-      bg: quantumImgUrl,
-      synth: { mode: 'drone', oscType: 'sine', baseFreq: 640, lfoRate: 0.14, lfoDepth: 30, filterFreq: 3200, noiseAmount: 0.02, noiseFilterFreq: 4000, level: 0.04 } },
-    { num: '04', title: 'Virtual Isolation', slug: 'virtual-isolation', year: '2020', medium: 'Wearable Device, Interactive Installation', hue: 205,
-      desc: 'A wearable interactive object with a display demonstrating real-time vital readings and memories. As society tries to renegotiate survival and social interaction, it asks: is surviving alone enough to stay human, when human memory depends so heavily on others?',
-      bg: virtualImgUrl,
-      synth: { mode: 'pulse', oscType: 'sine', baseFreq: 220, freqJitter: 0, dur: 0.35, interval: 1400 } },
-    { num: '05', title: 'Moneyment', slug: 'moneyment', year: '2018', medium: 'Mixed-Media Installation (Video and Object)', hue: 88,
-      desc: 'Money needs people, and people need money — an almost perfect circle. Every human action finds its place in the value chain, and every move is profitable. Dedicated to all those who do not play this game.',
-      bg: moneymentImgUrl,
-      synth: { mode: 'pulse', oscType: 'square', baseFreq: 1200, freqJitter: 400, dur: 0.08, interval: 420 } },
-    { num: '06', title: 'Limbo', slug: 'limbo', year: '2016 – 2018', medium: 'Reactive Video Installation', hue: 322,
-      desc: 'Replaces a space close to the stairs between two floors with a reactive interface. When the observer watches the screen, it triggers a private story — decided by their own appearance — trapped in time and space.',
-      bg: limboImgUrl,
-      synth: { mode: 'drone', oscType: 'sawtooth', baseFreq: 55, lfoRate: 0.07, lfoDepth: 12, filterFreq: 260, noiseAmount: 0.035, noiseFilterFreq: 400, level: 0.045 } },
-    { num: '07', title: '5.5', slug: '5.5', year: '2019', medium: 'Interactive Sound Installation', hue: 218,
-      desc: 'Transforms artificial light into sound. Wearing headset and headphones, visitors hear a mixture of electromagnetic disturbances caused by the artificial light sources in the room — follow the white noise, let your ears guide you.',
-      bg: fiveFiveImgUrl,
-      synth: { mode: 'drone', oscType: 'sawtooth', baseFreq: 120, lfoRate: 6.5, lfoDepth: 4, filterFreq: 650, noiseAmount: 0.025, noiseFilterFreq: 1200, level: 0.04 } },
-    { num: '08', title: 'Behind the Box', slug: 'behind-the-box', year: '2020', medium: 'Interactive Mixed-Media Installation', hue: 28,
-      desc: 'A cubic object with a translucent LCD panel and multichannel mapped audio, transmitting sound through audio-mapped LED arrays. Moving the apparatus changes what you hear — recordings from a war zone, a suicide vlogger, a makeup tutorial — an amplifier that alters nothing.',
-      bg: behindBoxImgUrl,
-      synth: { mode: 'drone', oscType: 'square', baseFreq: 210, lfoRate: 0.05, lfoDepth: 2, filterFreq: 480, noiseAmount: 0.015, noiseFilterFreq: 800, level: 0.035 } },
-    { num: '09', title: 'Two Faces', slug: 'two-faces', year: '2023', medium: 'Video Installation', hue: 284,
-      desc: 'Once the largest bakery in Europe, now leaving Vienna after 130 years. A daughter tries to decipher her secretive mother; a son struggles with the ghost of his father. What remains behind, and what has been completely forgotten?',
-      bg: twoFacesImgUrl,
-      synth: { mode: 'drone', oscType: 'sine', baseFreq: 130, lfoRate: 0.09, lfoDepth: 6, filterFreq: 620, noiseAmount: 0.05, noiseFilterFreq: 500, level: 0.045 } },
-    { num: '10', title: 'Lumiscape', slug: 'lumiscape', year: 'Upcoming', medium: 'Interactive Installation', hue: 58,
-      desc: 'Builds on prior work with Li-Fi technology and a fascination with quantum physics to investigate the complex, often veiled relationship between humans and nature.',
-      bg: lumiscapeImgUrl,
-      synth: { mode: 'pulse', oscType: 'sine', baseFreq: 900, freqJitter: 500, dur: 0.6, interval: 1100 } }
-  ];
+  // ---- project data — read from the JSON SignalTV.astro embedded, computed
+  // server-side (build time) from the CMS's published projects. See that
+  // file for how hue/synth/bg are derived per project. ----
+  var projectsDataEl = document.getElementById('projectsData');
+  var projects = projectsDataEl ? JSON.parse(projectsDataEl.textContent) : [];
 
   var activeIndex = 0;
   var listEl = document.getElementById('projectList');
@@ -238,7 +185,7 @@ var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   function renderDesc(p) {
     descTitle.textContent = p.title;
-    descMeta.textContent = p.year + ' | ' + p.medium;
+    descMeta.textContent = p.year;
     descBody.textContent = p.desc;
     seeMore.href = '/projects/' + p.slug;
   }

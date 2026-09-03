@@ -1,0 +1,49 @@
+---
+// One dynamic route for every project, replacing the old one-static-file-
+// per-project pages — content now comes entirely from the CMS `posts`
+// collection, so there's a single source of truth for both this page and
+// the admin editor. Static (no prerender=false): generates one HTML file
+// per published project at build time via getStaticPaths, same as the old
+// hand-written files did, just generated instead of duplicated by hand.
+import ProjectPage from '../../layouts/ProjectPage.astro';
+import { cms } from '../../cms';
+import type { ContentBlock } from '../../../steincms/cms/posts/posts-store';
+
+export async function getStaticPaths() {
+	const publishedPosts = cms.postsStore ? cms.postsStore.loadPublishedPosts() : [];
+	return publishedPosts.map((post) => ({
+		params: { slug: post.slug },
+		props: { post },
+	}));
+}
+
+const { post } = Astro.props;
+
+const blocks = post.blocks as ContentBlock[];
+const textBlocks = blocks.filter((b): b is Extract<ContentBlock, { type: 'text' }> => b.type === 'text');
+const galleryImages = blocks.flatMap((b) => {
+	if (b.type === 'gallery') return b.images.map((img) => img.url);
+	if (b.type === 'image') return b.url ? [b.url] : [];
+	return [];
+});
+
+const project = {
+	title: post.title,
+	// No separate "medium/type" field in the CMS — the meta line (medium,
+	// venue, awards) lives as the first text block instead, shown via the
+	// body below rather than duplicated here.
+	type: post.year ?? '',
+	artist: 'Çağdaş Çeçen',
+	verticaltext: post.title,
+	// Videos + external links are both folded into the body's text blocks
+	// (a "Links" section) rather than separate structured fields — see
+	// content.schema.ts for why.
+	videos: [],
+	images: galleryImages,
+	links: [],
+};
+---
+
+<ProjectPage title={`Çağdaş Çeçen - ${post.title}`} description={post.description} project={project}>
+	{textBlocks.map((block) => <Fragment set:html={block.html} />)}
+</ProjectPage>
