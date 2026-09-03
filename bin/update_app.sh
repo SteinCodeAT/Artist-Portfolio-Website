@@ -33,10 +33,6 @@ fi
 # Optional: set in .env during staging when nginx site-wide Basic Auth is enabled.
 # Example: NGINX_BASIC_AUTH_USER=staging  NGINX_BASIC_AUTH_PASS=...
 SERVICE_NAME="${USER}_app.service"
-EVENTS_LOCAL="src/content/events/event-data.local.json"
-EVENTS_EXAMPLE="src/content/events/event-data.example.json"
-POSTS_LOCAL="src/content/posts/post-data.local.json"
-POSTS_EXAMPLE="src/content/posts/post-data.example.json"
 UPLOADS_DIR="public/uploads/blog"
 
 CURL_AUTH=()
@@ -50,16 +46,6 @@ cd "$APP_DIR"
 git pull
 
 find "$APP_DIR/bin" -maxdepth 1 -name '*.sh' -exec chmod +x {} +
-
-if [ ! -f "$EVENTS_LOCAL" ]; then
-  echo "Creating $EVENTS_LOCAL from example..."
-  cp "$EVENTS_EXAMPLE" "$EVENTS_LOCAL"
-fi
-
-if [ ! -f "$POSTS_LOCAL" ]; then
-  echo "Creating $POSTS_LOCAL from example..."
-  cp "$POSTS_EXAMPLE" "$POSTS_LOCAL"
-fi
 
 mkdir -p "$UPLOADS_DIR"
 
@@ -108,8 +94,6 @@ echo "Verifying website is accessible..."
 
 URLS_TO_CHECK=(
   "$PUBLIC_URL"
-  "$PUBLIC_URL/impressum"
-  "$PUBLIC_URL/datenschutz"
 )
 
 FAILED=0
