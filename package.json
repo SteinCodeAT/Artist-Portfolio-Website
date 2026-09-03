@@ -53,16 +53,16 @@
     "sharp": "^0.35.4",
     "typescript": "^5.3.3",
     "xlsx": "^0.18.5",
-    "zod": "^4.5.4"
-  },
-  "devDependencies": {
+    "zod": "^4.5.4",
     "@types/js-yaml": "^4.0.9",
     "astro-icon": "^1.2.0",
     "drizzle-kit": "^0.31.10",
+    "tsx": "^4.23.13"
+  },
+  "devDependencies": {
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
-    "prettier-plugin-astro": "^0.13.0",
-    "tsx": "^4.23.13"
+    "prettier-plugin-astro": "^0.13.0"
   }
 }
