@@ -2,23 +2,28 @@
 // One dynamic route for every project, replacing the old one-static-file-
 // per-project pages — content now comes entirely from the CMS `posts`
 // collection, so there's a single source of truth for both this page and
-// the admin editor. Static (no prerender=false): generates one HTML file
-// per published project at build time via getStaticPaths, same as the old
-// hand-written files did, just generated instead of duplicated by hand.
+// the admin editor.
+//
+// On-demand (prerender = false), not static: a static build bakes the
+// page's HTML in at `astro build` time, so any edit made afterwards in the
+// admin (new cover image, updated text, a removed image) would silently
+// never show up on the live site until the project is rebuilt and
+// redeployed — from the artist's side that looks exactly like "saving does
+// nothing" / "the old image keeps coming back". Rendering on request keeps
+// this route reading the same live DB the admin edits.
+export const prerender = false;
+
 import ProjectPage from '../../layouts/ProjectPage.astro';
 import { cms } from '../../cms';
 import { videoTypes } from '../../const.js';
 import type { ContentBlock } from '../../../steincms/cms/posts/posts-store';
 
-export async function getStaticPaths() {
-	const publishedPosts = cms.postsStore ? cms.postsStore.loadPublishedPosts() : [];
-	return publishedPosts.map((post) => ({
-		params: { slug: post.slug },
-		props: { post },
-	}));
-}
+const { slug } = Astro.params;
+const post = slug && cms.postsStore ? cms.postsStore.findPostBySlug(slug) : undefined;
 
-const { post } = Astro.props;
+if (!post || post.status !== 'published') {
+	return new Response('Not found', { status: 404 });
+}
 
 const blocks = post.blocks as ContentBlock[];
 const textBlocks = blocks.filter((b): b is Extract<ContentBlock, { type: 'text' }> => b.type === 'text');

@@ -68,6 +68,20 @@ All commands are run from the root of the project, from a terminal:
 | `npm run dev`             | Starts local dev server at `localhost:4321`      |
 | `npm run build`           | Build your production site to `./dist/`          |
 | `npm run format`          | Run prettier to format all files                 |
+| `npm run db:sync-schema`  | Read `src/content.schema.ts` and write generated Drizzle tables |
+| `npm run db:generate`     | Sync schema **and** create a SQL migration if columns changed |
+| `npm run db:migrate`      | Apply pending migrations to the SQLite database (`data/admin_cms.sqlite`) |
+| `npm run db:studio`       | Open Drizzle Studio to browse / edit rows        |
+| `npm run hash_password`   | Hash a password for `auth.yaml` (`npm run hash_password -- "secret"`) |
+
+After changing `src/content.schema.ts`, run:
+
+```bash
+npm run db:generate
+npm run db:migrate
+```
+
+(`db:generate` already runs `db:sync-schema`. Details: `steincms/DATABASE.md`.)
 
 
 ## Continuous Integration and Deployment

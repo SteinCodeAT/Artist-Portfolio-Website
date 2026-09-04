@@ -1,4 +1,12 @@
 ---
+// On-demand (prerender = false), not static: a static build bakes this
+// page's HTML in at `astro build` time, so edits made afterwards in the
+// admin (About singleton, project cover images feeding the Signal TV hero)
+// would never show up on the live site until the project is rebuilt and
+// redeployed. Rendering on request keeps this page reading the same live
+// DB the admin edits, same as the projects/[slug] route.
+export const prerender = false;
+
 import Layout from '../layouts/Layout.astro';
 
 import SignalTV from '../components/SignalTV.astro'
@@ -16,10 +24,9 @@ human movement, space and uncertainty and developing
 new ways of interaction between humans and spaces.
 `
 
-// Read at BUILD time — this page is static (no prerender=false), so the CMS
-// data gets baked into the HTML on the next `npm run build`, same as any
-// other static-site CMS integration. Falls back to the original hardcoded
-// content if the singleton was never saved (fresh install, no About content yet).
+// Read on every request (see prerender = false above). Falls back to the
+// original hardcoded content if the singleton was never saved (fresh
+// install, no About content yet).
 type AboutContent = {
 	bio?: string;
 	tagline?: string;

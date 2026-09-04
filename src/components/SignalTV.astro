@@ -5,8 +5,10 @@
 // .banner-section (100vh) here, since this now lives inside a normal
 // scrollable page instead of owning the whole viewport.
 //
-// The channel list is generated here (build time — this page is static) from
-// whatever's published in the CMS, instead of a hardcoded array. hue/synth
+// The channel list is generated here on every request (the homepage that
+// renders this has prerender = false, so this reads the live DB, not a
+// build-time snapshot) from whatever's published in the CMS, instead of a
+// hardcoded array. hue/synth
 // params for the original 10 projects are the exact hand-tuned values from
 // before this was CMS-driven; any project added later through the CMS gets
 // a deterministic hue (hashed from its slug) and one shared ambient synth

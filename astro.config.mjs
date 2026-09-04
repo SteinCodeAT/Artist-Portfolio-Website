@@ -8,6 +8,37 @@ import { cmsIntegration } from './steincms/astro/cms-integration';
 import { authEnvSchema, publicEnvSchema } from './steincms/astro/env-schema';
 import { siteConfig } from './src/site.config';
 import { contentSchema } from './src/content.schema';
+import Database from 'better-sqlite3';
+
+// /projects/[slug] is rendered on demand (prerender = false — see that
+// file for why), so @astrojs/sitemap can no longer discover those URLs by
+// crawling the build output the way it does for static routes. Read the
+// published slugs straight from the DB at config time and hand them to the
+// sitemap explicitly, or every project page silently drops out of
+// sitemap.xml.
+//
+// A direct better-sqlite3 read here, not an import of src/cms.ts: the CMS
+// module graph pulls in steincms/api/log-cms-activity.ts, which uses
+// `astro:env/server` — a virtual module Astro only resolves once its own
+// Vite pipeline is running, not while astro.config.mjs itself is being
+// loaded. Reading the table directly sidesteps that entirely.
+function loadPublishedProjectUrls() {
+  try {
+    const sqlite = new Database(process.env.DATABASE_URL ?? './data/admin_cms.sqlite', { readonly: true });
+    try {
+      const rows = sqlite.prepare("SELECT slug FROM posts WHERE status = 'published'").all();
+      return rows.map((row) => `https://www.cagdascecen.com/projects/${row.slug}/`);
+    } finally {
+      sqlite.close();
+    }
+  } catch {
+    // Fresh checkout, DB not created yet (npm run db:sync-schema hasn't run) — an
+    // empty sitemap entry list is fine, the build shouldn't fail over this.
+    return [];
+  }
+}
+
+const publishedProjectUrls = loadPublishedProjectUrls();
 
 // astro.config.mjs
 export default defineConfig({
@@ -15,7 +46,7 @@ export default defineConfig({
   base: '',
   adapter: node({ mode: 'standalone' }),
   integrations: [
-    sitemap(),
+    sitemap({ customPages: publishedProjectUrls }),
     icon(),
     compressor(),
     cmsIntegration({ cmsModule: './src/cms.ts', siteConfig, contentSchema }),
