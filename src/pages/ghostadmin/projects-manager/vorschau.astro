@@ -1,147 +1,113 @@
 ---
-// src/pages/ghostadmin/projects-manager/vorschau.astro
-// Draft preview — the real /projects/{slug} page only shows published CMS
-// content once Phase 3 wires the public site to the CMS; until then this is
-// the only way to see a draft before publishing.
+// Draft preview — renders through the exact same ProjectPage layout the real
+// public /projects/{slug} pages use (see [slug].astro), so what you see here
+// is what publishing actually looks like. The public route only serves
+// published posts, so this is the only way to see a draft before publishing.
 export const prerender = false;
 
-import AdminAreaLayout from '@steincms/admin/layouts/AdminAreaLayout.astro';
+import ProjectPage from '../../../layouts/ProjectPage.astro';
+import { videoTypes } from '../../../const.js';
 import { cms } from '../../../cms';
-import { siteConfig } from '../../../site.config';
-import { adminNav, adminPaths, adminLayoutText } from '../../../admin-nav';
+import { adminPaths } from '../../../admin-nav';
+import type { ContentBlock } from '../../../../steincms/cms/posts/posts-store';
 
 const { postsStore } = cms;
 const id = Astro.url.searchParams.get('id');
 const post = id && postsStore ? postsStore.findPostById(id) : null;
+
+const editorHref = post ? `${adminPaths.base}/projects-manager/bearbeiten?id=${post.id}` : `${adminPaths.base}/projects-manager`;
+
+let project: {
+	title: string;
+	type: string;
+	artist: string;
+	verticaltext: string;
+	videos: Array<{ src: string; type: string }>;
+	images: string[];
+	links: never[];
+	textBlocks: Extract<ContentBlock, { type: 'text' }>[];
+} | null = null;
+if (post) {
+	const blocks = post.blocks as ContentBlock[];
+	const textBlocks = blocks.filter((b): b is Extract<ContentBlock, { type: 'text' }> => b.type === 'text');
+	const galleryImages = blocks.flatMap((b) => {
+		if (b.type === 'gallery') return b.images.map((img) => img.url);
+		if (b.type === 'image') return b.url ? [b.url] : [];
+		return [];
+	});
+	project = {
+		title: post.title,
+		type: post.year ?? '',
+		artist: 'Çağdaş Çeçen',
+		verticaltext: post.title,
+		videos: post.videoEmbedUrl ? [{ src: post.videoEmbedUrl, type: videoTypes.external }] : [],
+		images: galleryImages,
+		links: [],
+		textBlocks,
+	};
+}
 ---
 
-<AdminAreaLayout
-	title={`Preview — ${siteConfig.admin.title}`}
-	activeSection="blog"
-	adminPath={siteConfig.admin.path}
-	adminTitle={siteConfig.admin.title}
-	siteName={siteConfig.name}
-	siteShortName={siteConfig.shortName}
-	adminLogoSrc={siteConfig.admin.logo}
-	navItems={adminNav}
-	{...adminLayoutText}
->
-	{!post ? (
-		<p>Project not found — save it first.</p>
-	) : (
-		<article class="preview">
-			<div class="preview-nav">
-				<a class="back-link" href={`${adminPaths.base}/projects-manager/bearbeiten?id=${post.id}`}>&larr; Back to editor</a>
-				<a class="back-link" href={`${adminPaths.base}/projects-manager`}>All Projects</a>
+{!post || !project ? (
+	<html lang="en">
+		<body style="background:#030406; color:#e4e4e4; font-family:system-ui,sans-serif; display:grid; place-items:center; min-height:100vh; margin:0;">
+			<div>
+				<p>Project not found — save it first.</p>
+				<a href={editorHref} style="color:#00c896;">&larr; Back to editor</a>
 			</div>
-			<p class="preview-badge" data-status={post.status}>{post.status === 'published' ? 'Published' : 'Draft preview'}</p>
-			<p class="preview-note">
-				This shows what's saved in the CMS right now — it's not the live public page's design
-				(that still needs its own dynamic route reading from here).
-			</p>
-			{post.mainImage && <img class="preview-cover" src={post.mainImage} alt="" />}
-			<h1>{post.title}</h1>
-			<p class="preview-desc">{post.description}</p>
-			<div class="preview-body">
-				{post.blocks.map((block) => {
-					if (block.type === 'text') return <div set:html={block.html} />;
-					if (block.type === 'image') return (
-						<figure>
-							<img src={block.url} alt={block.alt} />
-							{block.caption && <figcaption>{block.caption}</figcaption>}
-						</figure>
-					);
-					if (block.type === 'gallery') return (
-						<div class="preview-gallery">
-							{block.images.map((img) => <img src={img.url} alt={img.alt ?? ''} />)}
-						</div>
-					);
-					return null;
-				})}
-			</div>
-		</article>
-	)}
-</AdminAreaLayout>
-
-<style>
-	.preview-nav {
-		display: flex;
-		gap: 1rem;
-		margin-bottom: 1rem;
-	}
-	.back-link {
-		display: inline-block;
-		color: #666;
-		text-decoration: none;
-		font-size: 0.85rem;
-	}
-	.back-link:hover {
-		color: #1a1a1a;
-	}
-	.preview-note {
-		margin: 0 0 1.5rem;
-		padding: 0.65rem 0.9rem;
-		background: #f5f6f8;
-		border-radius: 8px;
-		font-size: 0.82rem;
-		color: #667085;
-		line-height: 1.4;
-	}
-	.preview {
-		max-width: 48rem;
-	}
-	.preview-badge {
-		display: inline-block;
-		margin: 0 0 1rem;
-		padding: 0.25rem 0.65rem;
-		border-radius: 999px;
-		background: #fef0c7;
-		color: #b54708;
-		font-size: 0.78rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
-	}
-	.preview-badge[data-status='published'] {
-		background: #d1fadf;
-		color: #027a48;
-	}
-	.preview-cover {
-		width: 100%;
-		max-height: 24rem;
-		object-fit: cover;
-		border-radius: 12px;
-		margin-bottom: 1.25rem;
-	}
-	h1 {
-		margin: 0 0 0.5rem;
-	}
-	.preview-desc {
-		color: #4a5568;
-		font-size: 1.05rem;
-		line-height: 1.6;
-	}
-	.preview-body {
-		margin-top: 1.5rem;
-		line-height: 1.7;
-	}
-	.preview-body figure {
-		margin: 1.5rem 0;
-	}
-	.preview-body img {
-		max-width: 100%;
-		border-radius: 8px;
-	}
-	.preview-gallery {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-		gap: 0.75rem;
-		margin: 1.5rem 0;
-	}
-	.preview-gallery img {
-		width: 100%;
-		aspect-ratio: 1;
-		object-fit: cover;
-		border-radius: 8px;
-	}
-</style>
+		</body>
+	</html>
+) : (
+	<ProjectPage title={`Çağdaş Çeçen - ${post.title}`} description={post.description} project={project}>
+		{/* position:fixed, so where it sits in ProjectPage's slot doesn't matter
+		    visually — but it DOES need to be inside ProjectPage's own <body>,
+		    not a sibling after it (ProjectPage renders a full <html> document
+		    via its own Layout, so anything placed after </ProjectPage> here
+		    would land outside </html> entirely — invalid, and browsers may
+		    just drop it). */}
+		<div class="preview-bar">
+			<span class="preview-bar-badge" data-status={post.status}>{post.status === 'published' ? 'Published' : 'Draft Preview'}</span>
+			<a class="preview-bar-link" href={editorHref}>&larr; Back to editor</a>
+			<a class="preview-bar-link" href={`${adminPaths.base}/projects-manager`}>All Projects</a>
+		</div>
+		<style>
+			.preview-bar {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				z-index: 999;
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+				padding: 0.6rem 1.25rem;
+				background: rgba(3, 4, 6, 0.92);
+				backdrop-filter: blur(8px);
+				border-bottom: 1px solid rgba(228, 228, 228, 0.15);
+				font-family: 'JetBrains Mono', ui-monospace, monospace;
+				font-size: 0.78rem;
+			}
+			.preview-bar-badge {
+				padding: 0.15rem 0.6rem;
+				border-radius: 999px;
+				background: #3a2c0f;
+				color: #ffb020;
+				font-weight: 700;
+				letter-spacing: 0.04em;
+				text-transform: uppercase;
+			}
+			.preview-bar-badge[data-status='published'] {
+				background: #0f3a2c;
+				color: #00c896;
+			}
+			.preview-bar-link {
+				color: #9a9da4;
+				text-decoration: none;
+			}
+			.preview-bar-link:hover {
+				color: #00c896;
+			}
+		</style>
+		{project.textBlocks.map((block) => <Fragment set:html={block.html} />)}
+	</ProjectPage>
+)}

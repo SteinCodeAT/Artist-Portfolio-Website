@@ -58,6 +58,10 @@ export type PostRecord = {
 	mainImage?: string | null;
 	blocks: ContentBlock[];
 	year: string | null;
+	// A single embeddable video player URL (e.g. https://player.vimeo.com/video/123)
+	// shown above the description on the project page. Optional — most
+	// projects have none and just use photos.
+	videoEmbedUrl?: string | null;
 	status: PostStatus;
 	publishedAt: string | null;
 	createdAt: string;
@@ -71,6 +75,7 @@ export type CreatePostInput = {
 	mainImage?: string | null;
 	blocks: ContentBlock[];
 	year: string | null;
+	videoEmbedUrl?: string | null;
 	status?: PostStatus;
 	publishedAt?: string | null;
 };
@@ -81,6 +86,7 @@ export type UpdatePostInput = {
 	mainImage?: string | null;
 	blocks?: ContentBlock[];
 	year?: string | null;
+	videoEmbedUrl?: string | null;
 	status?: PostStatus;
 	publishedAt?: string | null;
 };
@@ -294,6 +300,7 @@ export function createPostsStore(config: PostsStoreConfig, storage: RecordListSt
 				blocks: input.blocks,
 				status,
 				year: input.year?.trim() || null,
+				videoEmbedUrl: input.videoEmbedUrl?.trim() || null,
 				publishedAt:
 					status === 'published'
 						? resolvePublishedAt(null, 'published', input.publishedAt)
@@ -340,6 +347,10 @@ export function createPostsStore(config: PostsStoreConfig, storage: RecordListSt
 				status: nextStatus,
 				slug: nextSlug,
 				year: patch.year !== undefined ? (patch.year?.trim() || null) : (current.year ?? null),
+				videoEmbedUrl:
+					patch.videoEmbedUrl !== undefined
+						? (patch.videoEmbedUrl?.trim() || null)
+						: (current.videoEmbedUrl ?? null),
 				publishedAt: resolvePublishedAt(
 					current.publishedAt,
 					nextStatus,

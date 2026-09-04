@@ -32,6 +32,13 @@ export function createPostsHandler(
 			if (!year) {
 				return jsonResponse({ error: 'Jahr fehlt' }, 400);
 			}
+			// Optional — most projects have no video, so an empty string just clears it.
+			// String(null) === "null" (a real, truthy string) — check for actual
+			// null/empty BEFORE stringifying, or clearing the field saves the
+			// literal text "null" instead of clearing it.
+			const videoEmbedUrl = body.videoEmbedUrl !== undefined
+				? (body.videoEmbedUrl == null ? null : String(body.videoEmbedUrl).trim() || null)
+				: undefined;
 
 			if (!title) {
 				return jsonResponse({ error: 'Titel fehlt' }, 400);
@@ -78,6 +85,7 @@ export function createPostsHandler(
 				blocks,
 				status,
 				year,
+				...(videoEmbedUrl !== undefined ? { videoEmbedUrl } : {}),
 				...(mainImage !== undefined ? { mainImage } : {}),
 				...(publishedAt !== undefined ? { publishedAt } : {}),
 			});
@@ -106,6 +114,12 @@ export function createPostsHandler(
 			if (!year) {
 				return jsonResponse({ error: 'Jahr fehlt' }, 400);
 			}
+			// String(null) === "null" (a real, truthy string) — check for actual
+			// null/empty BEFORE stringifying, or clearing the field saves the
+			// literal text "null" instead of clearing it.
+			const videoEmbedUrl = body.videoEmbedUrl !== undefined
+				? (body.videoEmbedUrl == null ? null : String(body.videoEmbedUrl).trim() || null)
+				: undefined;
 			if (!id) {
 				return jsonResponse({ error: 'ID fehlt' }, 400);
 			}
@@ -156,6 +170,7 @@ export function createPostsHandler(
 				...(blocks !== undefined ? { blocks } : {}),
 				...(status !== undefined ? { status } : {}),
 				...(year !== undefined ? { year } : {}),
+				...(videoEmbedUrl !== undefined ? { videoEmbedUrl } : {}),
 				...(mainImage !== undefined ? { mainImage } : {}),
 				...(publishedAt !== undefined ? { publishedAt } : {}),
 			});

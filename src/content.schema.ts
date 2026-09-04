@@ -43,6 +43,7 @@ const projectRecord = defineRecord({
 			group: 'content',
 		}),
 		year: textField({ optional: true, label: 'Year' }),
+		videoEmbedUrl: textField({ optional: true, label: 'Video Embed URL (Vimeo player URL)' }),
 		status: enumField(['draft', 'published'], { label: 'Status' }),
 		publishedAt: isoTimestampField({ nullable: true, label: 'Published At' }),
 		createdAt: isoTimestampField({ label: 'Created At' }),

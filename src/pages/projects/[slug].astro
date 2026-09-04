@@ -7,6 +7,7 @@
 // hand-written files did, just generated instead of duplicated by hand.
 import ProjectPage from '../../layouts/ProjectPage.astro';
 import { cms } from '../../cms';
+import { videoTypes } from '../../const.js';
 import type { ContentBlock } from '../../../steincms/cms/posts/posts-store';
 
 export async function getStaticPaths() {
@@ -35,10 +36,11 @@ const project = {
 	type: post.year ?? '',
 	artist: 'Çağdaş Çeçen',
 	verticaltext: post.title,
-	// Videos + external links are both folded into the body's text blocks
-	// (a "Links" section) rather than separate structured fields — see
-	// content.schema.ts for why.
-	videos: [],
+	// External links are folded into the body's text blocks (a "Links"
+	// section) rather than a separate structured field — see content.schema.ts.
+	// videoEmbedUrl is the one exception: a single optional embed shown above
+	// the write-up, same slot the old hardcoded pages used.
+	videos: post.videoEmbedUrl ? [{ src: post.videoEmbedUrl, type: videoTypes.external }] : [],
 	images: galleryImages,
 	links: [],
 };

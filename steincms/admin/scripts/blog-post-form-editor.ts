@@ -260,8 +260,10 @@ function initBlogPostFormEditor() {
       (document.getElementById('post-main-image') as HTMLInputElement | null)?.value?.trim() ?? '';
     const year =
       (document.getElementById('post-year') as HTMLInputElement | null)?.value?.trim() ?? '';
+    const videoEmbedUrl =
+      (document.getElementById('post-video-embed-url') as HTMLInputElement | null)?.value?.trim() ?? '';
     const blocks = sectionEditor.getBlocks();
-    return JSON.stringify({ title, description, mainImage, year, blocks });
+    return JSON.stringify({ title, description, mainImage, year, videoEmbedUrl, blocks });
   }
 
   function markDirtyIfChanged() {
@@ -312,6 +314,9 @@ function initBlogPostFormEditor() {
       }
     }
 
+    const videoEmbedUrl =
+      (document.getElementById('post-video-embed-url') as HTMLInputElement | null)?.value?.trim() ?? '';
+
     const publishedAt = readPublishedAtPayload(status);
     const payload: Record<string, unknown> = {
       title,
@@ -320,6 +325,7 @@ function initBlogPostFormEditor() {
       blocks,
       status,
       year,
+      videoEmbedUrl: videoEmbedUrl || null,
     };
 
     if (publishedAt !== undefined) {
@@ -410,6 +416,7 @@ function initBlogPostFormEditor() {
   document.getElementById('post-title')?.addEventListener('input', markDirtyIfChanged);
   document.getElementById('post-description')?.addEventListener('input', markDirtyIfChanged);
   document.getElementById('post-year')?.addEventListener('input', markDirtyIfChanged);
+  document.getElementById('post-video-embed-url')?.addEventListener('input', markDirtyIfChanged);
   document.getElementById('post-main-image')?.addEventListener('change', markDirtyIfChanged);
   
   // Sections: mark dirty on a timer after Quill edits - simples approach 

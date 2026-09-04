@@ -120,6 +120,15 @@ const currentYear = new Date().getFullYear();
 				</section>
 
 				<section class="editor-sidebar-card">
+					<h3 class="sidebar-card-title">Video</h3>
+					<label class="field">
+						<span class="field-label-inline">Video Embed URL</span>
+						<small class="field-hint">Optional. A Vimeo player URL — on the project's Vimeo page, use Share → Embed and copy the src from the iframe code (looks like https://player.vimeo.com/video/12345678). Shown above the write-up.</small>
+						<input type="text" id="post-video-embed-url" value={post?.videoEmbedUrl ?? ''} placeholder="https://player.vimeo.com/video/12345678" />
+					</label>
+				</section>
+
+				<section class="editor-sidebar-card">
 					<h3 class="sidebar-card-title">Status</h3>
 					<p class="status-display" id="post-status-display" data-status={post?.status ?? 'draft'}>
 						{post?.status === 'published' ? '● Published' : '○ Draft'}
