@@ -9,6 +9,32 @@ import { authEnvSchema, publicEnvSchema } from './steincms/astro/env-schema';
 import { siteConfig } from './src/site.config';
 import { contentSchema } from './src/content.schema';
 import Database from 'better-sqlite3';
+import fs from 'node:fs/promises';
+
+// public/media/ holds CMS-uploaded images (steincms/cms/media/media-store.ts
+// writes new uploads straight into it at runtime). Astro's build also copies
+// the whole public/ dir into dist/client/ once, at build time — and the
+// @astrojs/node standalone adapter's production server serves static files
+// straight out of that dist/client/ copy, taking priority over any page
+// route at the same path. Left alone, that means the very first build after
+// a deploy freezes every media file at whatever it was at that moment: a
+// cover image changed or removed afterwards via the admin updates the DB
+// and public/media/ correctly, but the running server keeps serving the
+// stale dist/client/media/ copy forever — exactly the "can't change the
+// cover image on production" bug. src/pages/media/[...path].ts serves
+// public/media/ live on every request instead, but only if nothing in
+// dist/client/media/ exists to shadow it — hence deleting that copy here,
+// right after the build finishes.
+function excludeMediaFromStaticOutput() {
+  return {
+    name: 'exclude-media-from-static-output',
+    hooks: {
+      'astro:build:done': async ({ dir }) => {
+        await fs.rm(new URL('media/', dir), { recursive: true, force: true });
+      },
+    },
+  };
+}
 
 // /projects/[slug] is rendered on demand (prerender = false — see that
 // file for why), so @astrojs/sitemap can no longer discover those URLs by
@@ -46,6 +72,9 @@ export default defineConfig({
   base: '',
   adapter: node({ mode: 'standalone' }),
   integrations: [
+    // Runs before compressor() so it isn't wasting time gzip/brotli-ing
+    // media files that are about to be deleted anyway.
+    excludeMediaFromStaticOutput(),
     sitemap({ customPages: publishedProjectUrls }),
     icon(),
     compressor(),
