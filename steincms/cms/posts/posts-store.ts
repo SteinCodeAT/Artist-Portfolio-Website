@@ -57,6 +57,7 @@ export type PostRecord = {
 	description: string;
 	mainImage?: string | null;
 	blocks: ContentBlock[];
+	mainGallery: string[];
 	year: string | null;
 	// A single embeddable video player URL (e.g. https://player.vimeo.com/video/123)
 	// shown above the description on the project page. Optional — most
@@ -74,6 +75,7 @@ export type CreatePostInput = {
 	description: string;
 	mainImage?: string | null;
 	blocks: ContentBlock[];
+	mainGallery: string[];
 	year: string | null;
 	videoEmbedUrl?: string | null;
 	status?: PostStatus;
@@ -85,6 +87,7 @@ export type UpdatePostInput = {
 	description?: string;
 	mainImage?: string | null;
 	blocks?: ContentBlock[];
+	mainGallery?: string[];
 	year?: string | null;
 	videoEmbedUrl?: string | null;
 	status?: PostStatus;
@@ -128,6 +131,23 @@ export function createPostsStore(config: PostsStoreConfig, storage: RecordListSt
 			throw new Error('Invalid main image URL');
 		}
 		return url;
+	}
+
+	function parseMainGallery(value: unknown): string[] | undefined {
+		if (value === undefined) {
+			return undefined;
+		}
+		if (!Array.isArray(value)) {
+			throw new Error('mainGallery must be an array');
+		}
+
+		return value.map((item, index) => {
+			const url = String(item ?? '').trim();
+			if (!url || !isValidImageUrl(url, config.mediaConfig)) {
+				throw new Error(`Invalid gallery image URL at index ${index + 1}`);
+			}
+			return url;
+		});
 	}
 
 	function validateAndSanitizeBlocks(raw: unknown): ContentBlock[] {
@@ -298,6 +318,7 @@ export function createPostsStore(config: PostsStoreConfig, storage: RecordListSt
 				description: input.description,
 				...(input.mainImage ? { mainImage: input.mainImage } : {}),
 				blocks: input.blocks,
+				mainGallery: input.mainGallery ?? [],
 				status,
 				year: input.year?.trim() || null,
 				videoEmbedUrl: input.videoEmbedUrl?.trim() || null,
@@ -344,6 +365,7 @@ export function createPostsStore(config: PostsStoreConfig, storage: RecordListSt
 				title: nextTitle,
 				description: patch.description ?? current.description,
 				blocks: patch.blocks ?? current.blocks,
+				mainGallery: patch.mainGallery !== undefined ? patch.mainGallery : (current.mainGallery ?? []),
 				status: nextStatus,
 				slug: nextSlug,
 				year: patch.year !== undefined ? (patch.year?.trim() || null) : (current.year ?? null),
@@ -391,6 +413,7 @@ export function createPostsStore(config: PostsStoreConfig, storage: RecordListSt
 		findPostBySlug,
 		findPostById,
 		parseMainImage,
+		parseMainGallery,
 		validateAndSanitizeBlocks,
 		parsePublishedAt,
 		appendPostRecord,

@@ -27,11 +27,6 @@ if (!post || post.status !== 'published') {
 
 const blocks = post.blocks as ContentBlock[];
 const textBlocks = blocks.filter((b): b is Extract<ContentBlock, { type: 'text' }> => b.type === 'text');
-const galleryImages = blocks.flatMap((b) => {
-	if (b.type === 'gallery') return b.images.map((img) => img.url);
-	if (b.type === 'image') return b.url ? [b.url] : [];
-	return [];
-});
 
 const project = {
 	title: post.title,
@@ -46,7 +41,7 @@ const project = {
 	// videoEmbedUrl is the one exception: a single optional embed shown above
 	// the write-up, same slot the old hardcoded pages used.
 	videos: post.videoEmbedUrl ? [{ src: post.videoEmbedUrl, type: videoTypes.external }] : [],
-	images: galleryImages,
+	images: post.mainGallery ?? [],
 	links: [],
 };
 ---

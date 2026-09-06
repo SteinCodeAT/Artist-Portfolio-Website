@@ -91,17 +91,43 @@ const currentYear = new Date().getFullYear();
 							<span class="content-add-icon">&para;</span>
 							<span class="content-add-text"><strong>Text</strong><small>A paragraph</small></span>
 						</button>
-						<button type="button" class="content-add-option" data-add-image>
-							<span class="content-add-icon content-add-icon-image">&#128247;</span>
-							<span class="content-add-text"><strong>Image</strong><small>One photo with caption</small></span>
-						</button>
-						<button type="button" class="content-add-option" data-add-gallery>
-							<span class="content-add-icon content-add-icon-gallery">&#9638;</span>
-							<span class="content-add-text"><strong>Gallery</strong><small>Multiple photos</small></span>
+					</div>
+				</div>
+			</section>
+
+			<section
+				class="editor-panel main-gallery-panel"
+				id="main-gallery-root"
+				data-main-gallery-id={post?.id ?? ''}
+				data-initial-gallery={JSON.stringify(post?.mainGallery ?? [])}
+				aria-labelledby="main-gallery-heading"
+			>
+				<div class="blocks-toolbar">
+					<div>
+						<h2 class="panel-title" id="main-gallery-heading">Main Image Gallery (Right Side)</h2>
+						<p class="panel-subtitle">
+							Images that appear on the project's page, separated from the text. The images will be displayed in a grid on the right side of the page.
+						</p>
+					</div>
+				</div>
+				<div class="block-gallery-body">
+					<div class="block-gallery-grid" data-main-gallery-grid></div>
+					<div class="block-upload">
+						<input
+							type="file"
+							accept="image/jpeg,image/png,image/webp,image/gif"
+							data-main-gallery-files
+							multiple
+							hidden
+						/>
+						<button type="button" class="block-action-btn" data-main-gallery-upload>
+							Upload Images
 						</button>
 					</div>
 				</div>
 			</section>
+				
+			
 		</div>
 
 		<aside class="editor-sidebar">
@@ -334,8 +360,9 @@ const currentYear = new Date().getFullYear();
 
 	.content-add-options {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-template-columns: minmax(0, 1fr);
 		gap: 0.65rem;
+		max-width: 22rem;
 	}
 
 	.content-add-option {

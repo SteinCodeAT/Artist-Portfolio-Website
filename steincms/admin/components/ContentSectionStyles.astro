@@ -1,6 +1,10 @@
 ---
-/** Global styles for content-section-of-post-editor.ts block markup */
+import { Icon } from 'astro-icon/components';
 ---
+
+<template data-gallery-processing-icon>
+	<Icon name="mdi:cog" class="block-gallery-processing-icon" aria-hidden="true" />
+</template>
 
 <style is:global>
 	#content-sections-root .block-item {
@@ -48,7 +52,7 @@
 	}
 
 	#content-sections-root .block-btn,
-	#event-gallery-root .block-btn {
+	:is(#event-gallery-root, #main-gallery-root) .block-btn {
 		width: 32px;
 		height: 32px;
 		border: 1px solid #e4e4e4;
@@ -59,13 +63,13 @@
 	}
 
 	#content-sections-root .block-btn:disabled,
-	#event-gallery-root .block-btn:disabled {
+	:is(#event-gallery-root, #main-gallery-root) .block-btn:disabled {
 		opacity: 0.35;
 		cursor: not-allowed;
 	}
 
 	#content-sections-root .block-btn-danger,
-	#event-gallery-root .block-btn-danger {
+	:is(#event-gallery-root, #main-gallery-root) .block-btn-danger {
 		color: #b42318;
 	}
 
@@ -108,7 +112,7 @@
 	}
 
 	#content-sections-root .block-field,
-	#event-gallery-root .block-field {
+	:is(#event-gallery-root, #main-gallery-root) .block-field {
 		display: flex;
 		flex-direction: column;
 		gap: 0.35rem;
@@ -128,7 +132,7 @@
 	}
 
 	#content-sections-root .block-field input,
-	#event-gallery-root .block-field input {
+	:is(#event-gallery-root, #main-gallery-root) .block-field input {
 		padding: 0.55rem 0.75rem;
 		border: 1px solid #e8e8e8;
 		border-radius: 8px;
@@ -136,13 +140,13 @@
 	}
 
 	#content-sections-root .block-upload,
-	#event-gallery-root .block-upload {
+	:is(#event-gallery-root, #main-gallery-root) .block-upload {
 		display: flex;
 		justify-content: flex-start;
 	}
 
 	#content-sections-root .block-action-btn,
-	#event-gallery-root .block-action-btn {
+	:is(#event-gallery-root, #main-gallery-root) .block-action-btn {
 		padding: 0.55rem 1rem;
 		border: 1px solid #d0d5dd;
 		border-radius: 10px;
@@ -159,33 +163,33 @@
 	}
 
 	#content-sections-root .block-action-btn:hover:not(:disabled),
-	#event-gallery-root .block-action-btn:hover:not(:disabled) {
+	:is(#event-gallery-root, #main-gallery-root) .block-action-btn:hover:not(:disabled) {
 		background: #f9fafb;
 		border-color: #98a2b3;
 	}
 
 	#content-sections-root .block-action-btn:disabled,
-	#event-gallery-root .block-action-btn:disabled {
+	:is(#event-gallery-root, #main-gallery-root) .block-action-btn:disabled {
 		opacity: 0.6;
 		cursor: wait;
 	}
 
 	#content-sections-root .block-gallery-body,
-	#event-gallery-root .block-gallery-body {
+	:is(#event-gallery-root, #main-gallery-root) .block-gallery-body {
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
 	}
 
 	#content-sections-root .block-gallery-grid,
-	#event-gallery-root .block-gallery-grid {
+	:is(#event-gallery-root, #main-gallery-root) .block-gallery-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
 		gap: 0.75rem;
 	}
 
 	#content-sections-root .block-gallery-empty,
-	#event-gallery-root .block-gallery-empty {
+	:is(#event-gallery-root, #main-gallery-root) .block-gallery-empty {
 		margin: 0;
 		padding: 1.5rem;
 		text-align: center;
@@ -196,7 +200,7 @@
 	}
 
 	#content-sections-root .block-gallery-item,
-	#event-gallery-root .block-gallery-item {
+	:is(#event-gallery-root, #main-gallery-root) .block-gallery-item {
 		position: relative;
 		display: flex;
 		flex-direction: column;
@@ -208,26 +212,70 @@
 	}
 
 	#content-sections-root .block-gallery-thumb,
-	#event-gallery-root .block-gallery-thumb {
+	:is(#event-gallery-root, #main-gallery-root) .block-gallery-thumb {
 		width: 100%;
 		aspect-ratio: 1;
 		object-fit: cover;
 		border-radius: 4px;
 	}
 
+	#content-sections-root .block-gallery-item--processing,
+	:is(#event-gallery-root, #main-gallery-root) .block-gallery-item--processing {
+		border-style: dashed;
+		background: #f5f6f8;
+	}
+
+	#content-sections-root .block-gallery-thumb--processing,
+	:is(#event-gallery-root, #main-gallery-root) .block-gallery-thumb--processing {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		padding: 0.75rem;
+		box-sizing: border-box;
+		background: #eef1f5;
+		color: #667085;
+		font-size: 0.8rem;
+		font-weight: 600;
+		line-height: 1.35;
+		text-align: center;
+	}
+
+	#content-sections-root .block-gallery-processing-icon,
+	:is(#event-gallery-root, #main-gallery-root) .block-gallery-processing-icon {
+		width: 1.75rem;
+		height: 1.75rem;
+		flex-shrink: 0;
+		animation: block-gallery-cog-spin 1s linear infinite;
+	}
+
+	@keyframes block-gallery-cog-spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		#content-sections-root .block-gallery-processing-icon,
+		:is(#event-gallery-root, #main-gallery-root) .block-gallery-processing-icon {
+			animation: none;
+		}
+	}
+
 	#content-sections-root .block-gallery-alt span,
-	#event-gallery-root .block-gallery-alt span {
+	:is(#event-gallery-root, #main-gallery-root) .block-gallery-alt span {
 		font-size: 0.75rem;
 	}
 
 	#content-sections-root .block-gallery-alt input,
-	#event-gallery-root .block-gallery-alt input {
+	:is(#event-gallery-root, #main-gallery-root) .block-gallery-alt input {
 		padding: 0.4rem 0.55rem;
 		font-size: 0.8rem;
 	}
 
 	#content-sections-root .block-gallery-remove,
-	#event-gallery-root .block-gallery-remove {
+	:is(#event-gallery-root, #main-gallery-root) .block-gallery-remove {
 		align-self: flex-end;
 		width: 28px;
 		height: 28px;

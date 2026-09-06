@@ -1,0 +1,1 @@
+ALTER TABLE `posts` ADD `main_gallery` text;

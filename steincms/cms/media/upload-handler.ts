@@ -1,3 +1,4 @@
+import { createUuidV7 } from '@steincms/cms/core/uuid';
 import type { MediaConfig, MediaContentType } from './media-store.ts';
 import { ALLOWED_MIME, processUploadedImage, type ImagePreset } from './image-processor.ts';
 
@@ -37,13 +38,12 @@ export async function handleMultiImageUpload(
 	startSlot?: string,
 ): Promise<Array<{ url: string; thumbUrl: string }>> {
 	const results: Array<{ url: string; thumbUrl: string }> = [];
-	let slotIndex = startSlot ? Number.parseInt(startSlot, 10) : 1;
 
 	for (const file of files) {
 		const slot =
 			files.length === 1 && startSlot
 				? startSlot
-				: `${String(slotIndex).padStart(2, '0')}.webp`;
+				: `${createUuidV7()}.webp`;
 		const processed = await handleImageUpload(config, {
 			buffer: file.buffer,
 			mime: file.mime,
@@ -52,9 +52,6 @@ export async function handleMultiImageUpload(
 			slot,
 		});
 		results.push({ url: processed.url, thumbUrl: processed.thumbUrl });
-		if (!startSlot || files.length > 1) {
-			slotIndex += 1;
-		}
 	}
 
 	return results;

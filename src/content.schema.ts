@@ -14,6 +14,7 @@ import {
 	mediaUrlField,
 	slugField,
 	stringListField,
+	mediaUrlList,
 	textField,
 	type ContentSchemaRegistry,
 } from '@steincms/cms/schema';
@@ -38,10 +39,11 @@ const projectRecord = defineRecord({
 		description: textField({ required: true, rows: 3, label: 'Description' }),
 		mainImage: mediaUrlField({ nullable: true, label: 'Cover Image' }),
 		blocks: contentBlockList({
-			types: ['text', 'image', 'gallery'],
+			types: ['text'],
 			label: 'Body',
 			group: 'content',
 		}),
+		mainGallery: mediaUrlList({ optional: false, label: 'Hauptgalerie rechts' }),
 		year: textField({ optional: true, label: 'Year' }),
 		videoEmbedUrl: textField({ optional: true, label: 'Video Embed URL (Vimeo player URL)' }),
 		status: enumField(['draft', 'published'], { label: 'Status' }),

@@ -30,18 +30,13 @@ let project: {
 if (post) {
 	const blocks = post.blocks as ContentBlock[];
 	const textBlocks = blocks.filter((b): b is Extract<ContentBlock, { type: 'text' }> => b.type === 'text');
-	const galleryImages = blocks.flatMap((b) => {
-		if (b.type === 'gallery') return b.images.map((img) => img.url);
-		if (b.type === 'image') return b.url ? [b.url] : [];
-		return [];
-	});
 	project = {
 		title: post.title,
 		type: post.year ?? '',
 		artist: 'Çağdaş Çeçen',
 		verticaltext: post.title,
 		videos: post.videoEmbedUrl ? [{ src: post.videoEmbedUrl, type: videoTypes.external }] : [],
-		images: galleryImages,
+		images: post.mainGallery ?? [],
 		links: [],
 		textBlocks,
 	};

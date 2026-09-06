@@ -14,7 +14,8 @@
  *   content-section-of-post-editor.ts ← text/image/gallery sections only
  */
 
-import { initContentSectionEditor, uploadImages } from './content-section-of-post-editor.ts';
+import { initContentSectionEditor, uploadImages, type BlockData } from './content-section-of-post-editor.ts';
+import { initEventGallerySection } from './event-gallery-section.ts';
 
 /** Reuses ConfirmDeleteModal.astro (#delete-event-modal) as a simple notice. */
 function showNotice(message: string, title = 'Notice'): Promise<void> {
@@ -86,6 +87,31 @@ function readEditorConfig(root: HTMLElement) {
   }
 
   return { postId, initialBlocks, adminPath, blogPublicPath, postsListPath, postsPreviewPath };
+}
+
+function readInitialGallery(): string[] {
+  const galleryRoot = document.getElementById('main-gallery-root');
+  if (!galleryRoot) return [];
+
+  try {
+    return JSON.parse(galleryRoot.dataset.initialGallery ?? '[]') as string[];
+  } catch {
+    return [];
+  }
+}
+
+function photoUrlsFromBlocks(blocks: BlockData[]): string[] {
+  const urls: string[] = [];
+  for (const block of blocks) {
+    if (block.type === 'gallery') {
+      for (const image of block.images) {
+        if (image.url) urls.push(image.url);
+      }
+    } else if (block.type === 'image' && block.url) {
+      urls.push(block.url);
+    }
+  }
+  return urls;
 }
 
 // ---------------------------------------------------------------------------
@@ -234,6 +260,7 @@ function updateSidebarMeta(post: SavedPost) {
 
 function initBlogPostFormEditor() {
   const root = document.getElementById('content-sections-root');
+  const galleryRoot = document.getElementById('main-gallery-root');
   if (!root) {
     return;
   }
@@ -246,8 +273,27 @@ function initBlogPostFormEditor() {
   // Updated after first save so preview + PUT work on brand-new posts.
   let postId = initialPostId;
 
-  // Article body editor (text / image / gallery sections only).
-  const sectionEditor = initContentSectionEditor(root, initialBlocks);
+  const textBlocks = (initialBlocks as BlockData[]).filter((block) => block.type === 'text');
+  const seededGallery = readInitialGallery();
+  const initialGallery = seededGallery.length > 0 ? seededGallery : photoUrlsFromBlocks(initialBlocks as BlockData[]);
+
+  const sectionEditor = initContentSectionEditor(root, textBlocks, {
+    allowedTypes: ['text'],
+  });
+  const galleryEditor = galleryRoot
+    ? initEventGallerySection(galleryRoot, initialGallery, {
+        contentType: 'posts',
+        entryIdDatasetKey: 'mainGalleryId',
+        gridSelector: '[data-main-gallery-grid]',
+        filesSelector: '[data-main-gallery-files]',
+        uploadSelector: '[data-main-gallery-upload]',
+        emptyLabel: 'No images yet — upload below',
+        uploadLabel: 'Upload Images',
+        uploadingLabel: 'Uploading…',
+        uploadFailedLabel: 'Upload failed',
+        processingLabel: 'Processing the uploaded image…',
+      })
+    : null;
 
   // Snapshot for dirty detection — lives inside init, not module-wide.
   let lastSavedSnapshot: string | null = null;
@@ -263,7 +309,8 @@ function initBlogPostFormEditor() {
     const videoEmbedUrl =
       (document.getElementById('post-video-embed-url') as HTMLInputElement | null)?.value?.trim() ?? '';
     const blocks = sectionEditor.getBlocks();
-    return JSON.stringify({ title, description, mainImage, year, videoEmbedUrl, blocks });
+    const mainGallery = galleryEditor?.getGalleryUrls() ?? [];
+    return JSON.stringify({ title, description, mainImage, year, videoEmbedUrl, blocks, mainGallery });
   }
 
   function markDirtyIfChanged() {
@@ -288,10 +335,9 @@ function initBlogPostFormEditor() {
     const mainImageInput = document.getElementById('post-main-image') as HTMLInputElement | null;
     const mainImage = mainImageInput?.value?.trim() ?? '';
 
-    // Drop empty image/gallery sections before save.
+    // Body is text-only — drop leftover image/gallery sections from older data.
     const blocks = sectionEditor.getBlocks().filter((block) => {
-      if (block.type === 'image') return Boolean(block.url);
-      if (block.type === 'gallery') return block.images.length > 0;
+      if (block.type === 'image' || block.type === 'gallery') return false;
       return true;
     });
 
@@ -307,13 +353,6 @@ function initBlogPostFormEditor() {
       return null;
     }
 
-    for (const block of blocks) {
-      if (block.type === 'image' && block.url && !block.alt.trim()) {
-        await showNotice('Please add alt text for every image.');
-        return null;
-      }
-    }
-
     const videoEmbedUrl =
       (document.getElementById('post-video-embed-url') as HTMLInputElement | null)?.value?.trim() ?? '';
 
@@ -323,6 +362,7 @@ function initBlogPostFormEditor() {
       description,
       mainImage: mainImage || null,
       blocks,
+      mainGallery: galleryEditor?.getGalleryUrls() ?? [],
       status,
       year,
       videoEmbedUrl: videoEmbedUrl || null,
@@ -360,6 +400,9 @@ function initBlogPostFormEditor() {
 
     postId = data.post.id;
     root!.dataset.postId = data.post.id;
+    if (galleryRoot) {
+      galleryRoot.dataset.mainGalleryId = data.post.id;
+    }
 
     const previewBtn = document.getElementById('btn-preview') as HTMLButtonElement | null;
     if (previewBtn) {
@@ -423,6 +466,10 @@ function initBlogPostFormEditor() {
   root.addEventListener('input', markDirtyIfChanged);
   root.addEventListener('click', () => {
     // Re-check after add/remove/move section - click handlers run first
+    setTimeout(markDirtyIfChanged, 0);
+  });
+  galleryRoot?.addEventListener('input', markDirtyIfChanged);
+  galleryRoot?.addEventListener('click', () => {
     setTimeout(markDirtyIfChanged, 0);
   });
 

@@ -12,6 +12,7 @@ export const posts = sqliteTable(
 		description: text('description'),
 		mainImage: text('main_image'),
 		blocks: text('blocks', { mode: 'json' }).$type<unknown>(),
+		mainGallery: text('main_gallery', { mode: 'json' }).$type<string[]>(),
 		year: text('year'),
 		videoEmbedUrl: text('video_embed_url'),
 		status: text('status'),

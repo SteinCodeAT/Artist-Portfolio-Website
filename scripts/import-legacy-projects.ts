@@ -192,7 +192,6 @@ function importProject(p: LegacyProject) {
 	const blocks = [
 		{ id: 'meta', type: 'text', html: `<p><em>${p.medium} · ${p.year}</em></p>` },
 		...p.paragraphs.map((html, i) => ({ id: `text-${i}`, type: 'text', html: `<p>${html}</p>` })),
-		...(galleryImages.length > 0 ? [{ id: 'gallery-0', type: 'gallery', images: galleryImages }] : []),
 	];
 
 	cmsDatabase.open().insert(posts).values({
@@ -202,6 +201,7 @@ function importProject(p: LegacyProject) {
 		description: p.description,
 		mainImage: galleryImages[0]?.url ?? null,
 		blocks,
+		mainGallery: galleryImages.map((image) => image.url),
 		status: 'published',
 		publishedAt: now,
 		createdAt: now,

@@ -66,6 +66,18 @@ export function createPostsHandler(
 				}
 			}
 
+			let mainGallery: string[] = [];
+			if (body.mainGallery !== undefined) {
+				try {
+					mainGallery = store.parseMainGallery(body.mainGallery) ?? [];
+				} catch (error) {
+					return jsonResponse(
+						{ error: error instanceof Error ? error.message : 'Ungültige Galerie' },
+						400,
+					);
+				}
+			}
+
 			let publishedAt: string | null | undefined;
 			if (body.publishedAt !== undefined) {
 				try {
@@ -83,6 +95,7 @@ export function createPostsHandler(
 				title,
 				description,
 				blocks,
+				mainGallery,
 				status,
 				year,
 				...(videoEmbedUrl !== undefined ? { videoEmbedUrl } : {}),
@@ -152,6 +165,18 @@ export function createPostsHandler(
 				}
 			}
 
+			let mainGallery: string[] | undefined;
+			if (body.mainGallery !== undefined) {
+				try {
+					mainGallery = store.parseMainGallery(body.mainGallery);
+				} catch (error) {
+					return jsonResponse(
+						{ error: error instanceof Error ? error.message : 'Ungültige Galerie' },
+						400,
+					);
+				}
+			}
+
 			let publishedAt: string | null | undefined;
 			if (body.publishedAt !== undefined) {
 				try {
@@ -168,6 +193,7 @@ export function createPostsHandler(
 				...(title !== undefined ? { title } : {}),
 				...(description !== undefined ? { description } : {}),
 				...(blocks !== undefined ? { blocks } : {}),
+				...(mainGallery !== undefined ? { mainGallery } : {}),
 				...(status !== undefined ? { status } : {}),
 				...(year !== undefined ? { year } : {}),
 				...(videoEmbedUrl !== undefined ? { videoEmbedUrl } : {}),

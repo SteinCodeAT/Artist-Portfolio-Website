@@ -25,6 +25,7 @@ import type {
   TableBlockData,
   TextBlockData,
 } from '@steincms/cms/blocks/editor-block';
+import { galleryProcessingIconHtml, previewThumbUrl } from './gallery-thumb-preview.ts';
 
 // `export type { X } from '...'` re-exports X for OTHER files but does not
 // bind X locally — this file uses these types itself below, so they need the
@@ -42,6 +43,10 @@ type UploadResult = {
   url: string;
   thumbUrl: string;
 };
+
+const galleryThumbPreviewSrc = new Map<string, string>();
+const galleryProcessingIds = new Map<string, string[]>();
+const GALLERY_PROCESSING_LABEL = 'Bild wird verarbeitet…';
 
 // ---------------------------------------------------------------------------
 // Quill — one instance per text section, keyed by section id
@@ -184,15 +189,16 @@ function escapeHtml(value: string): string {
 }
 
 function renderGalleryGrid(block: GalleryBlockData): string {
-  if (block.images.length === 0) {
+  const pendingIds = galleryProcessingIds.get(block.id) ?? [];
+  if (block.images.length === 0 && pendingIds.length === 0) {
     return '<p class="block-gallery-empty">Noch keine Bilder — unten hochladen</p>';
   }
 
-  return block.images
+  const ready = block.images
     .map(
       (image) => `
         <div class="block-gallery-item" data-gallery-image-id="${escapeHtml(image.id)}">
-          <img src="${escapeHtml(image.thumbUrl)}" alt="" class="block-gallery-thumb" />
+          <img src="${escapeHtml(galleryThumbPreviewSrc.get(image.id) ?? image.thumbUrl)}" alt="" class="block-gallery-thumb" />
           <label class="block-field block-gallery-alt">
             <span>Alt-Text (optional)</span>
             <input type="text" data-gallery-alt value="${escapeHtml(image.alt ?? '')}" />
@@ -202,6 +208,21 @@ function renderGalleryGrid(block: GalleryBlockData): string {
       `,
     )
     .join('');
+
+  const processing = pendingIds
+    .map(
+      (id) => `
+        <div class="block-gallery-item block-gallery-item--processing" data-gallery-image-id="${escapeHtml(id)}">
+          <div class="block-gallery-thumb block-gallery-thumb--processing" role="status">
+            ${galleryProcessingIconHtml()}
+            <span>${GALLERY_PROCESSING_LABEL}</span>
+          </div>
+        </div>
+      `,
+    )
+    .join('');
+
+  return `${ready}${processing}`;
 }
 
 function renderTableGrid(block: TableBlockData): string {
@@ -328,12 +349,19 @@ export function initContentSectionEditor(
 
       itemEl.querySelector('.block-gallery-remove')?.addEventListener('click', () => {
         block.images = block.images.filter((entry) => entry.id !== imageId);
+        galleryThumbPreviewSrc.delete(imageId);
         render();
       });
     });
 
     const fileInput = article.querySelector('[data-gallery-files]') as HTMLInputElement | null;
     const uploadBtn = article.querySelector('.block-gallery-upload-btn') as HTMLButtonElement | null;
+    const isProcessing = (galleryProcessingIds.get(block.id) ?? []).length > 0;
+
+    if (uploadBtn) {
+      uploadBtn.textContent = isProcessing ? 'Wird hochgeladen…' : 'Bilder hochladen';
+      uploadBtn.disabled = isProcessing;
+    }
 
     uploadBtn?.addEventListener('click', () => fileInput?.click());
 
@@ -342,27 +370,31 @@ export function initContentSectionEditor(
       fileInput.value = '';
       if (selected.length === 0) return;
 
-      if (uploadBtn) {
-        uploadBtn.textContent = 'Wird hochgeladen…';
-        uploadBtn.disabled = true;
-      }
+      galleryProcessingIds.set(
+        block.id,
+        selected.map(() => newImageId()),
+      );
+      render();
 
       try {
         const uploaded = await uploadImages(selected, uploadContext());
-        for (const result of uploaded) {
+        const previewSrcs = await Promise.all(
+          uploaded.map((result) => previewThumbUrl(result.thumbUrl)),
+        );
+        for (const [index, result] of uploaded.entries()) {
+          const imageId = newImageId();
           block.images.push({
-            id: newImageId(),
+            id: imageId,
             url: result.url,
             thumbUrl: result.thumbUrl,
           });
+          galleryThumbPreviewSrc.set(imageId, previewSrcs[index] ?? result.thumbUrl);
         }
-        render();
       } catch (error) {
         alert(error instanceof Error ? error.message : 'Upload fehlgeschlagen');
-        if (uploadBtn) {
-          uploadBtn.textContent = 'Bilder hochladen';
-          uploadBtn.disabled = false;
-        }
+      } finally {
+        galleryProcessingIds.delete(block.id);
+        render();
       }
     });
   }

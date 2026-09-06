@@ -60,7 +60,8 @@ export const siteConfig: SiteConfig = {
 	},
 
 	media: {
-		root: 'public/media',
+		root: process.env.NODE_ENV === 'production'
+		? '/var/www/cagdascecen.com/media' : 'public/media',
 		urlPrefix: '/media',
 		draftPrefix: '_drafts',
 	},

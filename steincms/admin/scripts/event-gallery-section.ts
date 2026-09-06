@@ -1,15 +1,43 @@
 /**
- * Fixed Veranstaltungsbilder gallery section for the event editor.
- * Separate from article blocks — maps to event.gallery[] on save.
+ * Fixed gallery section — separate from article blocks.
+ * Events: maps to event.gallery[]. Projects: maps to post.mainGallery[].
  */
 
 import { uploadImages } from './content-section-of-post-editor.ts';
+import { galleryProcessingIconHtml, previewThumbUrl } from './gallery-thumb-preview.ts';
 
 type GalleryImageEntry = {
 	id: string;
 	url: string;
 	thumbUrl: string;
+	previewSrc?: string;
 	alt?: string;
+	processing?: boolean;
+};
+
+export type FixedGallerySectionOptions = {
+	contentType: 'events' | 'posts';
+	entryIdDatasetKey?: string;
+	gridSelector?: string;
+	filesSelector?: string;
+	uploadSelector?: string;
+	emptyLabel?: string;
+	uploadLabel?: string;
+	uploadingLabel?: string;
+	uploadFailedLabel?: string;
+	processingLabel?: string;
+};
+
+const DEFAULTS: Required<Omit<FixedGallerySectionOptions, 'contentType'>> = {
+	entryIdDatasetKey: 'eventId',
+	gridSelector: '[data-event-gallery-grid]',
+	filesSelector: '[data-event-gallery-files]',
+	uploadSelector: '[data-event-gallery-upload]',
+	emptyLabel: 'Noch keine Bilder — unten hochladen',
+	uploadLabel: 'Bilder hochladen',
+	uploadingLabel: 'Wird hochgeladen…',
+	uploadFailedLabel: 'Upload fehlgeschlagen',
+	processingLabel: 'Bild wird verarbeitet…',
 };
 
 function newImageId(): string {
@@ -37,45 +65,64 @@ function urlsToImages(urls: string[]): GalleryImageEntry[] {
 	}));
 }
 
-function renderGalleryGrid(images: GalleryImageEntry[]): string {
+function renderGalleryGrid(
+	images: GalleryImageEntry[],
+	emptyLabel: string,
+	processingLabel: string,
+): string {
 	if (images.length === 0) {
-		return '<p class="block-gallery-empty">Noch keine Bilder — unten hochladen</p>';
+		return `<p class="block-gallery-empty">${escapeHtml(emptyLabel)}</p>`;
 	}
 
 	return images
-		.map(
-			(image) => `
+		.map((image) => {
+			if (image.processing) {
+				return `
+        <div class="block-gallery-item block-gallery-item--processing" data-gallery-image-id="${escapeHtml(image.id)}">
+          <div class="block-gallery-thumb block-gallery-thumb--processing" role="status">
+            ${galleryProcessingIconHtml()}
+            <span>${escapeHtml(processingLabel)}</span>
+          </div>
+        </div>
+      `;
+			}
+
+			return `
         <div class="block-gallery-item" data-gallery-image-id="${escapeHtml(image.id)}">
-          <img src="${escapeHtml(image.thumbUrl)}" alt="" class="block-gallery-thumb" />
+          <img src="${escapeHtml(image.previewSrc ?? image.thumbUrl)}" alt="" class="block-gallery-thumb" />
           <label class="block-field block-gallery-alt">
             <span>Alt-Text (optional)</span>
             <input type="text" data-gallery-alt value="${escapeHtml(image.alt ?? '')}" />
           </label>
           <button type="button" class="block-btn block-btn-danger block-gallery-remove" title="Bild entfernen">✕</button>
         </div>
-      `,
-		)
+      `;
+		})
 		.join('');
 }
 
 export function initEventGallerySection(
 	root: HTMLElement,
 	initialUrls: string[],
+	options: FixedGallerySectionOptions = { contentType: 'events' },
 ): { getGalleryUrls: () => string[] } {
+	const settings = { ...DEFAULTS, ...options };
 	let images: GalleryImageEntry[] = urlsToImages(initialUrls);
-	const gridEl = root.querySelector('[data-event-gallery-grid]') as HTMLElement | null;
-	const fileInput = root.querySelector('[data-event-gallery-files]') as HTMLInputElement | null;
-	const uploadBtn = root.querySelector('[data-event-gallery-upload]') as HTMLButtonElement | null;
+	const gridEl = root.querySelector(settings.gridSelector) as HTMLElement | null;
+	const fileInput = root.querySelector(settings.filesSelector) as HTMLInputElement | null;
+	const uploadBtn = root.querySelector(settings.uploadSelector) as HTMLButtonElement | null;
 
 	if (!gridEl) {
-		throw new Error('[data-event-gallery-grid] not found');
+		throw new Error(`${settings.gridSelector} not found`);
 	}
 
-	const uploadContext = (): { contentType: 'events'; entryId: string } | undefined => {
-		const entryId = root.dataset.eventId || undefined;
+	const uploadContext = (): { contentType: 'events' | 'posts'; entryId: string } | undefined => {
+		const entryId = root.dataset[settings.entryIdDatasetKey] || undefined;
 		if (!entryId) return undefined;
-		return { contentType: 'events', entryId };
+		return { contentType: options.contentType, entryId };
 	};
+
+	let uploading = false;
 
 	function bindGridEvents(): void {
 		gridEl!.querySelectorAll('[data-gallery-image-id]').forEach((itemEl) => {
@@ -83,7 +130,7 @@ export function initEventGallerySection(
 			if (!imageId) return;
 
 			const image = images.find((entry) => entry.id === imageId);
-			if (!image) return;
+			if (!image || image.processing) return;
 
 			const altInput = itemEl.querySelector('[data-gallery-alt]') as HTMLInputElement | null;
 			altInput?.addEventListener('input', () => {
@@ -98,11 +145,15 @@ export function initEventGallerySection(
 	}
 
 	function render(): void {
-		gridEl!.innerHTML = renderGalleryGrid(images);
+		gridEl!.innerHTML = renderGalleryGrid(
+			images,
+			settings.emptyLabel,
+			settings.processingLabel,
+		);
 		bindGridEvents();
 		if (uploadBtn) {
-			uploadBtn.textContent = 'Bilder hochladen';
-			uploadBtn.disabled = false;
+			uploadBtn.textContent = uploading ? settings.uploadingLabel : settings.uploadLabel;
+			uploadBtn.disabled = uploading;
 		}
 	}
 
@@ -113,34 +164,51 @@ export function initEventGallerySection(
 		fileInput.value = '';
 		if (selected.length === 0) return;
 
-		if (uploadBtn) {
-			uploadBtn.textContent = 'Wird hochgeladen…';
-			uploadBtn.disabled = true;
-		}
+		uploading = true;
+		const pending = selected.map(() => {
+			const entry: GalleryImageEntry = {
+				id: newImageId(),
+				url: '',
+				thumbUrl: '',
+				processing: true,
+			};
+			images.push(entry);
+			return entry;
+		});
+		render();
 
 		try {
 			const uploaded = await uploadImages(selected, uploadContext());
-			for (const result of uploaded) {
-				images.push({
-					id: newImageId(),
-					url: result.url,
-					thumbUrl: result.thumbUrl,
-				});
+			await Promise.all(
+				uploaded.map(async (result, index) => {
+					const entry = pending[index];
+					if (!entry) return;
+					entry.url = result.url;
+					entry.thumbUrl = result.thumbUrl;
+					entry.previewSrc = await previewThumbUrl(result.thumbUrl);
+					entry.processing = false;
+					render();
+				}),
+			);
+			for (const entry of pending) {
+				if (entry.processing) {
+					images = images.filter((image) => image.id !== entry.id);
+				}
 			}
-			render();
 		} catch (error) {
-			alert(error instanceof Error ? error.message : 'Upload fehlgeschlagen');
-			if (uploadBtn) {
-				uploadBtn.textContent = 'Bilder hochladen';
-				uploadBtn.disabled = false;
-			}
+			images = images.filter((image) => !pending.some((entry) => entry.id === image.id));
+			alert(error instanceof Error ? error.message : settings.uploadFailedLabel);
+		} finally {
+			uploading = false;
+			render();
 		}
 	});
 
 	render();
 
 	return {
-		getGalleryUrls: () => images.map((image) => image.url),
+		getGalleryUrls: () =>
+			images.filter((image) => !image.processing && image.url).map((image) => image.url),
 	};
 }
 
