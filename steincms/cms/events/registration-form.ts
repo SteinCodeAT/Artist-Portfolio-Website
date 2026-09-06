@@ -158,7 +158,7 @@ export function remainingAttendeeSpots(form: EventRegistrationForm, guestCount: 
 
 const yesNoSchema = z.enum(['yes', 'no']);
 
-function answerFieldSchema(field: RegistrationField): z.ZodTypeAny {
+function answerFieldSchema(field: RegistrationField): z.ZodType {
 	if (field.type === 'yesno') {
 		return field.required ? yesNoSchema : yesNoSchema.optional();
 	}
@@ -201,7 +201,7 @@ export function hasExtraTopLevelKeys(body: Record<string, unknown>, baitName: st
 }
 
 export function registrationSubmitSchema(form: EventRegistrationForm, maxGuests: number) {
-	const answerShape: Record<string, z.ZodTypeAny> = {};
+	const answerShape: Record<string, z.ZodType> = {};
 	for (const field of form.fields) {
 		answerShape[field.id] = answerFieldSchema(field);
 	}

@@ -16,7 +16,7 @@
 
 import { initContentSectionEditor, uploadImages, type BlockData } from './content-section-of-post-editor.ts';
 import { initEventGallerySection } from './event-gallery-section.ts';
-import { onAdminEditorAction } from './editor-save-dropdown.ts';
+import { onAdminEditorAction, setEditorLivePageLink } from './editor-save-dropdown.ts';
 
 /** Reuses ConfirmDeleteModal.astro (#delete-event-modal) as a simple notice. */
 function showNotice(message: string, title = 'Notice'): Promise<void> {
@@ -430,6 +430,9 @@ function initBlogPostFormEditor() {
     updateSidebarMeta(data.post);
     setStatusDisplay(data.post.status);
     setHasPreviewDraftFlag(action === 'save-draft' || Boolean(data.post.previewDraft));
+    if (data.post.status === 'published' && data.post.slug) {
+      setEditorLivePageLink(`${blogPublicPath || '/projects'}/${encodeURIComponent(data.post.slug)}`);
+    }
 
     postId = data.post.id;
     root!.dataset.postId = data.post.id;

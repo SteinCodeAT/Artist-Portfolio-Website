@@ -24,7 +24,7 @@ import {
 	uploadImages,
 } from './content-section-of-post-editor.ts';
 import { initEventGallerySection } from './event-gallery-section.ts';
-import { onAdminEditorAction } from './editor-save-dropdown.ts';
+import { onAdminEditorAction, setEditorLivePageLink } from './editor-save-dropdown.ts';
 
 type SaveAction = 'save-draft' | 'publish' | 'discard-draft';
 
@@ -653,6 +653,11 @@ function initEventFormEditor() {
 		} else {
 			setSaveStatus('published', savedAt);
 			setHasPreviewDraftFlag(false);
+			if (data.event.slug) {
+				setEditorLivePageLink(
+					`${eventsPublicPath || '/veranstaltungen'}/${encodeURIComponent(data.event.slug)}`,
+				);
+			}
 		}
 
 		eventId = data.event.id;

@@ -1,10 +1,16 @@
 ---
-import type { AdminEditorAction, AdminEditorDraftBadge, AdminEditorPreview } from '../editor-actions';
+import type {
+	AdminEditorAction,
+	AdminEditorDraftBadge,
+	AdminEditorLiveLink,
+	AdminEditorPreview,
+} from '../editor-actions';
 
 interface Props {
 	showStatus?: boolean;
 	draftBadge?: AdminEditorDraftBadge | null;
 	preview?: AdminEditorPreview | null;
+	live?: AdminEditorLiveLink | null;
 	triggerLabel?: string;
 	actions?: AdminEditorAction[];
 }
@@ -13,6 +19,7 @@ const {
 	showStatus = false,
 	draftBadge = null,
 	preview = null,
+	live = null,
 	triggerLabel = 'Speichern ▾',
 	actions = [],
 } = Astro.props;
@@ -42,6 +49,21 @@ const {
 			>
 				{preview.label}
 			</button>
+		)
+	}
+	{
+		live && (
+			<a
+				class="btn-ghost editor-preview-btn"
+				id="btn-live-page"
+				href={live.href || '#'}
+				target="_blank"
+				rel="noopener"
+				title={live.title}
+				hidden={live.hidden}
+			>
+				{live.label}
+			</a>
 		)
 	}
 	{

@@ -31,7 +31,7 @@ export type DefineRecordInput = {
 export function compileRecordSchema(fields: RecordFields): z.ZodObject<z.ZodRawShape> {
 	// Built as a plain mutable record, then handed to z.object() — newer Zod
 	// versions type ZodRawShape itself as read-only.
-	const shape: Record<string, z.ZodTypeAny> = {};
+	const shape: Record<string, z.ZodType> = {};
 	for (const [name, field] of Object.entries(fields)) {
 		shape[name] = field.zod;
 	}
@@ -85,7 +85,7 @@ type CollectionDefBase = {
 	 */
 	jsonImportPath?: string;
 	record: RecordDef;
-	schema: z.ZodTypeAny;
+	schema: z.ZodType;
 	admin: CollectionAdminConfig;
 };
 

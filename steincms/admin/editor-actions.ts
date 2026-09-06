@@ -11,6 +11,13 @@ export type AdminEditorPreview = {
 	title?: string;
 };
 
+export type AdminEditorLiveLink = {
+	href: string;
+	label: string;
+	title?: string;
+	hidden?: boolean;
+};
+
 export type AdminEditorDraftBadge = {
 	label: string;
 	title?: string;

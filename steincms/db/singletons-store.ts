@@ -14,7 +14,7 @@ function eqColumn(column: unknown, value: unknown) {
 export function readValidateSingleton<T extends Record<string, unknown>>(
 	database: CmsDatabase,
 	key: string,
-	schema: z.ZodTypeAny,
+	schema: z.ZodType,
 ): T {
 	const raw = readSingleton(database, key);
 	if (!raw) throw new Error(`Singleton "${key}" not found in database`);
@@ -26,7 +26,7 @@ export function readValidateSingleton<T extends Record<string, unknown>>(
 export function writeValidateSingleton(
 	database: CmsDatabase,
 	key: string,
-	schema: z.ZodTypeAny,
+	schema: z.ZodType,
 	data: Record<string, unknown>,
 ): void {
 	const parsed = schema.safeParse(data);

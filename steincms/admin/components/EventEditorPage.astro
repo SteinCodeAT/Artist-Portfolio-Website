@@ -114,6 +114,12 @@ const initialRegistrationForm = source?.registrationForm ?? EMPTY_REGISTRATION_F
 			label: 'Entwurfsvorschau',
 			title: 'Zeigt den Entwurf an, ohne die Website zu veröffentlichen',
 		}}
+		live={{
+			href: eventSlug ? `${eventsPublicPath}/${eventSlug}` : '',
+			label: 'Live-Seite',
+			title: 'Öffnet die veröffentlichte Seite',
+			hidden: !isEdit || !eventSlug,
+		}}
 		triggerLabel="Speichern ▾"
 		actions={defaultEditorSaveActions(hasPreviewDraft)}
 	>

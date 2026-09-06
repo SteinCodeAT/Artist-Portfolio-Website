@@ -34,7 +34,7 @@ export type BaseFieldDef = BaseFieldOptions & {
 	kind: FieldKind;
 	name: string;
 	admin: Required<Pick<FieldAdminConfig, 'visible'>> & Pick<FieldAdminConfig, 'editor'>;
-	zod: z.ZodTypeAny;
+	zod: z.ZodType;
 };
 
 export type TextFieldDef = BaseFieldDef & {

@@ -37,7 +37,7 @@ export function createCollectionContentHandler(
 		if (!def) return jsonResponse({ error: 'Unknown collection' }, 404);
 
 		try {
-			const data = readValidateSingleton(options.database, collectionId, def.schema as z.ZodTypeAny);
+			const data = readValidateSingleton(options.database, collectionId, def.schema as z.ZodType);
 			return jsonResponse({ ok: true, data });
 		} catch (error) {
 			console.error(`GET /api/content/${collectionId} failed:`, error);
@@ -74,7 +74,7 @@ export function createCollectionContentHandler(
 			writeValidateSingleton(
 				options.database,
 				collectionId,
-				def.schema as z.ZodTypeAny,
+				def.schema as z.ZodType,
 				parsed.data as Record<string, unknown>,
 			);
 
@@ -105,7 +105,7 @@ export function createCollectionContentHandler(
 export function createSingletonContentHandler(
 	read: () => Record<string, unknown>,
 	write: (data: Record<string, unknown>) => void,
-	schema: z.ZodTypeAny,
+	schema: z.ZodType,
 ): { GET: APIRoute; POST: APIRoute } {
 	const GET: APIRoute = async () => {
 		try {

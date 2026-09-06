@@ -46,3 +46,14 @@ export function onAdminEditorAction(handler: (action: string) => void) {
 		if (action) handler(action);
 	});
 }
+
+export function setEditorLivePageLink(href: string | null) {
+	const link = document.getElementById('btn-live-page') as HTMLAnchorElement | null;
+	if (!link) return;
+	if (!href) {
+		link.hidden = true;
+		return;
+	}
+	link.href = href;
+	link.hidden = false;
+}

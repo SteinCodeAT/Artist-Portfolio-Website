@@ -12,6 +12,7 @@ interface Props {
 	hasPreviewDraft?: boolean;
 	editingDraft?: boolean;
 	previewHref?: string | null;
+	liveHref?: string | null;
 }
 
 const {
@@ -21,6 +22,7 @@ const {
 	hasPreviewDraft = false,
 	editingDraft = false,
 	previewHref = null,
+	liveHref = null,
 } = Astro.props;
 
 const visibleFields = fields.filter(
@@ -47,6 +49,15 @@ const visibleFields = fields.filter(
 					? {
 							label: 'Entwurfsvorschau',
 							title: 'Zeigt den Entwurf an, ohne die Website zu veröffentlichen',
+						}
+					: null
+			}
+			live={
+				liveHref
+					? {
+							href: liveHref,
+							label: 'Live-Seite',
+							title: 'Öffnet die veröffentlichte Seite',
 						}
 					: null
 			}

@@ -16,7 +16,7 @@ function resolveAdmin(options: BaseFieldOptions): BaseFieldDef['admin'] {
 
 function finalizeField<K extends BaseFieldDef['kind']>(
 	kind: K,
-	zodType: z.ZodTypeAny,
+	zodType: z.ZodType,
 	options: BaseFieldOptions = {},
 ): BaseFieldDef & { kind: K } {
 	return {
@@ -50,7 +50,7 @@ export function slugField(options: BaseFieldOptions = {}): FieldDef {
 }
 
 export function textField(options: TextFieldOptions = {}): TextFieldDef {
-	let schema: z.ZodTypeAny = z.string();
+	let schema: z.ZodType = z.string();
 	if (options.min !== undefined) {
 		schema = z.string().min(options.min);
 	}
@@ -67,7 +67,7 @@ export function textField(options: TextFieldOptions = {}): TextFieldDef {
 }
 
 export function numberField(options: BaseFieldOptions & { nullable?: boolean; int?: boolean } = {}): FieldDef {
-	let schema: z.ZodTypeAny = options.int ? z.number().int() : z.number();
+	let schema: z.ZodType = options.int ? z.number().int() : z.number();
 	if (options.nullable) {
 		schema = schema.nullable();
 	}
@@ -75,7 +75,7 @@ export function numberField(options: BaseFieldOptions & { nullable?: boolean; in
 }
 
 export function positiveNumberField(options: BaseFieldOptions & { nullable?: boolean, int?: boolean } = {}): FieldDef {
-	let schema: z.ZodTypeAny = options.int ? z.number().int().nonnegative() : z.number().nonnegative();
+	let schema: z.ZodType = options.int ? z.number().int().nonnegative() : z.number().nonnegative();
 	if (options.nullable) {
 		schema = schema.nullable();
 	}
@@ -83,7 +83,7 @@ export function positiveNumberField(options: BaseFieldOptions & { nullable?: boo
 }
 
 export function dateField(options: BaseFieldOptions & { nullable?: boolean } = {}): FieldDef {
-	let schema: z.ZodTypeAny = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+	let schema: z.ZodType = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 	if (options.nullable) {
 		schema = schema.nullable();
 	}
@@ -100,7 +100,7 @@ export function enumField<T extends string>(
 export function stringListField(
 	options: BaseFieldOptions & { minItems?: number; itemMin?: number } = {},
 ): FieldDef {
-	let schema: z.ZodTypeAny = z.array(
+	let schema: z.ZodType = z.array(
 		options.itemMin !== undefined ? z.string().min(options.itemMin) : z.string(),
 	);
 	if (options.minItems !== undefined) {
@@ -110,7 +110,7 @@ export function stringListField(
 }
 
 export function mediaUrlField(options: BaseFieldOptions & { nullable?: boolean } = {}): FieldDef {
-	let schema: z.ZodTypeAny = z.string();
+	let schema: z.ZodType = z.string();
 	if (options.nullable) {
 		schema = schema.nullable();
 	}
@@ -132,7 +132,7 @@ export function fieldGroup(options: FieldGroupOptions): FieldGroupDef {
 }
 
 export function isoTimestampField(options: BaseFieldOptions & { nullable?: boolean } = {}): FieldDef {
-	let schema: z.ZodTypeAny = z.string();
+	let schema: z.ZodType = z.string();
 	if (options.nullable) {
 		schema = schema.nullable();
 	}

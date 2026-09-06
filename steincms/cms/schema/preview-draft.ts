@@ -25,8 +25,8 @@ export function overlayFieldNames(record: RecordDef): string[] {
 	return overlayFields(record).map((field) => field.name);
 }
 
-export function derivePreviewDraftZod(fields: RecordFields): z.ZodTypeAny {
-	const shape: Record<string, z.ZodTypeAny> = {};
+export function derivePreviewDraftZod(fields: RecordFields): z.ZodType {
+	const shape: Record<string, z.ZodType> = {};
 	for (const field of Object.values(fields)) {
 		if (!isOverlayField(field)) continue;
 		shape[field.name] = field.zod;

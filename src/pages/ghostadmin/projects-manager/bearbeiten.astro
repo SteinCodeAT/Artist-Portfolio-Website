@@ -60,6 +60,12 @@ const currentYear = new Date().getFullYear();
 				label: 'Entwurfsvorschau',
 				title: 'Zeigt den Entwurf an, ohne die Website zu veröffentlichen',
 			}}
+			live={{
+				href: post?.slug ? `/projects/${post.slug}` : '',
+				label: 'Live-Seite',
+				title: 'Öffnet die veröffentlichte Seite',
+				hidden: post?.status !== 'published',
+			}}
 			triggerLabel="Speichern ▾"
 			actions={defaultEditorSaveActions(hasPreviewDraft)}
 		/>

@@ -16,12 +16,17 @@ const {
 	editorLabel = 'Back to editor',
 	badge = 'Draft Preview',
 } = Astro.props;
+
+const liveUrl = new URL(Astro.url);
+liveUrl.searchParams.delete('show-preview');
+const liveHref = `${liveUrl.pathname}${liveUrl.search}${liveUrl.hash}`;
 ---
 
 <div class="steincms-preview-bar">
 	<span class="steincms-preview-bar-badge">{badge}</span>
 	<a class="steincms-preview-bar-link" href={editorHref}>&larr; {editorLabel}</a>
 	<slot />
+	<a class="steincms-preview-bar-link steincms-preview-bar-live" href={liveHref}>Show Live-Version</a>
 </div>
 
 <style>
@@ -60,6 +65,10 @@ const {
 
 	.steincms-preview-bar-link:hover {
 		color: var(--steincms-preview-bar-accent, #18181b);
+	}
+
+	.steincms-preview-bar-live {
+		margin-left: auto;
 	}
 
 	.steincms-preview-bar :global(a) {

@@ -24,7 +24,7 @@ function sameTypes(a: ContentBlockType[], b: ContentBlockType[]): boolean {
 	return b.every((type) => setA.has(type));
 }
 
-export function blockArraySchema(types: ContentBlockType[]): z.ZodTypeAny {
+export function blockArraySchema(types: ContentBlockType[]): z.ZodType {
 	if (types.length === 0) {
 		throw new Error('contentBlockList requires at least one block type');
 	}
