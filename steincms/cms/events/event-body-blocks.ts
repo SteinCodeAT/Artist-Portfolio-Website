@@ -109,14 +109,16 @@ export function eventEditorSource(event: {
 	const draft = event.previewDraft;
 	if (draft) {
 		return {
-			title: draft.title,
-			date: draft.date,
-			category: draft.category,
-			excerpt: draft.excerpt,
-			cover: draft.cover,
-			initialBlocks: eventToInitialBlocks(draft.blocks),
-			initialGallery: eventToInitialGallery(draft.gallery),
-			registrationForm: parseRegistrationForm(draft.registrationForm ?? event.registrationForm),
+			title: String(draft.title ?? ''),
+			date: (draft.date as string | null) ?? null,
+			category: String(draft.category ?? ''),
+			excerpt: String(draft.excerpt ?? ''),
+			cover: (draft.cover as string | null) ?? null,
+			initialBlocks: eventToInitialBlocks(draft.blocks as EventContentBlock[] | undefined),
+			initialGallery: eventToInitialGallery((draft.gallery as string[] | undefined) ?? []),
+			registrationForm: parseRegistrationForm(
+				(draft.registrationForm as EventRegistrationForm | undefined) ?? event.registrationForm,
+			),
 			editingDraft: true,
 		};
 	}

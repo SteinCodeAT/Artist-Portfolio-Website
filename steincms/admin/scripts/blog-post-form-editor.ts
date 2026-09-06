@@ -16,6 +16,7 @@
 
 import { initContentSectionEditor, uploadImages, type BlockData } from './content-section-of-post-editor.ts';
 import { initEventGallerySection } from './event-gallery-section.ts';
+import { onAdminEditorAction } from './editor-save-dropdown.ts';
 
 /** Reuses ConfirmDeleteModal.astro (#delete-event-modal) as a simple notice. */
 function showNotice(message: string, title = 'Notice'): Promise<void> {
@@ -73,11 +74,10 @@ function showNotice(message: string, title = 'Notice'): Promise<void> {
  * Astro sets these when the page is rendered on the server.
  */
 function readEditorConfig(root: HTMLElement) {
-  const postId = root.dataset.postId || null;
+  const postId = root.dataset.postId || '';
   const adminPath = root.dataset.adminPath || '';
-  const blogPublicPath = root.dataset.blogPublicPath || '/blog';
-  const postsListPath = root.dataset.postsListPath || `${adminPath}/beitraege-manager`;
-  const postsPreviewPath = root.dataset.postsPreviewPath || `${adminPath}/beitraege-manager/vorschau`;
+  const blogPublicPath = root.dataset.blogPublicPath || '/projects';
+  const postsListPath = root.dataset.postsListPath || `${adminPath}/projects-manager`;
   let initialBlocks = [];
 
   try {
@@ -86,7 +86,7 @@ function readEditorConfig(root: HTMLElement) {
     initialBlocks = [];
   }
 
-  return { postId, initialBlocks, adminPath, blogPublicPath, postsListPath, postsPreviewPath };
+  return { postId, initialBlocks, adminPath, blogPublicPath, postsListPath };
 }
 
 function readInitialGallery(): string[] {
@@ -195,19 +195,33 @@ function setStatusDisplay(status: 'draft' | 'published') {
   const statusEl = document.getElementById('post-status-display');
   if (!statusEl) return;
 
-  statusEl.textContent = status === 'published' ? 'Veröffentlicht' : 'Entwurf';
+  statusEl.textContent = status === 'published' ? '● Published' : '○ Draft';
   statusEl.setAttribute('data-status', status);
 }
 
-/** Converts #post-published-at (datetime-local) to ISO string for the API. */
-function readPublishedAtPayload(status: 'draft' | 'published'): string | null | undefined {
-  const input = document.getElementById('post-published-at') as HTMLInputElement | null;
-  if (!input?.value.trim()) {
-    // Publishing without a date → API uses "now". Draft save → don't touch date.
-    return status === 'published' ? null : undefined;
+type SaveAction = 'save-draft' | 'publish' | 'discard-draft';
+
+function isSaveAction(action: string): action is SaveAction {
+  return action === 'save-draft' || action === 'publish' || action === 'discard-draft';
+}
+
+function setHasPreviewDraftFlag(hasDraft: boolean) {
+  const root = document.getElementById('content-sections-root');
+  if (root) {
+    root.dataset.hasPreviewDraft = hasDraft ? 'true' : 'false';
   }
 
-  return new Date(input.value).toISOString();
+  const discardBtn = document.querySelector(
+    '[data-save-action="discard-draft"]',
+  ) as HTMLButtonElement | null;
+  if (discardBtn) {
+    discardBtn.hidden = !hasDraft;
+  }
+
+  const badge = document.querySelector('.draft-badge') as HTMLElement | null;
+  if (badge) {
+    badge.hidden = !hasDraft;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -222,6 +236,7 @@ type SavedPost = {
   createdAt: string;
   updatedAt: string;
   publishedAt: string | null;
+  previewDraft?: unknown | null;
 };
 
 /** Same format as bearbeiten.astro sidebar — kept in sync for live updates after save. */
@@ -267,10 +282,9 @@ function initBlogPostFormEditor() {
 
   initMainImageField();
 
-  const { postId: initialPostId, initialBlocks, postsPreviewPath } =
+  const { postId: initialPostId, initialBlocks, blogPublicPath, postsListPath } =
     readEditorConfig(root);
 
-  // Updated after first save so preview + PUT work on brand-new posts.
   let postId = initialPostId;
 
   const textBlocks = (initialBlocks as BlockData[]).filter((block) => block.type === 'text');
@@ -319,15 +333,39 @@ function initBlogPostFormEditor() {
     }
   }
 
-  /**
-   * Gathers all form fields and sends to /api/posts.
-   * @param redirectAfterSave — false when saving only to enable preview
-   */
-  async function savePost(
-    status: 'draft' | 'published',
-    options: { redirectAfterSave?: boolean } = {},
-  ): Promise<SavedPost | null> {
-    const { redirectAfterSave = true } = options;
+  async function savePost(action: SaveAction): Promise<SavedPost | null> {
+    if (action === 'discard-draft') {
+      if (
+        !confirm(
+          'Entwurf verwerfen? Ungespeicherte Entwurfs-Änderungen gehen verloren und der veröffentlichte Stand wird wieder geladen.',
+        )
+      ) {
+        return null;
+      }
+
+      if (root!.dataset.postPersisted !== 'true') {
+        window.location.href = postsListPath;
+        return null;
+      }
+
+      setSaveStatus('saving');
+      const response = await fetch('/api/posts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ id: postId, action: 'discard-draft' }),
+      });
+
+      const data = (await response.json().catch(() => ({}))) as { error?: string };
+      if (!response.ok) {
+        await showNotice(data.error ?? 'Entwurf konnte nicht verworfen werden');
+        setSaveStatus('dirty');
+        return null;
+      }
+
+      window.location.href = `${window.location.pathname}?id=${postId}`;
+      return null;
+    }
 
     const title = (document.getElementById('post-title') as HTMLInputElement | null)?.value?.trim();
     const description =
@@ -335,7 +373,6 @@ function initBlogPostFormEditor() {
     const mainImageInput = document.getElementById('post-main-image') as HTMLInputElement | null;
     const mainImage = mainImageInput?.value?.trim() ?? '';
 
-    // Body is text-only — drop leftover image/gallery sections from older data.
     const blocks = sectionEditor.getBlocks().filter((block) => {
       if (block.type === 'image' || block.type === 'gallery') return false;
       return true;
@@ -356,30 +393,25 @@ function initBlogPostFormEditor() {
     const videoEmbedUrl =
       (document.getElementById('post-video-embed-url') as HTMLInputElement | null)?.value?.trim() ?? '';
 
-    const publishedAt = readPublishedAtPayload(status);
-    const payload: Record<string, unknown> = {
+    const payload = {
+      id: postId,
       title,
       description,
       mainImage: mainImage || null,
       blocks,
       mainGallery: galleryEditor?.getGalleryUrls() ?? [],
-      status,
       year,
       videoEmbedUrl: videoEmbedUrl || null,
+      action,
     };
 
-    if (publishedAt !== undefined) {
-      payload.publishedAt = publishedAt;
-    }
-
-    const isEdit = Boolean(postId);
-    setStatusDisplay(status);
+    const isEdit = root!.dataset.postPersisted === 'true';
     setSaveStatus('saving');
     const response = await fetch('/api/posts', {
       method: isEdit ? 'PUT' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'same-origin',
-      body: JSON.stringify(isEdit ? { id: postId, ...payload } : payload),
+      body: JSON.stringify(payload),
     });
 
     const data = (await response.json().catch(() => ({}))) as {
@@ -392,68 +424,60 @@ function initBlogPostFormEditor() {
       setSaveStatus('dirty');
       return null;
     }
-    
-    /* Store snapshot after successful save. */
+
     lastSavedSnapshot = captureSnapshot();
     setSaveStatus('saved', new Date());
     updateSidebarMeta(data.post);
+    setStatusDisplay(data.post.status);
+    setHasPreviewDraftFlag(action === 'save-draft' || Boolean(data.post.previewDraft));
 
     postId = data.post.id;
     root!.dataset.postId = data.post.id;
+    root!.dataset.postPersisted = 'true';
+    if (data.post.slug) {
+      root!.dataset.postSlug = data.post.slug;
+    }
     if (galleryRoot) {
       galleryRoot.dataset.mainGalleryId = data.post.id;
     }
 
-    const previewBtn = document.getElementById('btn-preview') as HTMLButtonElement | null;
-    if (previewBtn) {
-      previewBtn.dataset.previewDraft = `${postsPreviewPath}?id=${data.post.id}`;
-      previewBtn.dataset.previewNeedsSave = 'false';
-      // NOT linking to `${blogPublicPath}/${slug}` here — that only resolves
-      // for the handful of legacy-imported projects that still have a
-      // hand-written page under src/pages/projects/*.astro. A project
-      // created through the CMS has no public page at all yet (that needs
-      // a dynamic [slug].astro reading from the CMS, not built yet), so
-      // every preview goes through the admin preview page, which always
-      // exists regardless of publish status.
-    }
-
-    if (redirectAfterSave) {
-      window.location.href = `${postsPreviewPath}?id=${data.post.id}`;
-    }
+    const url = new URL(window.location.href);
+    url.searchParams.set('id', data.post.id);
+    history.replaceState(null, '', url.pathname + url.search);
 
     return data.post;
   }
 
-  /** Published → public /blog/slug; draft → intern vorschau.astro */
   function openPreviewUrl() {
-    const btn = document.getElementById('btn-preview');
-    const isPublished = btn?.dataset.previewPublic?.trim();
-    const url = isPublished || btn?.dataset.previewDraft?.trim();
-    if (url) window.open(url, '_blank', 'noopener');
-    else void showNotice('Please save the project first.');
+    const slug = root!.dataset.postSlug?.trim();
+    if (!slug) {
+      void showNotice('Vorschau konnte nicht geöffnet werden — kein Slug vorhanden.');
+      return;
+    }
+
+    const publicBase = blogPublicPath || '/projects';
+    window.open(`${publicBase}/${encodeURIComponent(slug)}?show-preview=true`, '_blank', 'noopener');
   }
 
-  function initPreviewButton() {
-    document.getElementById('btn-preview')?.addEventListener('click', async () => {
-      const btn = document.getElementById('btn-preview') as HTMLButtonElement | null;
-      const needsFirstSave = btn?.dataset.previewNeedsSave === 'true';
-      const isDirty = Boolean(lastSavedSnapshot && captureSnapshot() !== lastSavedSnapshot);
+  document.getElementById('btn-preview')?.addEventListener('click', async () => {
+    const btn = document.getElementById('btn-preview') as HTMLButtonElement | null;
+    const needsFirstSave = root!.dataset.postPersisted !== 'true';
+    const isDirty = Boolean(lastSavedSnapshot && captureSnapshot() !== lastSavedSnapshot);
 
-      if (needsFirstSave || isDirty) {
-        btn!.disabled = true;
-        // preview save = keep status don't force draft
-        const status = btn?.dataset.previewPublic ? 'published' : 'draft';
-        const saved = await savePost(status, { redirectAfterSave: false });
-        btn!.disabled = false;
-        if (saved) openPreviewUrl();
-        return;
-      }
+    if (needsFirstSave || isDirty) {
+      if (btn) btn.disabled = true;
+      const saved = await savePost('save-draft');
+      if (btn) btn.disabled = false;
+      if (saved) openPreviewUrl();
+      return;
+    }
 
-      openPreviewUrl();
-    });
-  }
+    openPreviewUrl();
+  });
 
-  initPreviewButton();
+  onAdminEditorAction((action) => {
+    if (isSaveAction(action)) void savePost(action);
+  });
 
   /* Listen for form input changes and update dirty state. */
   document.getElementById('post-title')?.addEventListener('input', markDirtyIfChanged);
@@ -477,18 +501,6 @@ function initBlogPostFormEditor() {
   if (lastSavedSnapshot === null) {
     lastSavedSnapshot = captureSnapshot();
   }
-  document.getElementById('btn-save-draft')?.addEventListener('click', () => {
-    // "Save Draft" must not silently unpublish an already-published post —
-    // it means "save my edits", not "take this offline". Only force draft
-    // status for a post that isn't published yet.
-    const currentStatus = document.getElementById('post-status-display')?.dataset.status;
-    const targetStatus = currentStatus === 'published' ? 'published' : 'draft';
-    void savePost(targetStatus, { redirectAfterSave: true });
-  });
-
-  document.getElementById('btn-publish')?.addEventListener('click', () => {
-    void savePost('published', { redirectAfterSave: true });
-  });
 }
 
 function setSaveStatus(status: 'idle' | 'saving' | 'saved' | 'dirty', savedAt?: Date) {

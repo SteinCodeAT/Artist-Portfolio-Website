@@ -24,8 +24,13 @@ import {
 	uploadImages,
 } from './content-section-of-post-editor.ts';
 import { initEventGallerySection } from './event-gallery-section.ts';
+import { onAdminEditorAction } from './editor-save-dropdown.ts';
 
 type SaveAction = 'save-draft' | 'publish' | 'discard-draft';
+
+function isSaveAction(action: string): action is SaveAction {
+	return action === 'save-draft' || action === 'publish' || action === 'discard-draft';
+}
 
 function newFieldId(): string {
 	return crypto.randomUUID();
@@ -473,32 +478,6 @@ function syncEventIdToGalleryRoot(eventId: string) {
 	}
 }
 
-function initSaveDropdown(onAction: (action: SaveAction) => void) {
-	const dropdown = document.querySelector('[data-save-dropdown]');
-	const trigger = dropdown?.querySelector('[data-save-dropdown-trigger]') as HTMLButtonElement | null;
-	const menu = dropdown?.querySelector('[data-save-dropdown-menu]') as HTMLElement | null;
-
-	if (!dropdown || !trigger || !menu) return;
-
-	trigger.addEventListener('click', () => {
-		menu.hidden = !menu.hidden;
-	});
-
-	document.addEventListener('click', (event) => {
-		if (!dropdown.contains(event.target as Node)) {
-			menu.hidden = true;
-		}
-	});
-
-	menu.querySelectorAll('[data-save-action]').forEach((button) => {
-		button.addEventListener('click', () => {
-			menu.hidden = true;
-			const action = button.getAttribute('data-save-action') as SaveAction;
-			onAction(action);
-		});
-	});
-}
-
 function setHasPreviewDraftFlag(hasDraft: boolean) {
 	const root = document.getElementById('content-sections-root');
 	if (root) {
@@ -725,8 +704,8 @@ function initEventFormEditor() {
 		openPreviewUrl();
 	});
 
-	initSaveDropdown((action) => {
-		void saveEvent(action);
+	onAdminEditorAction((action) => {
+		if (isSaveAction(action)) void saveEvent(action);
 	});
 
 	document.getElementById('event-title')?.addEventListener('input', markDirtyIfChanged);

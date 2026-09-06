@@ -42,18 +42,34 @@ const posts = postsStore
 	</div>
 
 	<AdminPostList itemLabel="project" searchPlaceholder="Search projects…">
-		{posts.map((post) => (
+		{posts.map((post) => {
+			const draft = post.previewDraft;
+			const title = String(draft?.title ?? post.title);
+			const excerpt = String(draft?.description ?? post.description);
+			const year = String(draft?.year ?? post.year ?? '');
+			const cover = (draft?.mainImage as string | undefined) || post.mainImage || '/favicon.svg';
+			const neverPublished = post.status !== 'published';
+			const meta = neverPublished
+				? `Draft · ${year || 'no year set'}`
+				: draft
+					? `Published · Unpublished edits · ${year || 'no year set'}`
+					: `Published · ${year || 'no year set'}`;
+			const viewHref = neverPublished
+				? `/projects/${post.slug}?show-preview=true`
+				: `/projects/${post.slug}`;
+			return (
 			<AdminListCard
 				id={post.id}
-				title={post.title}
-				excerpt={post.description}
-				meta={`${post.status === 'published' ? 'Published' : 'Draft'} · ${post.year || 'no year set'}`}
-				coverSrc={post.mainImage || '/favicon.svg'}
+				title={title}
+				excerpt={excerpt}
+				meta={meta}
+				coverSrc={cover}
 				editHref={`${adminPaths.base}/projects-manager/bearbeiten?id=${post.id}`}
-				viewHref={post.status === 'published' ? `/projects/${post.slug}` : undefined}
+				viewHref={viewHref}
 				viewLabel="View"
 				editLabel="Edit"
 			/>
-		))}
+			);
+		})}
 	</AdminPostList>
 </AdminAreaLayout>

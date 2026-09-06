@@ -1,0 +1,73 @@
+---
+/**
+ * Fixed top bar for authorized `?show-preview=true` views of a live public page.
+ * Collection-agnostic — posts, events, or any other overlay preview can reuse it.
+ * Colors default to a neutral chrome; a host page can override via
+ * `--steincms-preview-bar-*` custom properties.
+ */
+interface Props {
+	editorHref: string;
+	editorLabel?: string;
+	badge?: string;
+}
+
+const {
+	editorHref,
+	editorLabel = 'Back to editor',
+	badge = 'Draft Preview',
+} = Astro.props;
+---
+
+<div class="steincms-preview-bar">
+	<span class="steincms-preview-bar-badge">{badge}</span>
+	<a class="steincms-preview-bar-link" href={editorHref}>&larr; {editorLabel}</a>
+	<slot />
+</div>
+
+<style>
+	.steincms-preview-bar {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		z-index: 999;
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		padding: 0.6rem 1.25rem;
+		background: var(--steincms-preview-bar-bg, #f4f4f5);
+		color: var(--steincms-preview-bar-fg, #52525b);
+		backdrop-filter: blur(8px);
+		border-bottom: 1px solid var(--steincms-preview-bar-border, #e4e4e7);
+		font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+		font-size: 0.78rem;
+	}
+
+	.steincms-preview-bar-badge {
+		padding: 0.15rem 0.6rem;
+		border-radius: 999px;
+		background: var(--steincms-preview-bar-badge-bg, #e4e4e7);
+		color: var(--steincms-preview-bar-badge-fg, #3f3f46);
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+	}
+
+	.steincms-preview-bar-link {
+		color: var(--steincms-preview-bar-fg, #52525b);
+		text-decoration: none;
+	}
+
+	.steincms-preview-bar-link:hover {
+		color: var(--steincms-preview-bar-accent, #18181b);
+	}
+
+	.steincms-preview-bar :global(a) {
+		color: var(--steincms-preview-bar-fg, #52525b);
+		text-decoration: none;
+	}
+
+	.steincms-preview-bar :global(a:hover) {
+		color: var(--steincms-preview-bar-accent, #18181b);
+	}
+</style>

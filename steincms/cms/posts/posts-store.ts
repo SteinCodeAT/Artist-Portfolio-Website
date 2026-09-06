@@ -11,6 +11,7 @@ import { ensureUniqueSlug, slugify } from '@steincms/cms/core/slug';
 import { sanitizeHtml } from '@steincms/cms/core/sanitize-html';
 import { createUuidV7 } from '@steincms/cms/core/uuid';
 import { deleteEntryMedia, isMediaUrl, type MediaConfig } from '@steincms/cms/media/media-store';
+import { buildPreviewDraft, type PreviewDraftOverlay, type RecordDef } from '@steincms/cms/schema';
 import type { RecordListStorage } from '@steincms/cms/storage/record-list';
 
 export type TextBlock = {
@@ -67,6 +68,17 @@ export type PostRecord = {
 	publishedAt: string | null;
 	createdAt: string;
 	updatedAt: string;
+	previewDraft?: PreviewDraftOverlay | null;
+};
+
+export type PostFormInput = {
+	title: string;
+	description: string;
+	mainImage?: string | null;
+	blocks: ContentBlock[];
+	mainGallery: string[];
+	year: string | null;
+	videoEmbedUrl?: string | null;
 };
 
 export type CreatePostInput = {
@@ -98,6 +110,7 @@ export type PostsStoreConfig = {
 	/** Stable per-collection path used only to serialize concurrent writes (see core/file-store.ts). Not a data file. */
 	lockFilePath: string;
 	mediaConfig: MediaConfig;
+	record: RecordDef;
 };
 
 function isValidImageUrl(url: string, mediaConfig: MediaConfig): boolean {
@@ -328,6 +341,7 @@ export function createPostsStore(config: PostsStoreConfig, storage: RecordListSt
 						: null,
 				createdAt: now,
 				updatedAt: now,
+				previewDraft: null,
 			};
 
 			writePostRecords([...existing, newPost]);
@@ -386,6 +400,8 @@ export function createPostsStore(config: PostsStoreConfig, storage: RecordListSt
 				delete updatedPost.mainImage;
 			}
 
+			updatedPost.previewDraft = current.previewDraft ?? null;
+
 			const updated = [...existing];
 			updated[index] = updatedPost;
 			writePostRecords(updated);
@@ -406,6 +422,154 @@ export function createPostsStore(config: PostsStoreConfig, storage: RecordListSt
 		});
 	}
 
+	function parseFormInput(body: Record<string, unknown>): PostFormInput {
+		const title = String(body.title ?? '').trim();
+		if (!title) {
+			throw new Error('Titel fehlt');
+		}
+
+		const year = String(body.year ?? '').trim();
+		if (!year) {
+			throw new Error('Jahr fehlt');
+		}
+
+		const description = String(body.description ?? '').trim();
+		const blocks = validateAndSanitizeBlocks(body.blocks ?? []);
+		const mainGallery = parseMainGallery(body.mainGallery) ?? [];
+		const mainImage = body.mainImage !== undefined ? parseMainImage(body.mainImage) : null;
+		const videoEmbedUrl =
+			body.videoEmbedUrl == null ? null : String(body.videoEmbedUrl).trim() || null;
+
+		return {
+			title,
+			description,
+			mainImage: mainImage ?? null,
+			blocks,
+			mainGallery,
+			year,
+			videoEmbedUrl,
+		};
+	}
+
+	function applyLiveFields(current: PostRecord, input: PostFormInput, existing: PostRecord[]): PostRecord {
+		let nextSlug = current.slug;
+		if (input.title !== current.title) {
+			nextSlug = ensureUniqueSlug(
+				slugify(input.title),
+				existing.map((post) => post.slug),
+				current.slug,
+			);
+		}
+
+		return {
+			...current,
+			title: input.title,
+			description: input.description,
+			mainImage: input.mainImage ?? null,
+			blocks: input.blocks,
+			mainGallery: input.mainGallery,
+			year: input.year,
+			videoEmbedUrl: input.videoEmbedUrl ?? null,
+			slug: nextSlug,
+			status: 'published',
+			publishedAt: resolvePublishedAt(current.publishedAt, 'published'),
+			updatedAt: new Date().toISOString(),
+			previewDraft: null,
+		};
+	}
+
+	function savePreviewDraft(id: string, input: PostFormInput): Promise<PostRecord> {
+		return store.runWithLock(() => {
+			const existing = readPostRecords();
+			const draft = buildPreviewDraft(input as unknown as Record<string, unknown>, config.record);
+			const index = existing.findIndex((post) => post.id === id);
+
+			if (index === -1) {
+				const now = new Date().toISOString();
+				const slug = ensureUniqueSlug(
+					slugify(input.title),
+					existing.map((post) => post.slug),
+				);
+				const stub: PostRecord = {
+					id,
+					slug,
+					title: input.title,
+					description: '',
+					blocks: [],
+					mainGallery: [],
+					year: input.year,
+					videoEmbedUrl: null,
+					status: 'draft',
+					publishedAt: null,
+					createdAt: now,
+					updatedAt: now,
+					previewDraft: draft,
+				};
+				writePostRecords([...existing, stub]);
+				return stub;
+			}
+
+			const updated = [...existing];
+			updated[index] = { ...existing[index], previewDraft: draft };
+			writePostRecords(updated);
+			return updated[index];
+		});
+	}
+
+	function publishPost(id: string, input: PostFormInput): Promise<PostRecord> {
+		return store.runWithLock(() => {
+			const existing = readPostRecords();
+			const index = existing.findIndex((post) => post.id === id);
+			const now = new Date().toISOString();
+
+			if (index === -1) {
+				const slug = ensureUniqueSlug(
+					slugify(input.title),
+					existing.map((post) => post.slug),
+				);
+				const published: PostRecord = {
+					id,
+					slug,
+					title: input.title,
+					description: input.description,
+					mainImage: input.mainImage ?? null,
+					blocks: input.blocks,
+					mainGallery: input.mainGallery,
+					year: input.year,
+					videoEmbedUrl: input.videoEmbedUrl ?? null,
+					status: 'published',
+					publishedAt: now,
+					createdAt: now,
+					updatedAt: now,
+					previewDraft: null,
+				};
+				writePostRecords([...existing, published]);
+				return published;
+			}
+
+			const published = applyLiveFields(existing[index], input, existing);
+			const updated = [...existing];
+			updated[index] = published;
+			writePostRecords(updated);
+			return published;
+		});
+	}
+
+	function discardPreviewDraft(id: string): Promise<PostRecord | null> {
+		return store.runWithLock(() => {
+			const existing = readPostRecords();
+			const index = existing.findIndex((post) => post.id === id);
+			if (index === -1) {
+				return null;
+			}
+
+			const updated = [...existing];
+			updated[index] = { ...existing[index], previewDraft: null };
+			writePostRecords(updated);
+			return updated[index];
+		});
+	}
+
 	return {
 		readPostRecords,
 		loadPosts,
@@ -416,9 +580,13 @@ export function createPostsStore(config: PostsStoreConfig, storage: RecordListSt
 		parseMainGallery,
 		validateAndSanitizeBlocks,
 		parsePublishedAt,
+		parseFormInput,
 		appendPostRecord,
 		updatePostRecord,
 		deletePostRecord,
+		savePreviewDraft,
+		publishPost,
+		discardPreviewDraft,
 		nextPostId,
 	};
 }

@@ -19,13 +19,13 @@ interface Link {
 import '../styles/project-card-page.css';
 import { Icon } from "astro-icon/components";
 
-const { title, description, project } = Astro.props;
+const { title, description, project, noindex = false } = Astro.props;
 
 // project.images are plain URL strings (CMS-uploaded, already web-sized) —
 // not astro:assets ImageMetadata, so this renders as plain <img>, not <Image>.
 const randomlySortedImages = project.images.slice().reverse().sort(() => 0.5 - Math.random())
 ---
-<Layout title={title} description={description}>
+<Layout title={title} description={description} noindex={noindex}>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">

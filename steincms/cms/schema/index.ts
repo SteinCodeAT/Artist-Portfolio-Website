@@ -51,6 +51,17 @@ export {
 	textFieldRows,
 } from './fields';
 export {
+	applyPreviewDraft,
+	buildPreviewDraft,
+	derivePreviewDraftZod,
+	overlayFieldNames,
+	overlayFields,
+	recordForDisplay,
+	stripPreviewDraft,
+	type PreviewDraftOverlay,
+	type RecordDisplayResult,
+} from './preview-draft';
+export {
 	eventEditorPanelsFromRecord,
 	fieldByName,
 	fieldsOfKind,

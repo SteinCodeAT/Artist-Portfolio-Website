@@ -19,6 +19,7 @@ export const posts = sqliteTable(
 		publishedAt: text('published_at'),
 		createdAt: text('created_at'),
 		updatedAt: text('updated_at'),
+		previewDraft: text('preview_draft', { mode: 'json' }).$type<unknown>(),
 	},
 	(table) => [
 		index('posts_status_idx').on(table.status),

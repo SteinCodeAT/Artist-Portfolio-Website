@@ -1,5 +1,6 @@
+import { recordForDisplay, type RecordDef } from '@steincms/cms/schema';
 import type { EventRecordBase } from './events-store';
-import type { EventPreviewDraft } from './event-content-blocks';
+import type { EventContentBlock, EventRegistrationForm } from './event-content-blocks';
 
 export type EventDisplayResult<T extends EventRecordBase = EventRecordBase> = {
 	event: T;
@@ -11,54 +12,30 @@ function yearFromDate(date: string | null): number | null {
 	return date && /^\d{4}/.test(date) ? Number.parseInt(date.slice(0, 4), 10) : null;
 }
 
-function stripPreviewDraft<T extends EventRecordBase>(event: T): T {
-	const { previewDraft: _, ...publicEvent } = event;
-	return publicEvent as T;
-}
-
 /** Merge previewDraft for authorized preview mode; never expose draft fields otherwise. */
 export function eventForDisplay<T extends EventRecordBase>(
 	event: T,
 	options: { preview: boolean; authorized: boolean },
+	recordDef?: RecordDef,
 ): EventDisplayResult<T> {
-	const wantsPreview = options.preview && options.authorized;
-
-	if (!wantsPreview) {
-		return {
-			event: stripPreviewDraft(event),
-			isPreview: false,
-			hasDraft: false,
-		};
+	const { record, isPreview, hasDraft } = recordForDisplay(event, options, recordDef);
+	if (!hasDraft) {
+		return { event: record, isPreview, hasDraft };
 	}
 
-	const draft = event.previewDraft as EventPreviewDraft | null | undefined;
-	if (!draft) {
-		return {
-			event: stripPreviewDraft(event),
-			isPreview: true,
-			hasDraft: false,
-		};
-	}
-
-	const gallery = draft.gallery ?? event.gallery;
+	const gallery = (record.gallery ?? event.gallery) as string[];
 	return {
 		event: {
-			...event,
-			title: draft.title,
-			excerpt: draft.excerpt,
-			cover: draft.cover,
-			date: draft.date,
-			year: yearFromDate(draft.date),
-			category: draft.category,
-			location: draft.location ?? event.location,
-			blocks: draft.blocks,
+			...record,
+			year: yearFromDate(record.date),
 			gallery,
 			photoCount: gallery.length,
-			registrationForm: draft.registrationForm ?? event.registrationForm,
-			previewDraft: undefined,
+			blocks: (record.blocks ?? event.blocks) as EventContentBlock[] | undefined,
+			registrationForm:
+				(record.registrationForm as EventRegistrationForm | undefined) ?? event.registrationForm,
 		},
-		isPreview: true,
-		hasDraft: true,
+		isPreview,
+		hasDraft,
 	};
 }
 

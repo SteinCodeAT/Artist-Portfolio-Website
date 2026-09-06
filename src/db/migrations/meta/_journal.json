@@ -29,6 +29,13 @@
       "when": 1788705729798,
       "tag": "0003_dark_goblin_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1788709469729,
+      "tag": "0004_flippant_amazoness",
+      "breakpoints": true
     }
   ]
 }

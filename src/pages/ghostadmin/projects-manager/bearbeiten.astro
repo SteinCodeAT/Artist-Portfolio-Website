@@ -3,8 +3,11 @@
 export const prerender = false;
 
 import AdminAreaLayout from '@steincms/admin/layouts/AdminAreaLayout.astro';
+import AdminEditorActions from '@steincms/admin/components/AdminEditorActions.astro';
 import ContentSectionStyles from '@steincms/admin/components/ContentSectionStyles.astro';
 import ConfirmDeleteModal from '@steincms/admin/components/ConfirmDeleteModal.astro';
+import { defaultEditorSaveActions } from '@steincms/admin/editor-actions';
+import { postEditorSource } from '@steincms/cms/posts/post-display';
 import { cms } from '../../../cms';
 import { siteConfig } from '../../../site.config';
 import { adminNav, adminPaths, adminLayoutText } from '../../../admin-nav';
@@ -13,6 +16,10 @@ const { postsStore } = cms;
 const id = Astro.url.searchParams.get('id');
 const post = id && postsStore ? postsStore.findPostById(id) : null;
 const isEdit = Boolean(post);
+const source = post ? postEditorSource(post) : null;
+const editorPostId = post?.id ?? (postsStore ? postsStore.nextPostId(postsStore.readPostRecords()) : '');
+const hasPreviewDraft = Boolean(post?.previewDraft);
+const editingDraft = source?.editingDraft ?? false;
 
 const currentYear = new Date().getFullYear();
 ---
@@ -27,7 +34,7 @@ const currentYear = new Date().getFullYear();
 	adminLogoSrc={siteConfig.admin.logo}
 	navItems={adminNav}
 	{...adminLayoutText}
-	wideContent
+	wideContent={false}
 >
 	<ContentSectionStyles />
 
@@ -39,32 +46,35 @@ const currentYear = new Date().getFullYear();
 				type="text"
 				class="editor-title-input"
 				placeholder="Project title"
-				value={post?.title ?? ''}
+				value={source?.title ?? ''}
 			/>
 		</div>
-		<div class="toolbar-actions">
-			<span id="save-status" class="save-status"></span>
-			<button
-				type="button"
-				class="btn-ghost"
-				id="btn-preview"
-				data-preview-needs-save={isEdit ? 'false' : 'true'}
-				data-preview-draft={isEdit ? `${adminPaths.base}/projects-manager/vorschau?id=${post!.id}` : ''}
-				data-preview-public={post?.status === 'published' ? `/projects/${post.slug}` : undefined}
-			>Preview</button>
-			<button type="button" class="btn-ghost" id="btn-save-draft">{post?.status === 'published' ? 'Save' : 'Save Draft'}</button>
-			<button type="button" class="btn-primary" id="btn-publish">Publish</button>
-		</div>
+		<AdminEditorActions
+			showStatus
+			draftBadge={
+				editingDraft
+					? { label: 'Entwurf', title: 'Gespeicherter Entwurf — noch nicht veröffentlicht' }
+					: null
+			}
+			preview={{
+				label: 'Entwurfsvorschau',
+				title: 'Zeigt den Entwurf an, ohne die Website zu veröffentlichen',
+			}}
+			triggerLabel="Speichern ▾"
+			actions={defaultEditorSaveActions(hasPreviewDraft)}
+		/>
 	</header>
 
 	<div
 		id="content-sections-root"
-		data-post-id={post?.id ?? ''}
+		data-post-id={editorPostId}
+		data-post-persisted={isEdit ? 'true' : 'false'}
+		data-post-slug={post?.slug ?? ''}
+		data-has-preview-draft={hasPreviewDraft ? 'true' : 'false'}
 		data-admin-path={adminPaths.base}
 		data-blog-public-path="/projects"
 		data-posts-list-path={`${adminPaths.base}/projects-manager`}
-		data-posts-preview-path={`${adminPaths.base}/projects-manager/vorschau`}
-		data-initial-blocks={JSON.stringify(post?.blocks ?? [])}
+		data-initial-blocks={JSON.stringify(source?.blocks ?? [])}
 		data-upload-content-type="posts"
 		class="editor-layout"
 	>
@@ -73,7 +83,7 @@ const currentYear = new Date().getFullYear();
 				<label class="field">
 					<span class="field-label-inline">Description (short blurb)</span>
 					<small class="field-hint">Used as the Signal TV channel text, the project intro, and the SEO description.</small>
-					<textarea id="post-description" rows="3">{post?.description ?? ''}</textarea>
+					<textarea id="post-description" rows="3">{source?.description ?? ''}</textarea>
 				</label>
 			</section>
 
@@ -98,8 +108,8 @@ const currentYear = new Date().getFullYear();
 			<section
 				class="editor-panel main-gallery-panel"
 				id="main-gallery-root"
-				data-main-gallery-id={post?.id ?? ''}
-				data-initial-gallery={JSON.stringify(post?.mainGallery ?? [])}
+				data-main-gallery-id={editorPostId}
+				data-initial-gallery={JSON.stringify(source?.mainGallery ?? [])}
 				aria-labelledby="main-gallery-heading"
 			>
 				<div class="blocks-toolbar">
@@ -137,7 +147,7 @@ const currentYear = new Date().getFullYear();
 					<div class="main-image-preview-wrap">
 						<div class="main-image-preview" id="main-image-preview"></div>
 					</div>
-					<input type="hidden" id="post-main-image" value={post?.mainImage ?? ''} />
+					<input type="hidden" id="post-main-image" value={source?.mainImage ?? ''} />
 					<input type="file" id="main-image-file" accept="image/*" hidden />
 					<div class="main-image-actions">
 						<button type="button" id="btn-main-image-upload" class="btn-ghost btn-sm">Choose Image</button>
@@ -150,7 +160,7 @@ const currentYear = new Date().getFullYear();
 					<label class="field">
 						<span class="field-label-inline">Video Embed URL</span>
 						<small class="field-hint">Optional. A Vimeo player URL — on the project's Vimeo page, use Share → Embed and copy the src from the iframe code (looks like https://player.vimeo.com/video/12345678). Shown above the write-up.</small>
-						<input type="text" id="post-video-embed-url" value={post?.videoEmbedUrl ?? ''} placeholder="https://player.vimeo.com/video/12345678" />
+						<input type="text" id="post-video-embed-url" value={source?.videoEmbedUrl ?? ''} placeholder="https://player.vimeo.com/video/12345678" />
 					</label>
 				</section>
 
@@ -161,7 +171,7 @@ const currentYear = new Date().getFullYear();
 					</p>
 					<label class="field">
 						<span class="field-label-inline">Year</span>
-						<input type="text" id="post-year" value={post?.year ?? ''} placeholder={currentYear.toString()}/>
+						<input type="text" id="post-year" value={source?.year ?? ''} placeholder={currentYear.toString()}/>
 					</label>
 					<label class="field">
 						<span class="field-label-inline">Publish Date</span>
@@ -247,26 +257,6 @@ const currentYear = new Date().getFullYear();
 	.editor-title-input:focus {
 		outline: none;
 		box-shadow: inset 0 -2px 0 #00c896;
-	}
-
-	.toolbar-actions {
-		display: flex;
-		gap: 0.5rem;
-		align-items: center;
-		flex-wrap: wrap;
-	}
-
-	.save-status {
-		font-size: 0.82rem;
-		color: #667085;
-	}
-
-	.save-status.is-dirty {
-		color: #b54708;
-	}
-
-	.save-status.is-saved {
-		color: #027a48;
 	}
 
 	.editor-layout {

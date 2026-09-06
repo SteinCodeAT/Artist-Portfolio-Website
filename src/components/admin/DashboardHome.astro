@@ -8,6 +8,7 @@ type ProjectRow = {
 	title: string;
 	year: string | null;
 	status: 'draft' | 'published';
+	hasPreviewDraft?: boolean;
 };
 
 interface Props {
@@ -102,12 +103,12 @@ function formatWhen(iso: string | null | undefined): string {
 								<div>
 									<p class="dash-row-title">{post.title}</p>
 									<p class="dash-row-meta">
-										{post.year || 'no year'} · {post.status === 'published' ? 'Published' : 'Draft'}
+										{post.year || 'no year'} · {post.status === 'published' ? (post.hasPreviewDraft ? 'Published · Unpublished edits' : 'Published') : 'Draft'}
 									</p>
 								</div>
 								<div class="dash-row-actions">
-									<span class:list={['dash-badge', post.status === 'published' && 'dash-badge--ok']}>
-										{post.status === 'published' ? 'Live' : 'Draft'}
+									<span class:list={['dash-badge', post.status === 'published' && !post.hasPreviewDraft && 'dash-badge--ok']}>
+										{post.status === 'published' ? (post.hasPreviewDraft ? 'Edits' : 'Live') : 'Draft'}
 									</span>
 									<a href={`${projectsHref}/bearbeiten?id=${post.id}`}>Edit</a>
 								</div>

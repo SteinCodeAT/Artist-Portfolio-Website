@@ -1,45 +1,79 @@
 ---
 import type { FieldDef } from '@steincms/cms/schema';
 import { isContentBlockListField } from '@steincms/cms/schema';
+import { defaultEditorSaveActions } from '../editor-actions';
+import AdminEditorActions from './AdminEditorActions.astro';
 import SchemaFormField from './SchemaFormField.astro';
 
 interface Props {
 	fields: FieldDef[];
 	values: Record<string, unknown>;
 	formId?: string;
-	submitLabel?: string;
+	hasPreviewDraft?: boolean;
+	editingDraft?: boolean;
+	previewHref?: string | null;
 }
 
-const { fields, values, formId = 'schema-form', submitLabel = 'Speichern' } = Astro.props;
+const {
+	fields,
+	values,
+	formId = 'schema-form',
+	hasPreviewDraft = false,
+	editingDraft = false,
+	previewHref = null,
+} = Astro.props;
 
 const visibleFields = fields.filter(
 	(field) => field.admin.visible !== false && !isContentBlockListField(field),
 );
 ---
 
-<form id={formId} class="schema-form">
+<form
+	id={formId}
+	class="schema-form"
+	data-preview-href={previewHref ?? ''}
+	data-has-preview-draft={hasPreviewDraft ? 'true' : 'false'}
+>
+	<div class="schema-form-actions">
+		<AdminEditorActions
+			showStatus
+			draftBadge={{
+				label: 'Entwurf',
+				title: 'Gespeicherter Entwurf — noch nicht veröffentlicht',
+				hidden: !editingDraft,
+			}}
+			preview={
+				previewHref
+					? {
+							label: 'Entwurfsvorschau',
+							title: 'Zeigt den Entwurf an, ohne die Website zu veröffentlichen',
+						}
+					: null
+			}
+			triggerLabel="Speichern ▾"
+			actions={defaultEditorSaveActions(hasPreviewDraft)}
+		/>
+	</div>
 	{
 		visibleFields.map((field) => (
 			<SchemaFormField field={field} name={field.name} value={values[field.name]} />
 		))
 	}
-	<div class="schema-form-actions">
-		<button type="submit" class="btn-primary">{submitLabel}</button>
-		<span class="schema-form-status" aria-live="polite"></span>
-	</div>
 </form>
 
 <style>
 	.schema-form {
 		display: grid;
 		gap: 1rem;
-		max-width: 48rem;
+		max-width: 100%;
+		width: 100%;
 	}
 
 	.schema-form :global(.schema-field),
 	.schema-form :global(.schema-fieldset) {
 		display: grid;
 		gap: 0.35rem;
+		width: 100%;
 	}
 
 	.schema-form :global(.schema-field-wide) {
@@ -66,11 +100,15 @@ const visibleFields = fields.filter(
 	.schema-form-actions {
 		display: flex;
 		align-items: center;
+		justify-content: flex-end;
 		gap: 0.75rem;
+		margin-top: 0.5rem;
 	}
 </style>
 
 <script>
+	import { onAdminEditorAction } from '../scripts/editor-save-dropdown';
+
 	function readControlValue(element: HTMLInputElement | HTMLTextAreaElement): unknown {
 		const kind = element.dataset.kind;
 		if (
@@ -115,33 +153,162 @@ const visibleFields = fields.filter(
 		return data;
 	}
 
-	const form = document.getElementById('schema-form') as HTMLFormElement | null;
-	const statusEl = document.querySelector('.schema-form-status');
-	const collectionId =
-		form?.closest('[data-schema-collection]')?.getAttribute('data-schema-collection') ??
-		document.body.dataset.schemaCollection;
+	type SaveAction = 'save-draft' | 'publish' | 'discard-draft';
 
-	form?.addEventListener('submit', async (event) => {
-		event.preventDefault();
-		if (!collectionId) return;
-		if (!form.checkValidity()) {
-			form.reportValidity();
+	function isSaveAction(action: string): action is SaveAction {
+		return action === 'save-draft' || action === 'publish' || action === 'discard-draft';
+	}
+
+	function setSaveStatus(
+		status: 'idle' | 'saving' | 'saved' | 'dirty' | 'draft-saved' | 'published',
+		savedAt?: Date,
+	) {
+		const statusEl = document.getElementById('save-status');
+		if (!statusEl) return;
+
+		statusEl.classList.remove('is-saving', 'is-dirty', 'is-saved');
+
+		if (status === 'saving') {
+			statusEl.textContent = 'Speichert…';
+			statusEl.classList.add('is-saving');
 			return;
 		}
-		if (statusEl) statusEl.textContent = 'Speichert…';
+		if (status === 'draft-saved' && savedAt) {
+			statusEl.textContent = `Entwurf gespeichert um ${savedAt.toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' })}`;
+			statusEl.classList.add('is-saved');
+			return;
+		}
+		if (status === 'published' && savedAt) {
+			statusEl.textContent = `Veröffentlicht um ${savedAt.toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' })}`;
+			statusEl.classList.add('is-saved');
+			return;
+		}
+		if (status === 'saved' && savedAt) {
+			statusEl.textContent = `Gespeichert um ${savedAt.toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' })}`;
+			statusEl.classList.add('is-saved');
+			return;
+		}
+		if (status === 'dirty') {
+			statusEl.textContent = 'Ungespeicherte Änderungen';
+			statusEl.classList.add('is-dirty');
+			return;
+		}
+		statusEl.textContent = '';
+	}
 
-		const response = await fetch(`/api/content/${collectionId}`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			credentials: 'same-origin',
-			body: JSON.stringify(readSchemaForm(form)),
+	function setHasPreviewDraftFlag(hasDraft: boolean) {
+		const form = document.querySelector<HTMLFormElement>('form.schema-form');
+		if (form) {
+			form.dataset.hasPreviewDraft = hasDraft ? 'true' : 'false';
+		}
+
+		const discardBtn = document.querySelector(
+			'[data-save-action="discard-draft"]',
+		) as HTMLButtonElement | null;
+		if (discardBtn) {
+			discardBtn.hidden = !hasDraft;
+		}
+
+		const badge = document.querySelector('.draft-badge') as HTMLElement | null;
+		if (badge) {
+			badge.hidden = !hasDraft;
+		}
+	}
+
+	function initSchemaFormEditor() {
+		const editorForm = document.querySelector<HTMLFormElement>('form.schema-form');
+		if (!editorForm) return;
+
+		const collectionId =
+			editorForm.closest('[data-schema-collection]')?.getAttribute('data-schema-collection') ??
+			document.body.dataset.schemaCollection;
+		if (!collectionId) return;
+
+		const form: HTMLFormElement = editorForm;
+		let lastSavedSnapshot = JSON.stringify(readSchemaForm(form));
+
+		const markDirtyIfChanged = () => {
+			if (JSON.stringify(readSchemaForm(form)) !== lastSavedSnapshot) {
+				setSaveStatus('dirty');
+			}
+		};
+
+		form.addEventListener('submit', (event) => {
+			event.preventDefault();
+		});
+		form.addEventListener('input', markDirtyIfChanged);
+		form.addEventListener('change', markDirtyIfChanged);
+
+		async function saveSingleton(action: SaveAction): Promise<Record<string, unknown> | null> {
+			if (!form.checkValidity()) {
+				form.reportValidity();
+				return null;
+			}
+
+			setSaveStatus('saving');
+			const response = await fetch(`/api/content/${collectionId}`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'same-origin',
+				body: JSON.stringify({ action, ...readSchemaForm(form) }),
+			});
+
+			const payload = (await response.json().catch(() => ({}))) as {
+				error?: string;
+				data?: Record<string, unknown>;
+			};
+
+			if (!response.ok) {
+				setSaveStatus('dirty');
+				const statusEl = document.getElementById('save-status');
+				if (statusEl) statusEl.textContent = payload.error ?? 'Speichern fehlgeschlagen';
+				return null;
+			}
+
+			lastSavedSnapshot = JSON.stringify(readSchemaForm(form));
+			const savedAt = new Date();
+
+			if (action === 'discard-draft') {
+				window.location.reload();
+				return payload.data ?? {};
+			}
+
+			if (action === 'save-draft') {
+				setSaveStatus('draft-saved', savedAt);
+				setHasPreviewDraftFlag(true);
+			} else {
+				setSaveStatus('published', savedAt);
+				setHasPreviewDraftFlag(false);
+			}
+
+			return payload.data ?? {};
+		}
+
+		function openPreviewUrl() {
+			const href = form.dataset.previewHref?.trim();
+			if (!href) return;
+			window.open(href, '_blank', 'noopener');
+		}
+
+		document.getElementById('btn-preview')?.addEventListener('click', async () => {
+			const btn = document.getElementById('btn-preview') as HTMLButtonElement | null;
+			const isDirty = JSON.stringify(readSchemaForm(form)) !== lastSavedSnapshot;
+
+			if (isDirty) {
+				if (btn) btn.disabled = true;
+				const saved = await saveSingleton('save-draft');
+				if (btn) btn.disabled = false;
+				if (saved) openPreviewUrl();
+				return;
+			}
+
+			openPreviewUrl();
 		});
 
-		const payload = (await response.json().catch(() => ({}))) as { error?: string };
-		if (!response.ok) {
-			if (statusEl) statusEl.textContent = payload.error ?? 'Speichern fehlgeschlagen';
-			return;
-		}
-		if (statusEl) statusEl.textContent = 'Gespeichert';
-	});
+		onAdminEditorAction((action) => {
+			if (isSaveAction(action)) void saveSingleton(action);
+		});
+	}
+
+	initSchemaFormEditor();
 </script>

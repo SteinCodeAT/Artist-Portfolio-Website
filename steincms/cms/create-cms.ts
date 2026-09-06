@@ -108,6 +108,7 @@ export function createCms(options: CreateCmsOptions): CmsInstance {
 
 					categories: siteConfig.events.categories,
 					mediaConfig,
+					record: eventsCollection.def.record,
 				},
 				database)
 			: null;
@@ -118,6 +119,7 @@ export function createCms(options: CreateCmsOptions): CmsInstance {
 				{
 					lockFilePath: collectionLockPath(projectRoot, postsCollection.id),
 					mediaConfig,
+					record: postsCollection.def.record,
 				},
 				database)
 			: null;

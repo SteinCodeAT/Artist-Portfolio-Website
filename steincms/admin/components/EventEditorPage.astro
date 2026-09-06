@@ -1,5 +1,7 @@
 ---
 import ContentSectionStyles from './ContentSectionStyles.astro';
+import AdminEditorActions from './AdminEditorActions.astro';
+import { defaultEditorSaveActions } from '../editor-actions';
 import type { EventEditorSource } from '@steincms/cms/events/event-body-blocks';
 import type { EventRecordBase } from '@steincms/cms/events/events-store';
 import {
@@ -101,49 +103,22 @@ const initialRegistrationForm = source?.registrationForm ?? EMPTY_REGISTRATION_F
 			value={eventTitle}
 		/>
 	</div>
-	<div class="toolbar-actions">
-		<slot name="toolbar-actions" />
-		<span class="save-status" id="save-status" aria-live="polite"></span>
-		{
-			editingDraft && (
-				<span class="draft-badge" title="Gespeicherter Entwurf — noch nicht veröffentlicht">
-					Entwurf
-				</span>
-			)
+	<AdminEditorActions
+		showStatus
+		draftBadge={
+			editingDraft
+				? { label: 'Entwurf', title: 'Gespeicherter Entwurf — noch nicht veröffentlicht' }
+				: null
 		}
-		<button
-			type="button"
-			class="btn-ghost"
-			id="btn-preview"
-			title="Zeigt den Entwurf an, ohne die Website zu veröffentlichen"
-		>
-			Entwurfsvorschau
-		</button>
-		<div class="save-dropdown" data-save-dropdown>
-			<button type="button" class="btn-primary save-dropdown-trigger" data-save-dropdown-trigger>
-				Speichern ▾
-			</button>
-			<div class="save-dropdown-menu" data-save-dropdown-menu hidden>
-				<button type="button" class="save-dropdown-item" data-save-action="save-draft">
-					<strong>Entwurf speichern</strong>
-					<small>Nur Entwurf — Website bleibt unverändert</small>
-				</button>
-				<button type="button" class="save-dropdown-item" data-save-action="publish">
-					<strong>Speichern &amp; Veröffentlichen</strong>
-					<small>Entwurf übernehmen und live schalten</small>
-				</button>
-				<button
-					type="button"
-					class="save-dropdown-item save-dropdown-item-danger"
-					data-save-action="discard-draft"
-					hidden={!hasPreviewDraft}
-				>
-					<strong>Entwurf verwerfen</strong>
-					<small>Zurück zum veröffentlichten Stand</small>
-				</button>
-			</div>
-		</div>
-	</div>
+		preview={{
+			label: 'Entwurfsvorschau',
+			title: 'Zeigt den Entwurf an, ohne die Website zu veröffentlichen',
+		}}
+		triggerLabel="Speichern ▾"
+		actions={defaultEditorSaveActions(hasPreviewDraft)}
+	>
+		<slot name="toolbar-actions" />
+	</AdminEditorActions>
 </header>
 
 {!hasGuestTab && <slot name="after-toolbar" />}
@@ -660,13 +635,6 @@ const initialRegistrationForm = source?.registrationForm ?? EMPTY_REGISTRATION_F
 	.editor-title-input:focus {
 		outline: none;
 		box-shadow: inset 0 -2px 0 #a18b63;
-	}
-
-	.toolbar-actions {
-		display: flex;
-		gap: 0.5rem;
-		flex-wrap: wrap;
-		align-items: center;
 	}
 
 	.editor-form {
@@ -1437,83 +1405,6 @@ const initialRegistrationForm = source?.registrationForm ?? EMPTY_REGISTRATION_F
 		color: #4a5568;
 	}
 
-	.save-status {
-		font-size: 0.82rem;
-		color: #667085;
-		align-self: center;
-	}
-
-	.save-status.is-dirty {
-		color: #b54708;
-	}
-
-	.save-status.is-saved {
-		color: #027a48;
-	}
-
-	.draft-badge {
-		font-size: 0.78rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		padding: 0.25rem 0.55rem;
-		border-radius: 999px;
-		background: #fef0c7;
-		color: #b54708;
-		border: 1px solid #fedf89;
-	}
-
-	.save-dropdown {
-		position: relative;
-	}
-
-	.save-dropdown-menu {
-		position: absolute;
-		top: calc(100% + 0.35rem);
-		right: 0;
-		z-index: 30;
-		min-width: 16.5rem;
-		padding: 0.35rem;
-		border: 1px solid #e4e7ec;
-		border-radius: 10px;
-		background: #fff;
-		box-shadow: 0 8px 24px rgba(16, 24, 40, 0.12);
-	}
-
-	.save-dropdown-item {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.15rem;
-		width: 100%;
-		padding: 0.65rem 0.75rem;
-		border: none;
-		border-radius: 8px;
-		background: transparent;
-		text-align: left;
-		font: inherit;
-		cursor: pointer;
-	}
-
-	.save-dropdown-item:hover {
-		background: #f5f6f8;
-	}
-
-	.save-dropdown-item strong {
-		font-size: 0.92rem;
-		color: #1a1a1a;
-	}
-
-	.save-dropdown-item small {
-		font-size: 0.78rem;
-		color: #667085;
-		line-height: 1.35;
-	}
-
-	.save-dropdown-item-danger strong {
-		color: #b42318;
-	}
-
 	/* ─── Edit / Gästeliste tabs (card style) ─── */
 
 	.editor-shell {
@@ -1699,20 +1590,6 @@ const initialRegistrationForm = source?.registrationForm ?? EMPTY_REGISTRATION_F
 		.editor-shell .editor-tab-root {
 			border-radius: 12px;
 			margin-top: 0.35rem;
-		}
-
-		.toolbar-actions {
-			width: 100%;
-		}
-
-		.toolbar-actions .btn-ghost,
-		.toolbar-actions .btn-primary {
-			flex: 1;
-			text-align: center;
-		}
-
-		#btn-preview {
-			flex: 0 0 100%;
 		}
 	}
 </style>

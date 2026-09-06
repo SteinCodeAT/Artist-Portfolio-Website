@@ -1,28 +1,40 @@
 ---
-// One dynamic route for every project, replacing the old one-static-file-
-// per-project pages — content now comes entirely from the CMS `posts`
-// collection, so there's a single source of truth for both this page and
-// the admin editor.
-//
-// On-demand (prerender = false), not static: a static build bakes the
-// page's HTML in at `astro build` time, so any edit made afterwards in the
-// admin (new cover image, updated text, a removed image) would silently
-// never show up on the live site until the project is rebuilt and
-// redeployed — from the artist's side that looks exactly like "saving does
-// nothing" / "the old image keeps coming back". Rendering on request keeps
-// this route reading the same live DB the admin edits.
+// On-demand so admin edits (including authorized draft preview) read the live DB.
 export const prerender = false;
 
 import ProjectPage from '../../layouts/ProjectPage.astro';
+import PreviewBar from '@steincms/components/PreviewBar.astro';
+import { isAuthorizedRequest } from '@steincms/auth/admin-auth';
+import { postForDisplay } from '@steincms/cms/posts/post-display';
+import { findPostsCollection } from '@steincms/cms/schema';
 import { cms } from '../../cms';
+import { adminPaths } from '../../admin-nav';
 import { videoTypes } from '../../const.js';
 import type { ContentBlock } from '../../../steincms/cms/posts/posts-store';
 
 const { slug } = Astro.params;
-const post = slug && cms.postsStore ? cms.postsStore.findPostBySlug(slug) : undefined;
+const raw = slug && cms.postsStore ? cms.postsStore.findPostBySlug(slug) : undefined;
 
-if (!post || post.status !== 'published') {
+if (!raw) {
 	return new Response('Not found', { status: 404 });
+}
+
+const showPreview = Astro.url.searchParams.get('show-preview') === 'true';
+const authorized = isAuthorizedRequest(Astro.request);
+
+if ((!authorized || !showPreview) && raw.status !== 'published') {
+	return new Response('Not found', { status: 404 });
+}
+
+const postsCollection = findPostsCollection(cms.contentSchema);
+const { post, isPreview } = postForDisplay(
+	raw,
+	{ preview: showPreview, authorized },
+	postsCollection?.def.record,
+);
+
+if (isPreview) {
+	Astro.response.headers.set('Cache-Control', 'no-store');
 }
 
 const blocks = post.blocks as ContentBlock[];
@@ -46,6 +58,28 @@ const project = {
 };
 ---
 
-<ProjectPage title={`Çağdaş Çeçen - ${post.title}`} description={post.description} project={project}>
+<ProjectPage
+	title={`Çağdaş Çeçen - ${post.title}`}
+	description={post.description}
+	project={project}
+	noindex={isPreview}
+>
+	{isPreview && (
+		<div class="project-preview-bar">
+			<PreviewBar editorHref={`${adminPaths.base}/projects-manager/bearbeiten?id=${raw.id}`} />
+		</div>
+	)}
 	{textBlocks.map((block) => <Fragment set:html={block.html} />)}
+	{isPreview && (
+		<style>
+			.project-preview-bar {
+				--steincms-preview-bar-bg: rgba(3, 4, 6, 0.92);
+				--steincms-preview-bar-fg: #9a9da4;
+				--steincms-preview-bar-border: rgba(228, 228, 228, 0.15);
+				--steincms-preview-bar-badge-bg: #3a2c0f;
+				--steincms-preview-bar-badge-fg: #ffb020;
+				--steincms-preview-bar-accent: #00c896;
+			}
+		</style>
+	)}
 </ProjectPage>

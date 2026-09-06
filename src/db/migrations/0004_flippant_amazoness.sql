@@ -1,0 +1,1 @@
+ALTER TABLE `posts` ADD `preview_draft` text;

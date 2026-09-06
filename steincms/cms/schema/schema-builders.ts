@@ -12,6 +12,8 @@
 import { z } from 'zod';
 import type { FieldDef } from './fields/types';
 import type { CollectionKind } from '@steincms/cms/content-envelope';
+import { previewDraftField } from './fields/structured';
+import { derivePreviewDraftZod } from './preview-draft';
 
 // ---- Record: the fields of one entry --------------------------------------
 
@@ -40,6 +42,17 @@ export function defineRecord(input: DefineRecordInput): RecordDef {
 	const fields: RecordFields = {};
 	for (const [name, field] of Object.entries(input.fields)) {
 		fields[name] = { ...field, name };
+	}
+	if (!fields.previewDraft) {
+		fields.previewDraft = { ...previewDraftField(), name: 'previewDraft' };
+	}
+	for (const [name, field] of Object.entries(fields)) {
+		if (field.kind === 'previewDraft') {
+			fields[name] = {
+				...field,
+				zod: derivePreviewDraftZod(fields),
+			};
+		}
 	}
 	return {
 		fields,

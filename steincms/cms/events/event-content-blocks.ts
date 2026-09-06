@@ -1,10 +1,8 @@
 import { validateTableBlockFields } from '@steincms/cms/blocks/table-block';
 import { sanitizeHtml } from '@steincms/cms/core/sanitize-html';
 import { isMediaUrl, type MediaConfig } from '@steincms/cms/media/media-store';
-import {
-	parseRegistrationForm,
-	type EventRegistrationForm,
-} from './registration-form.ts';
+import { type PreviewDraftOverlay } from '@steincms/cms/schema';
+import { type EventRegistrationForm } from './registration-form.ts';
 
 export type {
 	EventRegistrationForm,
@@ -36,18 +34,7 @@ export type EventTableBlock = {
 
 export type EventContentBlock = EventTextBlock | EventImageBlock | EventTableBlock;
 
-export type EventPreviewDraft = {
-	title: string;
-	excerpt: string;
-	cover: string | null;
-	date: string | null;
-	category: string;
-	location?: string | null;
-	blocks: EventContentBlock[];
-	gallery: string[];
-	registrationForm?: EventRegistrationForm;
-	updatedAt: string;
-};
+export type EventPreviewDraft = PreviewDraftOverlay;
 
 export type EventFormInput = {
 	title: string;
@@ -60,21 +47,6 @@ export type EventFormInput = {
 	gallery: string[];
 	registrationForm?: EventRegistrationForm;
 };
-
-export function buildPreviewDraft(input: EventFormInput): EventPreviewDraft {
-	return {
-		title: input.title.trim(),
-		excerpt: (input.excerpt ?? '').trim(),
-		cover: input.cover ?? null,
-		date: input.date,
-		category: input.category,
-		location: input.location ?? null,
-		blocks: input.blocks,
-		gallery: input.gallery,
-		registrationForm: parseRegistrationForm(input.registrationForm),
-		updatedAt: new Date().toISOString(),
-	};
-}
 
 function stripHtml(html: string): string {
 	return html

@@ -24,6 +24,7 @@ function rowToPost(row: PostRow): PostRecord {
 		publishedAt: (row.publishedAt as string | null) ?? null,
 		createdAt: row.createdAt as string,
 		updatedAt: row.updatedAt as string,
+		previewDraft: (row.previewDraft as PostRecord['previewDraft']) ?? null,
 	};
 }
 
@@ -42,6 +43,7 @@ function postToRow(post: PostRecord): PostRow {
 		publishedAt: post.publishedAt,
 		createdAt: post.createdAt,
 		updatedAt: post.updatedAt,
+		previewDraft: post.previewDraft ?? null,
 	};
 }
 

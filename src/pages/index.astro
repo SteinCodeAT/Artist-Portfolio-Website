@@ -11,10 +11,15 @@ import Layout from '../layouts/Layout.astro';
 
 import SignalTV from '../components/SignalTV.astro'
 import ArtistCV from '../components/ArtistCV.astro'
+import PreviewBar from '@steincms/components/PreviewBar.astro';
+import { isAuthorizedRequest } from '@steincms/auth/admin-auth';
+import { getCollectionRecord, recordForDisplay } from '@steincms/cms/schema';
+import { readSingleton } from '@steincms/db/singletons-store';
 
 import CcProfileImage from '../img/cc-public.png'
 import { cmsDatabase } from '../db/cms-database';
-import { readSingleton } from '@steincms/db/singletons-store';
+import { contentSchema } from '../content.schema';
+import { adminPaths } from '../admin-nav';
 
 import '../styles/index.css';
 
@@ -26,8 +31,9 @@ new ways of interaction between humans and spaces.
 
 // Read on every request (see prerender = false above). Falls back to the
 // original hardcoded content if the singleton was never saved (fresh
-// install, no About content yet).
-type AboutContent = {
+// install, no About content yet). Authorized ?show-preview=true overlays
+// previewDraft so the admin can review without publishing.
+type AboutPageContent = {
 	bio?: string;
 	tagline?: string;
 	photo?: string | null;
@@ -40,13 +46,34 @@ type AboutContent = {
 	curatorial?: string[];
 	activities?: string[];
 	education?: string[];
+	previewDraft?: import('@steincms/cms/schema').PreviewDraftOverlay | null;
 };
-const about = readSingleton(cmsDatabase, 'about') as AboutContent | null;
+
+const rawAbout = readSingleton(cmsDatabase, 'about') as AboutPageContent | null;
+const showPreview = Astro.url.searchParams.get('show-preview') === 'true';
+const authorized = isAuthorizedRequest(Astro.request);
+const aboutRecord = getCollectionRecord(contentSchema.about);
+const displayed = rawAbout
+	? recordForDisplay(rawAbout, { preview: showPreview, authorized }, aboutRecord)
+	: { record: null, isPreview: showPreview && authorized, hasDraft: false };
+const about = displayed.record;
+const isPreview = displayed.isPreview;
+
+if (isPreview) {
+	Astro.response.headers.set('Cache-Control', 'no-store');
+}
+
 const photoSrc = about?.photo || CcProfileImage.src;
 const description = about?.tagline || fallbackDescription;
 ---
 
-<Layout title="Çağdaş Çeçen - Media Artist" description={description}>
+<Layout title="Çağdaş Çeçen - Media Artist" description={description} noindex={isPreview}>
+
+	{isPreview && (
+		<div class="about-preview-bar">
+			<PreviewBar editorHref={adminPaths.singletons.about ?? `${adminPaths.staticPages}/about`} />
+		</div>
+	)}
 
 	<main>
 		<a href="#main-card" class="sr-skip-link">
@@ -76,6 +103,19 @@ const description = about?.tagline || fallbackDescription;
 	</main>
 
 	<style>
+		.about-preview-bar {
+			--steincms-preview-bar-bg: rgba(3, 4, 6, 0.92);
+			--steincms-preview-bar-fg: #9a9da4;
+			--steincms-preview-bar-border: rgba(228, 228, 228, 0.15);
+			--steincms-preview-bar-badge-bg: #3a2c0f;
+			--steincms-preview-bar-badge-fg: #ffb020;
+			--steincms-preview-bar-accent: #00c896;
+		}
+
+		:global(body:has(.about-preview-bar)) {
+			padding-top: 3rem;
+		}
+
 		.site-footer {
 			position: relative;
 			background: #030406;

@@ -3,8 +3,13 @@ import type { ContentSchemaRegistry } from '@steincms/cms/schema';
 import { jsonResponse } from '@steincms/api/json-response';
 import { logCmsActivity } from '@steincms/api/log-cms-activity';
 import type { ActivityLogStore } from '@steincms/cms/activity-log';
+import {
+	applySingletonSaveAction,
+	isSingletonSaveAction,
+} from '@steincms/cms/singletons/singleton-draft';
 import type { CmsDatabase } from '@steincms/cms/storage/db-contract';
 import {
+	readSingleton,
 	readValidateSingleton,
 	writeValidateSingleton,
 } from '@steincms/db/singletons-store';
@@ -47,8 +52,24 @@ export function createCollectionContentHandler(
 
 		try {
 			const body = (await request.json()) as Record<string, unknown>;
-			const parsed = def.schema.safeParse(body);
-			if (!parsed.success) return jsonResponse({ error: parsed.error.message }, 400);
+			const actionRaw = String(body.action ?? 'publish').trim();
+			const action = isSingletonSaveAction(actionRaw) ? actionRaw : null;
+			if (!action) {
+				return jsonResponse({ error: 'Unbekannte Aktion' }, 400);
+			}
+
+			const { action: _unused, ...form } = body;
+			const current = readSingleton(options.database, collectionId);
+
+			if (action === 'discard-draft' && !current) {
+				return jsonResponse({ error: 'Seite nicht gefunden' }, 404);
+			}
+
+			const next = applySingletonSaveAction(current, form, action, def.record);
+			const parsed = def.schema.safeParse(next);
+			if (!parsed.success) {
+				return jsonResponse({ error: parsed.error.message }, 400);
+			}
 
 			writeValidateSingleton(
 				options.database,
@@ -56,10 +77,17 @@ export function createCollectionContentHandler(
 				def.schema as z.ZodTypeAny,
 				parsed.data as Record<string, unknown>,
 			);
+
 			const label = def.admin.label ?? collectionId;
+			const activityAction =
+				action === 'save-draft'
+					? 'Entwurf gespeichert'
+					: action === 'discard-draft'
+						? 'Entwurf verworfen'
+						: 'Seite veröffentlicht';
 			await logCmsActivity(options.activityLog, request, {
-				kind: 'page',
-				action: 'Seite gespeichert',
+				kind: action === 'save-draft' ? 'draft' : 'page',
+				action: activityAction,
 				title: label,
 				href: options.pageHref?.(collectionId),
 			});

@@ -13,7 +13,7 @@ import { cms } from '../../cms';
 const username = await getAuthenticatedUsername(Astro.request);
 const posts = cms.postsStore?.loadPosts() ?? [];
 const published = posts.filter((post) => post.status === 'published');
-const drafts = posts.filter((post) => post.status === 'draft');
+const drafts = posts.filter((post) => post.status !== 'published' || Boolean(post.previewDraft));
 const pages = listStaticPageEntries(contentSchema, adminPaths);
 const recent = cms.activityLog.readRecent(8);
 const recentProjects = [...posts]
@@ -21,9 +21,10 @@ const recentProjects = [...posts]
 	.slice(0, 5)
 	.map((post) => ({
 		id: post.id,
-		title: post.title,
-		year: post.year,
+		title: String(post.previewDraft?.title ?? post.title),
+		year: (post.previewDraft?.year as string | null | undefined) ?? post.year,
 		status: post.status,
+		hasPreviewDraft: Boolean(post.previewDraft),
 	}));
 ---
 

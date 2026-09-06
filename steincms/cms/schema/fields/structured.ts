@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { eventPreviewDraftSchema } from '@steincms/cms/events/event-preview-draft';
 import { registrationFormSchema } from '@steincms/cms/events/registration-form-schema';
 import { blockArraySchema } from './block-union';
 import type { BaseFieldOptions, ContentBlockListFieldDef, FieldDef } from './types';
@@ -64,6 +63,8 @@ export function previewDraftField(options: BaseFieldOptions = {}): FieldDef {
 			visible: options.admin?.visible ?? false,
 			editor: options.admin?.editor,
 		},
-		zod: eventPreviewDraftSchema.nullable().optional(),
+		// Placeholder — defineRecord() replaces this with a Zod object derived
+		// from sibling content fields + updatedAt.
+		zod: z.unknown().nullable().optional(),
 	};
 }

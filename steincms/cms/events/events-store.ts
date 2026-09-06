@@ -9,8 +9,8 @@ import { createFileStore } from '@steincms/cms/core/file-store';
 import { ensureUniqueSlug, slugify } from '@steincms/cms/core/slug';
 import { createUuidV7 } from '@steincms/cms/core/uuid';
 import { deleteEntryMedia, type MediaConfig } from '@steincms/cms/media/media-store';
+import { buildPreviewDraft, type RecordDef } from '@steincms/cms/schema';
 import {
-	buildPreviewDraft,
 	eventContentBlocksToBody,
 	validateEventContentBlocks,
 	type EventContentBlock,
@@ -72,6 +72,7 @@ export type EventsStoreConfig = {
 	baseUrl: string;
 	publicPath: string;
 	mediaConfig: MediaConfig;
+	record?: RecordDef;
 };
 
 function yearFromDate(date: string | null): number | null {
@@ -305,7 +306,7 @@ export function createEventsStore(config: EventsStoreConfig, storage: RecordList
 	function savePreviewDraft(id: string, input: EventFormInput): Promise<EventRecordBase> {
 		return store.runWithLock(() => {
 			const existing = readEventRecords();
-			const draft = buildPreviewDraft(input);
+			const draft = buildPreviewDraft(input as unknown as Record<string, unknown>, config.record);
 			const index = existing.findIndex((event) => event.id === id);
 
 			if (index === -1) {
