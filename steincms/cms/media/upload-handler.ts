@@ -11,6 +11,18 @@ export type UploadImageInput = {
 	preset?: ImagePreset;
 };
 
+function isCoverSlot(slot: string): boolean {
+	return slot === 'cover' || slot === 'cover.webp' || /_cover(?:\.webp)?$/.test(slot);
+}
+
+/** Generic cover requests get a unique file so drafts do not overwrite the live image. */
+function resolveUploadSlot(slot: string): string {
+	if (slot === 'cover' || slot === 'cover.webp') {
+		return `${createUuidV7()}_cover.webp`;
+	}
+	return slot;
+}
+
 export async function handleImageUpload(
 	config: MediaConfig,
 	input: UploadImageInput,
@@ -19,14 +31,16 @@ export async function handleImageUpload(
 		throw new Error('Ungültiger Dateityp');
 	}
 
+	const slot = resolveUploadSlot(input.slot);
+
 	return processUploadedImage(
 		input.buffer,
 		input.mime,
 		config,
 		input.contentType,
 		input.entryId,
-		input.slot,
-		input.preset ?? (input.slot === 'cover' ? 'cover' : 'gallery'),
+		slot,
+		input.preset ?? (isCoverSlot(input.slot) || isCoverSlot(slot) ? 'cover' : 'gallery'),
 	);
 }
 

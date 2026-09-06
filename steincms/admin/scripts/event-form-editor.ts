@@ -448,10 +448,11 @@ function initCoverPreview() {
 			const [result] = await uploadImages([file], {
 				contentType: 'events',
 				entryId,
-				slot: 'cover.webp',
+				slot: 'cover',
 				maxUploadBytes: readMaxUploadBytes(document.getElementById('content-sections-root')),
 			});
 			hiddenInput!.value = result.url;
+			hiddenInput!.dispatchEvent(new Event('change'));
 			if (filenameInput) {
 				filenameInput.value = result.url;
 			}
