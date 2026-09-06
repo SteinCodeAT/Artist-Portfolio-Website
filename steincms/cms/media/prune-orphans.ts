@@ -13,12 +13,15 @@ export type PruneOrphansOptions = {
 	database: CmsDatabase;
 	apply?: boolean;
 	includeDrafts?: boolean;
+	/** Days a file must be unused before it can be deleted. `0` = no age filter. */
+	minAgeDays?: number;
 };
 
 export type PruneOrphansResult = {
 	referencedUrls: number;
 	scannedFiles: number;
 	orphans: string[];
+	skippedYoung: string[];
 	emptyDirs: string[];
 	applied: boolean;
 };
@@ -60,23 +63,31 @@ export function pruneOrphanMedia(options: PruneOrphansOptions): PruneOrphansResu
 	const { mediaConfig, contentSchema, database } = options;
 	const apply = Boolean(options.apply);
 	const includeDrafts = Boolean(options.includeDrafts);
+	const minAgeMs = Math.max(0, options.minAgeDays ?? 0) * 24 * 60 * 60 * 1000;
 
 	const referenced = collectReferencedMediaUrls(contentSchema, database, mediaConfig);
 	const files = listMediaFiles(mediaConfig.root, includeDrafts, mediaConfig.draftPrefix);
 
 	const orphans: string[] = [];
+	const skippedYoung: string[] = [];
 	const keptFiles: string[] = [];
 
 	for (const filePath of files) {
 		const url = filePathToMediaUrl(filePath, mediaConfig);
 		if (url && shouldKeepFile(url, referenced)) {
 			keptFiles.push(filePath);
-		} else {
+			continue;
+		}
+		if (isOlderThanMinAge(filePath, minAgeMs)) {
 			orphans.push(filePath);
+		} else {
+			skippedYoung.push(filePath);
+			keptFiles.push(filePath);
 		}
 	}
 
 	orphans.sort(comparePosix);
+	skippedYoung.sort(comparePosix);
 
 	if (apply) {
 		for (const filePath of orphans) {
@@ -97,6 +108,7 @@ export function pruneOrphanMedia(options: PruneOrphansOptions): PruneOrphansResu
 		referencedUrls: referenced.size,
 		scannedFiles: files.length,
 		orphans,
+		skippedYoung,
 		emptyDirs,
 		applied: apply,
 	};
@@ -131,6 +143,17 @@ function normalizeMediaUrl(value: string, mediaConfig: MediaConfig): string | nu
 		return null;
 	}
 	return trimmed;
+}
+
+function isOlderThanMinAge(filePath: string, minAgeMs: number): boolean {
+	if (minAgeMs <= 0) {
+		return true;
+	}
+	try {
+		return fs.statSync(filePath).mtimeMs < Date.now() - minAgeMs;
+	} catch {
+		return false;
+	}
 }
 
 function shouldKeepFile(url: string, referenced: Set<string>): boolean {

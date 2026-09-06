@@ -71,7 +71,7 @@ Example: `defineRecord` describes an event's fields → `defineListCollection` w
 | `npm run db:generate` | sync-schema + create a new SQL migration file (when columns changed) |
 | `npm run db:migrate` | Apply pending SQL migrations to the SQLite file |
 | `npm run db:smoke` | Quick check that the database stores return data |
-| `npm run cms:prune-media` | Delete media files no longer referenced by any row in the database (dry run by default, `--apply` to actually delete) |
+| `npm run cms:prune-media` | Delete media files no longer referenced by any row in the database (dry run by default; `--apply` to delete; `--min-age-days` default 7, `0` skips the age filter) |
 | `npm run db:studio` | Open Drizzle Studio to browse rows |
 | `npm run cms:migrate` | *(JSON import only)* bring a collection's JSON file up to the current content schema version |
 | `npm run cms:status` | *(JSON import only)* report version drift for collections that have a `jsonImportPath` |
@@ -241,7 +241,7 @@ Grouped by the three buckets from "Which files do I touch?" above.
 | `cms/collection-store.ts` | JSON-import-only: schema-version migrations for `cms:migrate` |
 | `scripts/db-sync-schema.ts` | Entry point for `npm run db:sync-schema` |
 | `scripts/db-store-smoke.ts` | Smoke test |
-| `scripts/cms-prune-media.ts` | Delete media orphaned in the database |
+| `scripts/cms-prune-media.ts` | Delete media orphaned in the database (dry run; `--apply`; `--min-age-days` default 7) |
 | `scripts/cms-migrate.ts`, `cms-status.ts`, `db-import-json.ts` | JSON-import-only, see the section above |
 
 ### 🤖 Generated (`src/db/`)
