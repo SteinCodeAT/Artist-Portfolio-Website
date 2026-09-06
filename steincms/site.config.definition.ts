@@ -52,6 +52,13 @@ export type SiteConfig = {
 		root: string;
 		urlPrefix: string;
 		draftPrefix: string;
+		/** Default per-file upload limit in bytes. Used when a page has no override. */
+		maxUploadBytes?: number;
+		/**
+		 * Per-page overrides. Keys match the editor page: `posts` (projects/blog),
+		 * `events`, or a singleton/collection id such as `about`.
+		 */
+		maxUploadBytesByPage?: Record<string, number>;
 	};
 	nav: Array<{ label: string; href: string }>;
 	cms: {
@@ -71,5 +78,15 @@ export type SiteConfig = {
 		/** Pirsch dashboard access-link URL, e.g. with &ui=hide&interval=30d&lang=de appended. */
 		dashboardEmbedUrl?: string;
 	};
-	
 };
+
+/** Matches the nginx `/api/upload-image` body cap unless a site overrides it. */
+export const DEFAULT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+
+export function maxUploadBytesFor(siteConfig: SiteConfig, page = 'default'): number {
+	const byPage = siteConfig.media.maxUploadBytesByPage?.[page];
+	if (typeof byPage === 'number' && byPage > 0) return byPage;
+	const fallback = siteConfig.media.maxUploadBytes;
+	if (typeof fallback === 'number' && fallback > 0) return fallback;
+	return DEFAULT_MAX_UPLOAD_BYTES;
+}

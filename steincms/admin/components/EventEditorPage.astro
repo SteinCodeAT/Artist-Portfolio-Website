@@ -40,6 +40,7 @@ interface Props {
 	coverAssetsHint?: string;
 	/** When set, shows Bearbeiten / Gästeliste tabs instead of stacking guest content above the form. */
 	guestTab?: EventEditorGuestTab | null;
+	maxUploadBytes?: number;
 }
 
 const {
@@ -57,6 +58,7 @@ const {
 	prefillDate = null,
 	coverAssetsHint = 'Cover-Bilder werden beim Speichern in den Medienordner der Veranstaltung hochgeladen.',
 	guestTab = null,
+	maxUploadBytes,
 } = Astro.props;
 
 const hasGuestTab = Boolean(guestTab);
@@ -198,6 +200,7 @@ const initialRegistrationForm = source?.registrationForm ?? EMPTY_REGISTRATION_F
 				data-event-id={editorEventId}
 				data-event-persisted={isEdit ? 'true' : 'false'}
 				data-upload-content-type="events"
+				data-max-upload-bytes={maxUploadBytes}
 				data-return-to={fromCalendar ? 'calendar' : 'list'}
 				data-admin-path={adminPath}
 				data-events-public-path={eventsPublicPath}
@@ -255,6 +258,7 @@ const initialRegistrationForm = source?.registrationForm ?? EMPTY_REGISTRATION_F
 				class="editor-panel event-gallery-panel"
 				id="event-gallery-root"
 				data-event-id={editorEventId}
+				data-max-upload-bytes={maxUploadBytes}
 				data-initial-gallery={JSON.stringify(initialGallery)}
 				aria-labelledby="event-gallery-heading"
 			>

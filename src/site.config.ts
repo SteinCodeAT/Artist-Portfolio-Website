@@ -64,6 +64,10 @@ export const siteConfig: SiteConfig = {
 		? '/var/www/cagdascecen.com/media' : 'public/media',
 		urlPrefix: '/media',
 		draftPrefix: '_drafts',
+		maxUploadBytes: 10 * 1024 * 1024,
+		maxUploadBytesByPage: {
+			posts: 20 * 1024 * 1024,  // project editor
+		},
 	},
 
 	nav: [

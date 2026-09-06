@@ -20,11 +20,15 @@ import {
 import { isTableEmpty } from '@steincms/cms/blocks/table-block';
 import type { BlockData } from '@steincms/cms/blocks/editor-block';
 import {
+	formatTooLargeMessage,
 	initContentSectionEditor,
+	isUploadTooLargeError,
+	readMaxUploadBytes,
 	uploadImages,
 } from './content-section-of-post-editor.ts';
 import { initEventGallerySection } from './event-gallery-section.ts';
 import { onAdminEditorAction, setEditorLivePageLink } from './editor-save-dropdown.ts';
+import { showNotice } from './admin-notice.ts';
 
 type SaveAction = 'save-draft' | 'publish' | 'discard-draft';
 
@@ -445,6 +449,7 @@ function initCoverPreview() {
 				contentType: 'events',
 				entryId,
 				slot: 'cover.webp',
+				maxUploadBytes: readMaxUploadBytes(document.getElementById('content-sections-root')),
 			});
 			hiddenInput!.value = result.url;
 			if (filenameInput) {
@@ -452,7 +457,11 @@ function initCoverPreview() {
 			}
 			renderPreview();
 		} catch (error) {
-			alert(error instanceof Error ? error.message : 'Upload fehlgeschlagen');
+			if (isUploadTooLargeError(error)) {
+				await showNotice(formatTooLargeMessage(error.files, error.maxBytes), 'File too large');
+			} else {
+				alert(error instanceof Error ? error.message : 'Upload fehlgeschlagen');
+			}
 		} finally {
 			uploadBtn.textContent = 'Cover hochladen';
 			uploadBtn.removeAttribute('disabled');

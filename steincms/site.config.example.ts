@@ -65,6 +65,11 @@ export const siteConfigExample: SiteConfig = {
 		root: 'public/media',
 		urlPrefix: '/media',
 		draftPrefix: '_drafts',
+		maxUploadBytes: 10 * 1024 * 1024,
+		maxUploadBytesByPage: {
+			posts: 20 * 1024 * 1024,
+			events: 10 * 1024 * 1024,
+		},
 	},
 
 	nav: [

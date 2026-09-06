@@ -26,6 +26,8 @@ export type CmsSiteConfig = {
 		root: string;
 		urlPrefix: string;
 		draftPrefix: string;
+		maxUploadBytes?: number;
+		maxUploadBytesByPage?: Record<string, number>;
 	};
 	cms: {
 		expectedSteinCMSVersion: string;

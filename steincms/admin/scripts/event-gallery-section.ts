@@ -3,8 +3,15 @@
  * Events: maps to event.gallery[]. Projects: maps to post.mainGallery[].
  */
 
-import { uploadImages } from './content-section-of-post-editor.ts';
+import {
+	formatTooLargeMessage,
+	isUploadTooLargeError,
+	readMaxUploadBytes,
+	uploadImages,
+	type OversizedFile,
+} from './content-section-of-post-editor.ts';
 import { galleryProcessingIconHtml, previewThumbUrl } from './gallery-thumb-preview.ts';
+import { showNotice } from './admin-notice.ts';
 
 type GalleryImageEntry = {
 	id: string;
@@ -116,10 +123,11 @@ export function initEventGallerySection(
 		throw new Error(`${settings.gridSelector} not found`);
 	}
 
-	const uploadContext = (): { contentType: 'events' | 'posts'; entryId: string } | undefined => {
+	const maxUploadBytes = readMaxUploadBytes(root);
+	const uploadContext = (): { contentType: 'events' | 'posts'; entryId: string; maxUploadBytes: number } | undefined => {
 		const entryId = root.dataset[settings.entryIdDatasetKey] || undefined;
 		if (!entryId) return undefined;
-		return { contentType: options.contentType, entryId };
+		return { contentType: options.contentType, entryId, maxUploadBytes };
 	};
 
 	let uploading = false;
@@ -177,30 +185,52 @@ export function initEventGallerySection(
 		});
 		render();
 
+		const tooLarge: OversizedFile[] = [];
+		let otherError: Error | null = null;
+
+		const dropPending = (entry: GalleryImageEntry) => {
+			images = images.filter((image) => image.id !== entry.id);
+		};
+
 		try {
-			const uploaded = await uploadImages(selected, uploadContext());
-			await Promise.all(
-				uploaded.map(async (result, index) => {
-					const entry = pending[index];
-					if (!entry) return;
+			for (const [index, file] of selected.entries()) {
+				const entry = pending[index];
+				if (!entry) continue;
+
+				if (file.size > maxUploadBytes) {
+					tooLarge.push({ name: file.name, size: file.size });
+					dropPending(entry);
+					render();
+					continue;
+				}
+
+				try {
+					const [result] = await uploadImages([file], uploadContext());
 					entry.url = result.url;
 					entry.thumbUrl = result.thumbUrl;
 					entry.previewSrc = await previewThumbUrl(result.thumbUrl);
 					entry.processing = false;
-					render();
-				}),
-			);
-			for (const entry of pending) {
-				if (entry.processing) {
-					images = images.filter((image) => image.id !== entry.id);
+				} catch (error) {
+					dropPending(entry);
+					if (isUploadTooLargeError(error)) {
+						tooLarge.push(...error.files);
+					} else {
+						otherError = error instanceof Error ? error : new Error(settings.uploadFailedLabel);
+					}
 				}
+
+				render();
 			}
-		} catch (error) {
-			images = images.filter((image) => !pending.some((entry) => entry.id === image.id));
-			alert(error instanceof Error ? error.message : settings.uploadFailedLabel);
 		} finally {
 			uploading = false;
 			render();
+		}
+
+		if (tooLarge.length > 0) {
+			await showNotice(formatTooLargeMessage(tooLarge, maxUploadBytes), 'File too large');
+		}
+		if (otherError) {
+			await showNotice(otherError.message);
 		}
 	});
 

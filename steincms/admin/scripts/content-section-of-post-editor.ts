@@ -26,6 +26,7 @@ import type {
   TextBlockData,
 } from '@steincms/cms/blocks/editor-block';
 import { galleryProcessingIconHtml, previewThumbUrl } from './gallery-thumb-preview.ts';
+import { showNotice } from './admin-notice.ts';
 
 // `export type { X } from '...'` re-exports X for OTHER files but does not
 // bind X locally — this file uses these types itself below, so they need the
@@ -43,6 +44,88 @@ type UploadResult = {
   url: string;
   thumbUrl: string;
 };
+
+export const DEFAULT_MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+
+export type OversizedFile = {
+  name: string;
+  size: number;
+};
+
+export type UploadContext = {
+  contentType?: 'events' | 'posts';
+  entryId?: string;
+  slot?: string;
+  maxUploadBytes?: number;
+};
+
+export class UploadTooLargeError extends Error {
+  readonly files: OversizedFile[];
+  readonly maxBytes: number;
+
+  constructor(files: OversizedFile[], maxBytes: number) {
+    super(formatTooLargeMessage(files, maxBytes));
+    this.name = 'UploadTooLargeError';
+    this.files = files;
+    this.maxBytes = maxBytes;
+  }
+}
+
+export function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) {
+    const kb = bytes / 1024;
+    return `${kb < 10 ? kb.toFixed(1) : Math.round(kb)} KB`;
+  }
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+export function formatUploadLimit(bytes: number): string {
+  const mb = bytes / (1024 * 1024);
+  if (mb >= 1) {
+    return Number.isInteger(mb) ? `${mb} MB` : `${mb.toFixed(1)} MB`;
+  }
+  return formatFileSize(bytes);
+}
+
+export function formatTooLargeMessage(
+  files: OversizedFile[],
+  maxBytes = DEFAULT_MAX_UPLOAD_BYTES,
+): string {
+  const limit = formatUploadLimit(maxBytes);
+  const heading =
+    files.length === 1
+      ? `This file exceeds the ${limit} upload limit:`
+      : `These files exceed the ${limit} upload limit:`;
+  const lines = files.map((file) => `${file.name} — ${formatFileSize(file.size)}`);
+  return `${heading}\n${lines.join('\n')}`;
+}
+
+export function readMaxUploadBytes(from?: Element | null): number {
+  const scoped = from instanceof HTMLElement && from.dataset.maxUploadBytes
+    ? from
+    : from?.closest('[data-max-upload-bytes]') ?? null;
+  const candidates: Array<Element | null> = [
+    scoped,
+    document.getElementById('content-sections-root'),
+    document.getElementById('main-gallery-root'),
+    document.getElementById('event-gallery-root'),
+  ];
+  for (const el of candidates) {
+    if (!(el instanceof HTMLElement)) continue;
+    const parsed = Number(el.dataset.maxUploadBytes);
+    if (Number.isFinite(parsed) && parsed > 0) return parsed;
+  }
+  return DEFAULT_MAX_UPLOAD_BYTES;
+}
+
+export function isUploadTooLargeError(error: unknown): error is UploadTooLargeError {
+  return error instanceof UploadTooLargeError;
+}
+
+function toOversizedFile(file: File): OversizedFile {
+  return { name: file.name, size: file.size };
+}
 
 const galleryThumbPreviewSrc = new Map<string, string>();
 const galleryProcessingIds = new Map<string, string[]>();
@@ -101,14 +184,17 @@ function syncTextBlocksFromQuill(blocks: BlockData[]): void {
 // Image upload (shared by cover field in blog-post-form-editor + sections here)
 // ---------------------------------------------------------------------------
 
-export async function uploadImages(
-  files: File[],
-  context?: { contentType?: 'events' | 'posts'; entryId?: string; slot?: string },
-): Promise<UploadResult[]> {
-  const formData = new FormData();
-  for (const file of files) {
-    formData.append('file', file);
+async function uploadOneImage(
+  file: File,
+  context?: UploadContext,
+): Promise<UploadResult> {
+  const maxUploadBytes = context?.maxUploadBytes ?? DEFAULT_MAX_UPLOAD_BYTES;
+  if (file.size > maxUploadBytes) {
+    throw new UploadTooLargeError([toOversizedFile(file)], maxUploadBytes);
   }
+
+  const formData = new FormData();
+  formData.append('file', file);
 
   if (context?.contentType) {
     formData.append('contentType', context.contentType);
@@ -126,7 +212,7 @@ export async function uploadImages(
     body: formData,
   });
 
-  const data = (await response.json()) as {
+  const data = (await response.json().catch(() => ({}))) as {
     ok?: boolean;
     url?: string;
     thumbUrl?: string;
@@ -134,19 +220,50 @@ export async function uploadImages(
     error?: string;
   };
 
+  if (response.status === 413) {
+    throw new UploadTooLargeError([toOversizedFile(file)], maxUploadBytes);
+  }
+
   if (!response.ok) {
     throw new Error(data.error ?? 'Upload fehlgeschlagen');
   }
 
-  if (data.files) {
-    return data.files;
+  if (data.files?.[0]) {
+    return data.files[0];
   }
 
   if (data.url && data.thumbUrl) {
-    return [{ url: data.url, thumbUrl: data.thumbUrl }];
+    return { url: data.url, thumbUrl: data.thumbUrl };
   }
 
   throw new Error('Upload fehlgeschlagen');
+}
+
+export async function uploadImages(
+  files: File[],
+  context?: UploadContext,
+): Promise<UploadResult[]> {
+  const maxUploadBytes = context?.maxUploadBytes ?? DEFAULT_MAX_UPLOAD_BYTES;
+  const results: UploadResult[] = [];
+  const tooLarge: OversizedFile[] = [];
+
+  for (const file of files) {
+    try {
+      results.push(await uploadOneImage(file, { ...context, maxUploadBytes }));
+    } catch (error) {
+      if (isUploadTooLargeError(error)) {
+        tooLarge.push(...error.files);
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  if (tooLarge.length > 0) {
+    throw new UploadTooLargeError(tooLarge, maxUploadBytes);
+  }
+
+  return results;
 }
 
 // ---------------------------------------------------------------------------
@@ -303,12 +420,13 @@ export function initContentSectionEditor(
       ? structuredClone(initialBlocks)
       : [{ id: newBlockId(), type: 'text', html: '' }];
 
-  const uploadContext = (): { contentType: 'events' | 'posts'; entryId: string } | undefined => {
+  const maxUploadBytes = readMaxUploadBytes(root);
+  const uploadContext = (): UploadContext | undefined => {
     const contentType = root.dataset.uploadContentType as 'events' | 'posts' | undefined;
     const entryId =
       root.dataset.eventId || root.dataset.postId || root.dataset.entryId || undefined;
     if (!contentType || !entryId) return undefined;
-    return { contentType, entryId };
+    return { contentType, entryId, maxUploadBytes };
   };
 
   const listEl = root.querySelector('[data-section-list]') as HTMLElement | null;
@@ -370,31 +488,62 @@ export function initContentSectionEditor(
       fileInput.value = '';
       if (selected.length === 0) return;
 
-      galleryProcessingIds.set(
-        block.id,
-        selected.map(() => newImageId()),
-      );
+      const pendingIds = selected.map(() => newImageId());
+      galleryProcessingIds.set(block.id, [...pendingIds]);
       render();
 
-      try {
-        const uploaded = await uploadImages(selected, uploadContext());
-        const previewSrcs = await Promise.all(
-          uploaded.map((result) => previewThumbUrl(result.thumbUrl)),
-        );
-        for (const [index, result] of uploaded.entries()) {
+      const tooLarge: OversizedFile[] = [];
+      let otherError: Error | null = null;
+
+      const dropPending = (pendingId: string) => {
+        const remaining = (galleryProcessingIds.get(block.id) ?? []).filter((id) => id !== pendingId);
+        if (remaining.length === 0) {
+          galleryProcessingIds.delete(block.id);
+        } else {
+          galleryProcessingIds.set(block.id, remaining);
+        }
+      };
+
+      for (const [index, file] of selected.entries()) {
+        const pendingId = pendingIds[index];
+        if (!pendingId) continue;
+
+        if (file.size > maxUploadBytes) {
+          tooLarge.push(toOversizedFile(file));
+          dropPending(pendingId);
+          render();
+          continue;
+        }
+
+        try {
+          const [result] = await uploadImages([file], uploadContext());
           const imageId = newImageId();
           block.images.push({
             id: imageId,
             url: result.url,
             thumbUrl: result.thumbUrl,
           });
-          galleryThumbPreviewSrc.set(imageId, previewSrcs[index] ?? result.thumbUrl);
+          galleryThumbPreviewSrc.set(imageId, await previewThumbUrl(result.thumbUrl));
+        } catch (error) {
+          if (isUploadTooLargeError(error)) {
+            tooLarge.push(...error.files);
+          } else {
+            otherError = error instanceof Error ? error : new Error('Upload fehlgeschlagen');
+          }
         }
-      } catch (error) {
-        alert(error instanceof Error ? error.message : 'Upload fehlgeschlagen');
-      } finally {
-        galleryProcessingIds.delete(block.id);
+
+        dropPending(pendingId);
         render();
+      }
+
+      galleryProcessingIds.delete(block.id);
+      render();
+
+      if (tooLarge.length > 0) {
+        await showNotice(formatTooLargeMessage(tooLarge, maxUploadBytes), 'File too large');
+      }
+      if (otherError) {
+        await showNotice(otherError.message);
       }
     });
   }
@@ -422,7 +571,13 @@ export function initContentSectionEditor(
         block.url = result.url;
         render();
       } catch (error) {
-        alert(error instanceof Error ? error.message : 'Upload fehlgeschlagen');
+        const message = isUploadTooLargeError(error)
+          ? formatTooLargeMessage(error.files, error.maxBytes)
+          : error instanceof Error
+            ? error.message
+            : 'Upload fehlgeschlagen';
+        const title = isUploadTooLargeError(error) ? 'File too large' : 'Notice';
+        await showNotice(message, title);
         if (uploadBtn) {
           uploadBtn.textContent = 'Bild hochladen / ersetzen';
           uploadBtn.disabled = false;

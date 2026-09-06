@@ -10,7 +10,10 @@ import { defaultEditorSaveActions } from '@steincms/admin/editor-actions';
 import { postEditorSource } from '@steincms/cms/posts/post-display';
 import { cms } from '../../../cms';
 import { siteConfig } from '../../../site.config';
+import { maxUploadBytesFor } from '@steincms/site.config.definition';
 import { adminNav, adminPaths, adminLayoutText } from '../../../admin-nav';
+
+const maxUploadBytes = maxUploadBytesFor(siteConfig, 'posts');
 
 const { postsStore } = cms;
 const id = Astro.url.searchParams.get('id');
@@ -82,6 +85,7 @@ const currentYear = new Date().getFullYear();
 		data-posts-list-path={`${adminPaths.base}/projects-manager`}
 		data-initial-blocks={JSON.stringify(source?.blocks ?? [])}
 		data-upload-content-type="posts"
+		data-max-upload-bytes={maxUploadBytes}
 		class="editor-layout"
 	>
 		<div class="editor-main">
@@ -115,6 +119,7 @@ const currentYear = new Date().getFullYear();
 				class="editor-panel main-gallery-panel"
 				id="main-gallery-root"
 				data-main-gallery-id={editorPostId}
+				data-max-upload-bytes={maxUploadBytes}
 				data-initial-gallery={JSON.stringify(source?.mainGallery ?? [])}
 				aria-labelledby="main-gallery-heading"
 			>

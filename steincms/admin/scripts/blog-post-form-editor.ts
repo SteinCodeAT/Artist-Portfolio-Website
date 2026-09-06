@@ -14,56 +14,17 @@
  *   content-section-of-post-editor.ts ← text/image/gallery sections only
  */
 
-import { initContentSectionEditor, uploadImages, type BlockData } from './content-section-of-post-editor.ts';
+import {
+  formatTooLargeMessage,
+  initContentSectionEditor,
+  isUploadTooLargeError,
+  readMaxUploadBytes,
+  uploadImages,
+  type BlockData,
+} from './content-section-of-post-editor.ts';
 import { initEventGallerySection } from './event-gallery-section.ts';
 import { onAdminEditorAction, setEditorLivePageLink } from './editor-save-dropdown.ts';
-
-/** Reuses ConfirmDeleteModal.astro (#delete-event-modal) as a simple notice. */
-function showNotice(message: string, title = 'Notice'): Promise<void> {
-  const dialog = document.getElementById('delete-event-modal') as HTMLDialogElement | null;
-  const titleEl = document.getElementById('delete-event-title');
-  const messageEl = document.getElementById('delete-event-message');
-  const confirmBtn = document.getElementById('delete-event-confirm') as HTMLButtonElement | null;
-  const cancelBtn = document.getElementById('delete-event-cancel') as HTMLButtonElement | null;
-  const closeBtn = document.getElementById('delete-event-close') as HTMLButtonElement | null;
-
-  if (!dialog || !confirmBtn) {
-    window.alert(message);
-    return Promise.resolve();
-  }
-
-  const prevTitle = titleEl?.textContent ?? '';
-  const prevMessage = messageEl?.textContent ?? '';
-  const prevConfirm = confirmBtn.textContent ?? '';
-  const prevCancelHidden = cancelBtn?.hidden ?? false;
-
-  if (titleEl) titleEl.textContent = title;
-  if (messageEl) messageEl.textContent = message;
-  confirmBtn.textContent = 'OK';
-  if (cancelBtn) cancelBtn.hidden = true;
-
-  return new Promise((resolve) => {
-    let settled = false;
-    const done = () => {
-      if (settled) return;
-      settled = true;
-      confirmBtn.removeEventListener('click', done);
-      closeBtn?.removeEventListener('click', done);
-      dialog.removeEventListener('close', done);
-      if (titleEl) titleEl.textContent = prevTitle;
-      if (messageEl) messageEl.textContent = prevMessage;
-      confirmBtn.textContent = prevConfirm;
-      if (cancelBtn) cancelBtn.hidden = prevCancelHidden;
-      if (dialog.open) dialog.close();
-      resolve();
-    };
-
-    confirmBtn.addEventListener('click', done);
-    closeBtn?.addEventListener('click', done);
-    dialog.addEventListener('close', done);
-    dialog.showModal();
-  });
-}
+import { showNotice } from './admin-notice.ts';
 
 // ---------------------------------------------------------------------------
 // Config from bearbeiten.astro HTML data attributes
@@ -167,12 +128,17 @@ function initMainImageField() {
         contentType: 'posts',
         entryId: postId,
         slot: 'cover.webp',
+        maxUploadBytes: readMaxUploadBytes(document.getElementById('content-sections-root')),
       });
       
       hiddenInput.value = result.url;
       renderPreview();
     } catch (error) {
-      await showNotice(error instanceof Error ? error.message : 'Upload failed');
+      if (isUploadTooLargeError(error)) {
+        await showNotice(formatTooLargeMessage(error.files, error.maxBytes), 'File too large');
+      } else {
+        await showNotice(error instanceof Error ? error.message : 'Upload failed');
+      }
     } finally {
       uploadBtn.textContent = 'Bild wählen';
       uploadBtn.removeAttribute('disabled');
