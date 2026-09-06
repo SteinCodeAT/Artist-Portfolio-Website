@@ -72,9 +72,8 @@ const randomlySortedImages = project.images.slice().reverse().sort(() => 0.5 - M
                     }
                     <div class="description">
                         <h1 class="project-title">{project.title}</h1>
-                        <div style="padding-left: 40px;">
-                            <slot />
-                        </div>
+                        
+                        <slot />
                         
                         <ul class="additional-links-list">
                             {project.links.map((link: Link) => {
@@ -285,4 +284,9 @@ const randomlySortedImages = project.images.slice().reverse().sort(() => 0.5 - M
             </div>
         </div>
     </main>
+    <style is:global>
+        .description ol, .description ul {
+            padding-left: 80px;
+        }
+    </style>
 </Layout>
