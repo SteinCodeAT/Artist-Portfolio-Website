@@ -1,4 +1,5 @@
 ---
+import { Icon } from 'astro-icon/components';
 import type {
 	AdminEditorAction,
 	AdminEditorDraftBadge,
@@ -43,10 +44,11 @@ const {
 		preview && (
 			<button
 				type="button"
-				class="btn-ghost editor-preview-btn"
+				class="btn-ghost editor-preview-btn editor-action-btn"
 				id="btn-preview"
 				title={preview.title}
 			>
+				<Icon name="mdi:file-document-edit-outline" class="editor-action-icon" aria-hidden="true" />
 				{preview.label}
 			</button>
 		)
@@ -54,7 +56,7 @@ const {
 	{
 		live && (
 			<a
-				class="btn-ghost editor-preview-btn"
+				class="btn-ghost editor-preview-btn editor-action-btn"
 				id="btn-live-page"
 				href={live.href || '#'}
 				target="_blank"
@@ -62,6 +64,7 @@ const {
 				title={live.title}
 				hidden={live.hidden}
 			>
+				<Icon name="mdi:check-circle-outline" class="editor-action-icon" aria-hidden="true" />
 				{live.label}
 			</a>
 		)
@@ -69,7 +72,8 @@ const {
 	{
 		actions.length > 0 && (
 			<div class="save-dropdown" data-save-dropdown>
-				<button type="button" class="btn-primary save-dropdown-trigger" data-save-dropdown-trigger>
+				<button type="button" class="btn-primary save-dropdown-trigger editor-action-btn" data-save-dropdown-trigger>
+					<Icon name="mdi:content-save" class="editor-action-icon" aria-hidden="true" />
 					{triggerLabel}
 				</button>
 				<div class="save-dropdown-menu" data-save-dropdown-menu hidden>
@@ -128,6 +132,19 @@ const {
 		background: #fef0c7;
 		color: #b54708;
 		border: 1px solid #fedf89;
+	}
+
+	.editor-action-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+	}
+
+	.editor-action-btn :global(.editor-action-icon) {
+		width: 1.1em;
+		height: 1.1em;
+		flex-shrink: 0;
 	}
 
 	.save-dropdown {
