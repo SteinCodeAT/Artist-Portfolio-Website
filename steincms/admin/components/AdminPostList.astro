@@ -1,11 +1,33 @@
 ---
 interface Props {
+	/** Plural, lowercase — used only in the search-result count text ("14 projects"). */
 	itemLabel: string;
 	searchPlaceholder?: string;
 	pageSize?: number;
+	/**
+	 * REST endpoint for deleting a card's item, e.g. '/api/posts' — must
+	 * support DELETE with { id } in the body. Omit to leave list-page delete
+	 * disabled entirely (cards then need no deleteLabel either). The page
+	 * must also render <ConfirmDeleteModal /> once for the confirm dialog
+	 * this uses (see steincms/admin/scripts/confirm-dialog.ts).
+	 */
+	deleteEndpoint?: string;
+	/**
+	 * Singular, capitalized — names the item in the delete confirmation
+	 * ("„Foo" wirklich löschen?"), e.g. "Projekt". Defaults to itemLabel,
+	 * but that's plural/lowercase by convention, so pass this explicitly
+	 * for a properly-cased confirmation message.
+	 */
+	deleteItemLabel?: string;
 }
 
-const { itemLabel, searchPlaceholder = 'Suchen…', pageSize = 10 } = Astro.props;
+const {
+	itemLabel,
+	searchPlaceholder = 'Suchen…',
+	pageSize = 10,
+	deleteEndpoint,
+	deleteItemLabel = itemLabel,
+} = Astro.props;
 ---
 
 <div class="admin-post-list">
@@ -26,6 +48,8 @@ const { itemLabel, searchPlaceholder = 'Suchen…', pageSize = 10 } = Astro.prop
 		id="posts-list"
 		data-item-label={itemLabel}
 		data-page-size={pageSize}
+		data-delete-endpoint={deleteEndpoint}
+		data-delete-item-label={deleteItemLabel}
 	>
 		<slot />
 	</ul>

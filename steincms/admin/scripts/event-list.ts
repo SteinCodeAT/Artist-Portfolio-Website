@@ -1,5 +1,7 @@
 /** Admin post list search + pagination for AdminPostList.astro */
 
+import { deleteEditorRecord } from './confirm-dialog.ts';
+
 const DEFAULT_PAGE_SIZE = 10;
 
 function normalize(value: string): string {
@@ -27,6 +29,8 @@ function initEventList() {
 	if (!listRoot) return;
 
 	const itemLabel = listRoot.dataset.itemLabel ?? 'Einträge';
+	const deleteEndpoint = listRoot.dataset.deleteEndpoint;
+	const deleteItemLabel = listRoot.dataset.deleteItemLabel ?? itemLabel;
 	const pageSize = Number(listRoot.dataset.pageSize ?? DEFAULT_PAGE_SIZE) || DEFAULT_PAGE_SIZE;
 	const cards = Array.from(listRoot.querySelectorAll<HTMLElement>('[data-post-card]'));
 	const headings = Array.from(listRoot.querySelectorAll<HTMLElement>('[data-list-heading]'));
@@ -118,6 +122,30 @@ function initEventList() {
 		currentPage = 1;
 		render();
 	});
+
+	// Delete button on each card — only wired when the page opted in via
+	// AdminPostList's deleteEndpoint prop (and rendered <ConfirmDeleteModal />
+	// for confirmDialog/deleteEditorRecord to drive).
+	if (deleteEndpoint) {
+		listRoot.addEventListener('click', (event) => {
+			const button = (event.target as HTMLElement).closest<HTMLElement>('[data-delete-btn]');
+			if (!button) return;
+			const card = button.closest<HTMLElement>('[data-post-card]');
+			const id = card?.dataset.postId;
+			if (!id) return;
+
+			void deleteEditorRecord({
+				endpoint: deleteEndpoint,
+				id,
+				itemLabel: deleteItemLabel,
+				itemTitle: card?.dataset.title || undefined,
+				// Simplest correct refresh: reload the list so search/pagination
+				// state recomputes against the server's current data, rather than
+				// hand-rolling client-side DOM/pagination bookkeeping here.
+				redirectTo: window.location.href,
+			});
+		});
+	}
 
 	render();
 }

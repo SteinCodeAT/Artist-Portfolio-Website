@@ -69,6 +69,13 @@ const currentYear = new Date().getFullYear();
 				title: 'Öffnet die veröffentlichte Seite',
 				hidden: post?.status !== 'published',
 			}}
+			deleteButton={
+				// Only once the project actually exists — nothing to delete on a
+				// brand-new, unsaved editor page. A standalone button, not a save-
+				// dropdown entry — a destructive action shouldn't hide behind a
+				// menu of otherwise routine save actions.
+				isEdit ? { label: 'Delete Project', title: 'Permanently delete this project' } : null
+			}
 			triggerLabel="Speichern ▾"
 			actions={defaultEditorSaveActions(hasPreviewDraft)}
 		/>

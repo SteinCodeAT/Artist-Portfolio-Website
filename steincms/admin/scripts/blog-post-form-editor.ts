@@ -24,7 +24,7 @@ import {
 } from './content-section-of-post-editor.ts';
 import { initEventGallerySection } from './event-gallery-section.ts';
 import { onAdminEditorAction, setEditorLivePageLink } from './editor-save-dropdown.ts';
-import { showNotice } from './admin-notice.ts';
+import { showNotice, deleteEditorRecord } from './confirm-dialog.ts';
 
 // ---------------------------------------------------------------------------
 // Config from bearbeiten.astro HTML data attributes
@@ -448,6 +448,21 @@ function initBlogPostFormEditor() {
 
   onAdminEditorAction((action) => {
     if (isSaveAction(action)) void savePost(action);
+  });
+
+  // Standalone button (not a save-dropdown entry — see AdminEditorActions'
+  // deleteButton prop): a destructive action shouldn't hide behind a menu of
+  // otherwise routine save actions.
+  document.getElementById('btn-delete-record')?.addEventListener('click', () => {
+    void deleteEditorRecord({
+      endpoint: '/api/posts',
+      id: postId,
+      itemLabel: 'Projekt',
+      itemTitle: (document.getElementById('post-title') as HTMLInputElement | null)?.value?.trim() || undefined,
+      redirectTo: postsListPath,
+      onSaving: () => setSaveStatus('saving'),
+      onError: () => setSaveStatus('dirty'),
+    });
   });
 
   /* Listen for form input changes and update dirty state. */

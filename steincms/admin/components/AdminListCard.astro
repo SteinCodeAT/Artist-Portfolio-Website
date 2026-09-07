@@ -11,6 +11,8 @@ interface Props {
 	viewHref?: string;
 	viewLabel?: string;
 	editLabel?: string;
+	/** Renders a Delete button next to View/Edit when set — see AdminPostList's deleteEndpoint prop, which supplies the actual API call target. */
+	deleteLabel?: string;
 	badge?: string;
 	group?: 'upcoming' | 'archive';
 	peopleCount?: number;
@@ -26,6 +28,7 @@ const {
 	viewHref,
 	viewLabel = 'Ansehen',
 	editLabel = 'Bearbeiten',
+	deleteLabel,
 	badge,
 	group = 'archive',
 	peopleCount = 0,
@@ -72,6 +75,11 @@ const {
 		<a class="btn-ghost btn-sm" href={editHref}>
 			{editLabel}
 		</a>
+		{deleteLabel && (
+			<button type="button" class="btn-ghost btn-sm btn-danger" data-delete-btn>
+				{deleteLabel}
+			</button>
+		)}
 	</div>
 </li>
 
@@ -158,6 +166,17 @@ const {
 		display: flex;
 		gap: 0.5rem;
 		padding: 0 1rem 1rem;
+	}
+
+	.post-card-actions .btn-danger {
+		margin-left: auto;
+		color: #b42318;
+		border-color: #fda29b;
+	}
+
+	.post-card-actions .btn-danger:hover {
+		background: #fef3f2;
+		border-color: #b42318;
 	}
 
 	@media (max-width: 640px) {

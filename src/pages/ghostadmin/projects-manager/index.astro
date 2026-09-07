@@ -5,6 +5,7 @@ export const prerender = false;
 import AdminAreaLayout from '@steincms/admin/layouts/AdminAreaLayout.astro';
 import AdminPostList from '@steincms/admin/components/AdminPostList.astro';
 import AdminListCard from '@steincms/admin/components/AdminListCard.astro';
+import ConfirmDeleteModal from '@steincms/admin/components/ConfirmDeleteModal.astro';
 import { cms } from '../../../cms';
 import { siteConfig } from '../../../site.config';
 import { adminNav, adminPaths, adminLayoutText } from '../../../admin-nav';
@@ -41,7 +42,12 @@ const posts = postsStore
 		</a>
 	</div>
 
-	<AdminPostList itemLabel="project" searchPlaceholder="Search projects…">
+	<AdminPostList
+		itemLabel="project"
+		searchPlaceholder="Search projects…"
+		deleteEndpoint="/api/posts"
+		deleteItemLabel="Projekt"
+	>
 		{posts.map((post) => {
 			const draft = post.previewDraft;
 			const title = String(draft?.title ?? post.title);
@@ -68,8 +74,11 @@ const posts = postsStore
 				viewHref={viewHref}
 				viewLabel="View"
 				editLabel="Edit"
+				deleteLabel="Delete"
 			/>
 			);
 		})}
 	</AdminPostList>
+
+	<ConfirmDeleteModal />
 </AdminAreaLayout>

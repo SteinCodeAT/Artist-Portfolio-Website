@@ -3,6 +3,8 @@
  * Saves via POST/PUT /api/update-events.
  */
 
+import { confirmDialog } from './confirm-dialog.ts';
+
 export type EventModalCategory = {
 	value: string;
 	label: string;
@@ -174,57 +176,10 @@ export function initEventFormModal(options: { onSaved?: () => void } = {}) {
 }
 
 export function confirmDeleteEvent(options?: { title?: string }): Promise<boolean> {
-	const dialog = document.getElementById('delete-event-modal') as HTMLDialogElement | null;
-	const messageEl = document.getElementById('delete-event-message');
-	const errorEl = document.getElementById('delete-event-error');
-	const confirmBtn = document.getElementById('delete-event-confirm');
-	const cancelBtn = document.getElementById('delete-event-cancel');
-	const closeBtn = document.getElementById('delete-event-close');
-  
-	if (!dialog || !confirmBtn || !cancelBtn) {
-	  return Promise.resolve(window.confirm('Diesen Termin wirklich löschen?'));
-	}
-  
-	if (messageEl) {
-	  messageEl.textContent = options?.title
+	const message = options?.title
 		? `„${options.title}" wirklich löschen?`
 		: 'Diesen Termin wirklich löschen?';
-	}
-	errorEl?.setAttribute('hidden', '');
-  
-	return new Promise((resolve) => {
-	  const cleanup = () => {
-		confirmBtn.removeEventListener('click', onConfirm);
-		cancelBtn.removeEventListener('click', onCancel);
-		closeBtn?.removeEventListener('click', onCancel);
-		dialog.removeEventListener('click', onBackdrop);
-		dialog.removeEventListener('close', onCancel);
-	  };
-  
-	  const onConfirm = () => {
-		cleanup();
-		dialog.close();
-		resolve(true);
-	  };
-  
-	  const onCancel = () => {
-		cleanup();
-		if (dialog.open) dialog.close();
-		resolve(false);
-	  };
-  
-	  const onBackdrop = (event: MouseEvent) => {
-		if (event.target === dialog) onCancel();
-	  };
-  
-	  confirmBtn.addEventListener('click', onConfirm);
-	  cancelBtn.addEventListener('click', onCancel);
-	  closeBtn?.addEventListener('click', onCancel);
-	  dialog.addEventListener('click', onBackdrop);
-	  dialog.addEventListener('close', onCancel);
-  
-	  dialog.showModal();
-	});
-  }
+	return confirmDialog(message, { title: 'Termin löschen', confirmLabel: 'Löschen' });
+}
 
 export {};

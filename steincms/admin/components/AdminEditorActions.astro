@@ -2,6 +2,7 @@
 import { Icon } from 'astro-icon/components';
 import type {
 	AdminEditorAction,
+	AdminEditorDeleteButton,
 	AdminEditorDraftBadge,
 	AdminEditorLiveLink,
 	AdminEditorPreview,
@@ -12,6 +13,13 @@ interface Props {
 	draftBadge?: AdminEditorDraftBadge | null;
 	preview?: AdminEditorPreview | null;
 	live?: AdminEditorLiveLink | null;
+	/**
+	 * A standalone, clearly-visible destructive action — separate from the
+	 * save dropdown on purpose, so it isn't buried inside a menu of otherwise
+	 * routine save actions. Wire its click (id="btn-delete-record") to
+	 * deleteEditorRecord() from steincms/admin/scripts/confirm-dialog.ts.
+	 */
+	deleteButton?: AdminEditorDeleteButton | null;
 	triggerLabel?: string;
 	actions?: AdminEditorAction[];
 }
@@ -21,6 +29,7 @@ const {
 	draftBadge = null,
 	preview = null,
 	live = null,
+	deleteButton = null,
 	triggerLabel = 'Speichern ▾',
 	actions = [],
 } = Astro.props;
@@ -67,6 +76,19 @@ const {
 				<Icon name="mdi:check-circle-outline" class="editor-action-icon" aria-hidden="true" />
 				{live.label}
 			</a>
+		)
+	}
+	{
+		deleteButton && (
+			<button
+				type="button"
+				class="btn-ghost btn-danger editor-action-btn"
+				id="btn-delete-record"
+				title={deleteButton.title}
+			>
+				<Icon name="mdi:trash-can-outline" class="editor-action-icon" aria-hidden="true" />
+				{deleteButton.label}
+			</button>
 		)
 	}
 	{
@@ -145,6 +167,16 @@ const {
 		width: 1.1em;
 		height: 1.1em;
 		flex-shrink: 0;
+	}
+
+	.btn-danger {
+		color: #b42318;
+		border-color: #fda29b;
+	}
+
+	.btn-danger:hover {
+		background: #fef3f2;
+		border-color: #b42318;
 	}
 
 	.save-dropdown {
